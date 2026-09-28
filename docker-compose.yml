@@ -1,0 +1,17 @@
+# signal-cli-rest-api for Signal.NET.
+# MODE must match Signal:Mode in appsettings.json:
+#   normal          -> Normal         (HTTP polling)
+#   native          -> Native         (HTTP polling)
+#   json-rpc        -> JsonRpc        (WebSocket, recommended)
+#   json-rpc-native -> JsonRpcNative  (WebSocket)
+services:
+  signal-cli-rest-api:
+    image: bbernhard/signal-cli-rest-api:latest
+    container_name: signal-cli-rest-api
+    restart: unless-stopped
+    environment:
+      - MODE=${SIGNAL_MODE:-json-rpc}
+    ports:
+      - "127.0.0.1:8080:8080"   # the REST API has no authentication; keep it off the network
+    volumes:
+      - ./signal-cli-config:/home/.local/share/signal-cli

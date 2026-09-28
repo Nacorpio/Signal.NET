@@ -1,0 +1,26 @@
+# Normalize to LF in the repository and working copy (matches .editorconfig on every OS).
+* text=auto eol=lf
+
+# Source and project files
+*.cs      text diff=csharp
+*.csproj  text
+*.props   text
+*.targets text
+*.slnx    text
+*.json    text
+*.yml     text
+*.yaml    text
+*.md      text diff=markdown
+*.editorconfig text
+
+# Shell scripts must keep LF, batch files CRLF
+*.sh  text eol=lf
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.snk binary

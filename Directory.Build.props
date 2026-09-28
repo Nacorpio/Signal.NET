@@ -1,0 +1,36 @@
+<Project>
+  <!-- Language and build settings for every project. -->
+  <PropertyGroup>
+    <TargetFramework>net11.0</TargetFramework>
+    <!-- C# 15 (unions, extension members) is still a preview language version. -->
+    <LangVersion>preview</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <!-- NuGet package metadata (applies to the packable src/ projects). -->
+  <PropertyGroup>
+    <Authors>Nacorpio</Authors>
+    <Product>Signal.NET</Product>
+    <Copyright>Copyright (c) 2026 Nacorpio</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>signal;signal-cli;signal-cli-rest-api;bot;messaging;ddd</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <VersionSuffix>preview</VersionSuffix>
+
+    <!-- Source Link: the repository URL is taken from the git remote at build time. -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <!-- Deterministic builds on CI (GitHub Actions sets GITHUB_ACTIONS=true). -->
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+</Project>

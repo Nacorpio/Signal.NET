@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Signal.Application</RootNamespace>
+    <Description>Application layer for Signal.NET: ports, message pipeline, domain event dispatching and the text command system.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Signal.Domain\Signal.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Signal.Application.Tests" />
+  </ItemGroup>
+</Project>

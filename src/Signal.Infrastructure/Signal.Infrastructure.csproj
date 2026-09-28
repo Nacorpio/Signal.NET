@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Signal.Infrastructure</RootNamespace>
+    <Description>signal-cli-rest-api adapters (REST, polling and WebSocket receivers) for Signal.NET.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Signal.Application\Signal.Application.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Signal.Infrastructure.Tests" />
+  </ItemGroup>
+</Project>

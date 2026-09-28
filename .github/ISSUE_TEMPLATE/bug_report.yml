@@ -1,0 +1,41 @@
+name: Bug report
+description: Something does not work as documented.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! **Do not include real phone numbers, group ids or message contents** — replace them with placeholders.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Include what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Minimal code and/or the message you sent to the bot.
+      render: csharp
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Container execution mode
+      options: [normal, native, json-rpc, json-rpc-native]
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Signal.NET version, signal-cli-rest-api version (from /v1/about), .NET SDK version
+      placeholder: "Signal.NET 0.1.0-preview, signal-cli-rest-api 0.100, .NET 11.0.100-preview.6"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      render: text

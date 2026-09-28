@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Signal.Domain</RootNamespace>
+    <Description>Domain model (value objects, entities, domain events) for Signal.NET.</Description>
+  </PropertyGroup>
+</Project>

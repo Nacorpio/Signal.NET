@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: signal-cli-rest-api issues
+    url: https://github.com/bbernhard/signal-cli-rest-api/issues
+    about: Problems with the container itself (registration, linking, sending) belong there.

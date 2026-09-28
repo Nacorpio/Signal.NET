@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Signal.Hosting</RootNamespace>
+    <Description>Generic host integration for Signal.NET (DI registration, background receiver, health checks).</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Signal.Infrastructure\Signal.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+  </ItemGroup>
+</Project>
