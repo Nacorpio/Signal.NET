@@ -312,6 +312,68 @@ public interface IAccountService
         throw new NotSupportedException($"{GetType().Name} does not support raw device link URIs.");
 }
 
+/// <summary>A sticker pack known to an account, from <see cref="IStickerService.ListAsync"/>.</summary>
+/// <param name="PackId">The hex pack id; use it with <c>OutgoingMessageBuilder.WithSticker</c>.</param>
+/// <param name="Title">The pack title, if known.</param>
+/// <param name="Author">The pack author, if known.</param>
+/// <param name="Installed">Whether the pack is installed; only stickers of installed packs can be sent.</param>
+/// <param name="Url">The pack's share URL, if reported.</param>
+public sealed record StickerPack(string PackId, string? Title, string? Author, bool Installed, string? Url);
+
+/// <summary>Lists and installs sticker packs (<c>/v1/sticker-packs/{number}</c>).</summary>
+public interface IStickerService
+{
+    /// <summary>Lists the account's sticker packs (<c>GET /v1/sticker-packs/{number}</c>).</summary>
+    /// <param name="account">The account.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The sticker packs.</returns>
+    Task<IReadOnlyList<StickerPack>> ListAsync(PhoneNumber account, CancellationToken cancellationToken = default);
+
+    /// <summary>Installs a sticker pack (<c>POST /v1/sticker-packs/{number}</c>).</summary>
+    /// <param name="account">The account.</param>
+    /// <param name="packId">The hex pack id.</param>
+    /// <param name="packKey">The hex pack key that decrypts the pack.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>A task that completes when the pack was installed.</returns>
+    /// <exception cref="ArgumentException"><paramref name="packId"/> or <paramref name="packKey"/> is empty.</exception>
+    Task InstallAsync(PhoneNumber account, string packId, string packKey, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Installs a sticker pack from its share link, <c>https://signal.art/addstickers/#pack_id=…&amp;pack_key=…</c>.
+    /// </summary>
+    /// <param name="account">The account.</param>
+    /// <param name="addStickersUrl">The share link.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>A task that completes when the pack was installed.</returns>
+    /// <exception cref="ArgumentException">The link has no <c>pack_id</c> or <c>pack_key</c>.</exception>
+    Task InstallAsync(PhoneNumber account, Uri addStickersUrl, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(addStickersUrl);
+
+        // The parameters are in the fragment (never sent to signal.art), formatted like a query string.
+        string? packId = null, packKey = null;
+        foreach (var pair in addStickersUrl.Fragment.TrimStart('#').Split('&', StringSplitOptions.RemoveEmptyEntries))
+        {
+            switch (pair.Split('=', 2))
+            {
+                case ["pack_id", var value]:
+                    packId = Uri.UnescapeDataString(value);
+                    break;
+                case ["pack_key", var value]:
+                    packKey = Uri.UnescapeDataString(value);
+                    break;
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(packId) || string.IsNullOrWhiteSpace(packKey))
+        {
+            throw new ArgumentException("The link must contain pack_id and pack_key.", nameof(addStickersUrl));
+        }
+
+        return InstallAsync(account, packId, packKey, cancellationToken);
+    }
+}
+
 /// <summary>A device linked to an account, from <see cref="IDeviceService.ListAsync"/>.</summary>
 /// <param name="Id">The device id; the primary device is <c>1</c>.</param>
 /// <param name="Name">The device name, if set.</param>

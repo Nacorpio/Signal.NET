@@ -207,16 +207,29 @@ var message = OutgoingMessage.To(recipientA, recipientB)
 | `WithText` / `WithStyledText` | Sets the text. Styled mode enables `**bold**`, `*italic*`, `~strike~`, `` `mono` `` and `\|\|spoiler\|\|`. |
 | `WithAttachment(bytes, contentType, fileName?)` | Encodes the content as `data:<mime>;filename=<name>;base64,<data>` |
 | `WithBase64Attachment(string)` | Adds content that is already base64 or a data URI |
-
-Outgoing attachments can't be streamed: `POST /v2/send` expects them as base64 inside the JSON body, so the
-whole file is encoded in memory. Downloads, in contrast, can stream (`IAttachmentService.OpenReadAsync`).
 | `WithMention(author, start, length)` | Mentions a user at the given position in the text |
 | `Quoting(timestamp, author, text?)` | Replies to (quotes) a message |
 | `Editing(timestamp)` | Turns the send into an edit of a message sent earlier |
 | `AsViewOnce()`, `NotifySelf()` | Signal send flags |
+| `WithSticker(Sticker)` / `WithSticker(packId, stickerId)` | Sends a sticker from a pack installed on the account (see `IStickerService`). A sticker is valid content on its own. |
+| `WithLinkPreview(url, title?, description?, base64Thumbnail?)` | Attaches a preview card for a link in the text. Only absolute `http`/`https` URLs are accepted. |
 
-`Build()` throws `SignalDomainException` if the message has no recipient, has neither text nor an
-attachment, or has a mention that extends past the end of the text.
+Outgoing attachments can't be streamed: `POST /v2/send` expects them as base64 inside the JSON body, so the
+whole file is encoded in memory. Downloads, in contrast, can stream (`IAttachmentService.OpenReadAsync`).
+
+`Build()` throws `SignalDomainException` if the message:
+
+- has no recipient;
+- has no text, attachment or sticker;
+- has a mention that extends past the end of the text;
+- combines a sticker with attachments;
+- has a link preview whose URL isn't in the text. Signal clients would silently drop such a preview, so it fails early instead.
+
+### `Sticker`
+
+**Purpose:** a reference to a sticker, written as `packId:stickerId`. `PackId` is hex and normalized to lower
+case. `Sticker` implements `IParsable<Sticker>`, so a command parameter of type `Sticker` binds directly from
+an argument like `f3a9…:4`.
 
 ### Small value records
 
@@ -226,6 +239,7 @@ attachment, or has a mention that extends past the end of the text.
 | `Mention(Author, Start, Length, Name)` | A mention inside a text. `Author` is a phone number or UUID. |
 | `Quote(Timestamp, Author, Text)` | A quoted message |
 | `Reaction(Emoji, TargetAuthor, TargetTimestamp, IsRemove)` | An emoji reaction, or its removal |
+| `LinkPreview(Url, Title, Description, Base64Thumbnail)` | A link preview card of an outgoing message |
 | `TextMode` | `Normal` or `Styled` |
 
 ---

@@ -28,6 +28,8 @@ namespace Signal.Infrastructure.Http;
 [JsonSerializable(typeof(UpdateAccountSettingsRequestDto))]
 [JsonSerializable(typeof(SetPinRequestDto))]
 [JsonSerializable(typeof(RateLimitChallengeRequestDto))]
+[JsonSerializable(typeof(List<StickerPackDto>))]
+[JsonSerializable(typeof(AddStickerPackRequestDto))]
 [JsonSerializable(typeof(DeviceLinkUriResponseDto))]
 [JsonSerializable(typeof(List<DeviceDto>))]
 [JsonSerializable(typeof(AddDeviceRequestDto))]

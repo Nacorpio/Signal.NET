@@ -37,6 +37,10 @@ internal sealed class RestMessageSender(SignalApiClient api) : IMessageSender
             EditTimestamp = message.EditTimestamp,
             ViewOnce = message.ViewOnce ? true : null,
             NotifySelf = message.NotifySelf,
+            Sticker = message.Sticker?.ToString(),
+            LinkPreview = message.LinkPreview is { } preview
+                ? new LinkPreviewDto { Url = preview.Url, Title = preview.Title, Description = preview.Description, Base64Thumbnail = preview.Base64Thumbnail }
+                : null,
         };
 
         var response = await api.SendAsync(HttpMethod.Post, "v2/send", request,
@@ -242,6 +246,29 @@ internal sealed class RestAccountService(SignalApiClient api) : IAccountService
 
     private static string AccountPath(PhoneNumber account, string resource) =>
         $"v1/accounts/{SignalApiClient.Escape(account.Value)}/{resource}";
+}
+
+/// <summary>Implements <see cref="IStickerService"/> with <c>GET</c>/<c>POST /v1/sticker-packs/{number}</c>.</summary>
+internal sealed class RestStickerService(SignalApiClient api) : IStickerService
+{
+    public async Task<IReadOnlyList<StickerPack>> ListAsync(PhoneNumber account, CancellationToken cancellationToken = default)
+    {
+        var packs = await api.GetAsync(PacksPath(account), SignalRestJsonContext.Default.ListStickerPackDto, cancellationToken);
+        return [.. packs
+            .Where(p => !string.IsNullOrWhiteSpace(p.PackId))
+            .Select(p => new StickerPack(p.PackId!.ToLowerInvariant(), p.Title, p.Author, p.Installed, string.IsNullOrWhiteSpace(p.Url) ? null : p.Url))];
+    }
+
+    public Task InstallAsync(PhoneNumber account, string packId, string packKey, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(packId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(packKey);
+        return api.SendAsync(HttpMethod.Post, PacksPath(account),
+            new AddStickerPackRequestDto { PackId = packId.Trim(), PackKey = packKey.Trim() },
+            SignalRestJsonContext.Default.AddStickerPackRequestDto, cancellationToken);
+    }
+
+    private static string PacksPath(PhoneNumber account) => $"v1/sticker-packs/{SignalApiClient.Escape(account.Value)}";
 }
 
 /// <summary>Implements <see cref="IDeviceService"/> with the <c>/v1/devices/{number}</c> endpoints.</summary>

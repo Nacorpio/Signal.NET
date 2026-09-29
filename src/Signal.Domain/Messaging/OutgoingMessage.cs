@@ -29,6 +29,8 @@ public sealed class OutgoingMessage
         EditTimestamp = builder.EditTimestampValue;
         ViewOnce = builder.ViewOnceValue;
         NotifySelf = builder.NotifySelfValue;
+        Sticker = builder.StickerValue;
+        LinkPreview = builder.LinkPreviewValue;
     }
 
     /// <summary>The recipients (at least one, without duplicates).</summary>
@@ -58,6 +60,12 @@ public sealed class OutgoingMessage
     /// <summary>Whether the sending account's other devices should notify; <see langword="null"/> uses the API default.</summary>
     public bool? NotifySelf { get; }
 
+    /// <summary>The sticker to send, if any. Never combined with <see cref="Attachments"/>.</summary>
+    public Sticker? Sticker { get; }
+
+    /// <summary>The link preview for a URL in <see cref="Text"/>, if any.</summary>
+    public LinkPreview? LinkPreview { get; }
+
     /// <summary>Starts building a message without recipients.</summary>
     /// <returns>A new builder.</returns>
     public static OutgoingMessageBuilder Create() => new();
@@ -80,6 +88,8 @@ public sealed class OutgoingMessageBuilder
     internal long? EditTimestampValue { get; private set; }
     internal bool ViewOnceValue { get; private set; }
     internal bool? NotifySelfValue { get; private set; }
+    internal Sticker? StickerValue { get; private set; }
+    internal LinkPreview? LinkPreviewValue { get; private set; }
 
     /// <summary>Adds recipients. Duplicates are ignored. Phone numbers, account ids, usernames and group ids convert implicitly.</summary>
     /// <param name="recipients">The recipients to add.</param>
@@ -204,10 +214,56 @@ public sealed class OutgoingMessageBuilder
         return this;
     }
 
+    /// <summary>Sends a sticker from a sticker pack installed on the account (see <c>IStickerService</c>).</summary>
+    /// <param name="sticker">The sticker, e.g. <c>Sticker.Parse("f3a9…:4")</c>.</param>
+    /// <returns>This builder.</returns>
+    public OutgoingMessageBuilder WithSticker(Sticker sticker)
+    {
+        StickerValue = sticker.PackId is null ? throw new ArgumentException("A default (empty) sticker cannot be sent.", nameof(sticker)) : sticker;
+        return this;
+    }
+
+    /// <summary>Sends a sticker from a sticker pack installed on the account.</summary>
+    /// <param name="packId">The hex id of the sticker pack.</param>
+    /// <param name="stickerId">The index of the sticker within the pack.</param>
+    /// <returns>This builder.</returns>
+    /// <exception cref="SignalDomainException"><paramref name="packId"/> is not hex, or <paramref name="stickerId"/> is negative.</exception>
+    public OutgoingMessageBuilder WithSticker(string packId, int stickerId) => WithSticker(new Sticker(packId, stickerId));
+
+    /// <summary>
+    /// Attaches a link preview card. The URL must also appear in the message text, because Signal clients ignore
+    /// previews of links that aren't in the text.
+    /// </summary>
+    /// <param name="preview">The preview.</param>
+    /// <returns>This builder.</returns>
+    /// <exception cref="SignalDomainException">The URL is not an absolute <c>http</c> or <c>https</c> URL.</exception>
+    public OutgoingMessageBuilder WithLinkPreview(LinkPreview preview)
+    {
+        ArgumentNullException.ThrowIfNull(preview);
+        if (!Uri.TryCreate(preview.Url, UriKind.Absolute, out var uri) || (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+        {
+            throw new SignalDomainException($"'{preview.Url}' is not an absolute http or https URL.");
+        }
+
+        LinkPreviewValue = preview;
+        return this;
+    }
+
+    /// <summary>Attaches a link preview card for a URL contained in the message text.</summary>
+    /// <param name="url">The previewed URL; must appear in the text.</param>
+    /// <param name="title">The card title.</param>
+    /// <param name="description">The card description.</param>
+    /// <param name="base64Thumbnail">The thumbnail image as base64 or data URI.</param>
+    /// <returns>This builder.</returns>
+    /// <exception cref="SignalDomainException"><paramref name="url"/> is not an absolute <c>http</c> or <c>https</c> URL.</exception>
+    public OutgoingMessageBuilder WithLinkPreview(string url, string? title = null, string? description = null, string? base64Thumbnail = null) =>
+        WithLinkPreview(new LinkPreview(url, title, description, base64Thumbnail));
+
     /// <summary>Validates the state and creates the immutable message.</summary>
     /// <returns>The message.</returns>
     /// <exception cref="SignalDomainException">
-    /// There is no recipient, neither text nor an attachment, or a mention exceeds the text.
+    /// There is no recipient; there is neither text, an attachment nor a sticker; a mention exceeds the text; a sticker
+    /// is combined with attachments; or the link preview's URL is not in the text.
     /// </exception>
     public OutgoingMessage Build()
     {
@@ -216,14 +272,24 @@ public sealed class OutgoingMessageBuilder
             throw new SignalDomainException("A message needs at least one recipient.");
         }
 
-        if (string.IsNullOrEmpty(TextValue) && AttachmentList.Count == 0)
+        if (string.IsNullOrEmpty(TextValue) && AttachmentList.Count == 0 && StickerValue is null)
         {
-            throw new SignalDomainException("A message needs a text or at least one attachment.");
+            throw new SignalDomainException("A message needs a text, an attachment or a sticker.");
         }
 
         if (MentionList.Any(m => m.Start + m.Length > (TextValue?.Length ?? 0)))
         {
             throw new SignalDomainException("A mention exceeds the message text.");
+        }
+
+        if (StickerValue is not null && AttachmentList.Count > 0)
+        {
+            throw new SignalDomainException("A sticker cannot be combined with attachments.");
+        }
+
+        if (LinkPreviewValue is not null && TextValue?.Contains(LinkPreviewValue.Url, StringComparison.Ordinal) != true)
+        {
+            throw new SignalDomainException("The link preview's URL must appear in the message text.");
         }
 
         return new OutgoingMessage(this);
