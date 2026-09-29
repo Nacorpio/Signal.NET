@@ -98,6 +98,21 @@ internal sealed class SignalApiClient(HttpClient http)
             ?? throw new SignalApiException(response.StatusCode, "Empty response body.", path);
     }
 
+    /// <summary>
+    /// Sends a JSON body and deserializes the response if it has one. For endpoints that answer either with a
+    /// body (e.g. 201) or without one (204).
+    /// </summary>
+    /// <returns>The deserialized body, or <see langword="default"/> for an empty response.</returns>
+    /// <exception cref="SignalApiException">Non-success status code.</exception>
+    public async Task<TResult?> SendForOptionalResultAsync<TBody, TResult>(
+        HttpMethod method, string path, TBody body, JsonTypeInfo<TBody> bodyType, JsonTypeInfo<TResult> resultType, CancellationToken cancellationToken)
+        where TResult : class
+    {
+        using var response = await SendCoreAsync(method, path, body, bodyType, cancellationToken);
+        var content = await response.Content.ReadAsStringAsync(cancellationToken);
+        return string.IsNullOrWhiteSpace(content) ? null : JsonSerializer.Deserialize(content, resultType);
+    }
+
     /// <summary>Sends a JSON body; returns the (successful) response, which the caller must dispose.</summary>
     private async Task<HttpResponseMessage> SendCoreAsync<TBody>(
         HttpMethod method, string path, TBody body, JsonTypeInfo<TBody> bodyType, CancellationToken cancellationToken)

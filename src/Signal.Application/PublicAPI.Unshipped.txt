@@ -1,7 +1,28 @@
 #nullable enable
+override Signal.Application.Abstractions.AccountSettings.Equals(object? obj) -> bool
+override Signal.Application.Abstractions.AccountSettings.GetHashCode() -> int
+override Signal.Application.Abstractions.AccountSettings.ToString() -> string!
 override Signal.Application.Abstractions.RegistrationOptions.Equals(object? obj) -> bool
 override Signal.Application.Abstractions.RegistrationOptions.GetHashCode() -> int
 override Signal.Application.Abstractions.RegistrationOptions.ToString() -> string!
+override Signal.Application.Abstractions.UsernameAssignment.Equals(object? obj) -> bool
+override Signal.Application.Abstractions.UsernameAssignment.GetHashCode() -> int
+override Signal.Application.Abstractions.UsernameAssignment.ToString() -> string!
+Signal.Application.Abstractions.AccountSettings
+Signal.Application.Abstractions.AccountSettings.<Clone>$() -> Signal.Application.Abstractions.AccountSettings!
+Signal.Application.Abstractions.AccountSettings.AccountSettings(bool? DiscoverableByNumber = null, bool? ShareNumber = null) -> void
+Signal.Application.Abstractions.AccountSettings.Deconstruct(out bool? DiscoverableByNumber, out bool? ShareNumber) -> void
+Signal.Application.Abstractions.AccountSettings.DiscoverableByNumber.get -> bool?
+Signal.Application.Abstractions.AccountSettings.DiscoverableByNumber.init -> void
+Signal.Application.Abstractions.AccountSettings.Equals(Signal.Application.Abstractions.AccountSettings? other) -> bool
+Signal.Application.Abstractions.AccountSettings.ShareNumber.get -> bool?
+Signal.Application.Abstractions.AccountSettings.ShareNumber.init -> void
+Signal.Application.Abstractions.IAccountService.DeleteUsernameAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IAccountService.RemovePinAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IAccountService.SetPinAsync(Signal.Domain.ValueObjects.PhoneNumber account, string! pin, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IAccountService.SetUsernameAsync(Signal.Domain.ValueObjects.PhoneNumber account, string! nickname, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.UsernameAssignment?>!
+Signal.Application.Abstractions.IAccountService.SubmitRateLimitChallengeAsync(Signal.Domain.ValueObjects.PhoneNumber account, string! challengeToken, string! captcha, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IAccountService.UpdateSettingsAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Application.Abstractions.AccountSettings! settings, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Signal.Application.Abstractions.IRegistrationService
 Signal.Application.Abstractions.IRegistrationService.RegisterAsync(Signal.Domain.ValueObjects.PhoneNumber number, Signal.Application.Abstractions.RegistrationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Signal.Application.Abstractions.IRegistrationService.UnregisterAsync(Signal.Domain.ValueObjects.PhoneNumber number, bool deleteAccount = false, bool deleteLocalData = false, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
@@ -15,6 +36,17 @@ Signal.Application.Abstractions.RegistrationOptions.Equals(Signal.Application.Ab
 Signal.Application.Abstractions.RegistrationOptions.RegistrationOptions(bool UseVoice = false, string? Captcha = null) -> void
 Signal.Application.Abstractions.RegistrationOptions.UseVoice.get -> bool
 Signal.Application.Abstractions.RegistrationOptions.UseVoice.init -> void
+Signal.Application.Abstractions.UsernameAssignment
+Signal.Application.Abstractions.UsernameAssignment.<Clone>$() -> Signal.Application.Abstractions.UsernameAssignment!
+Signal.Application.Abstractions.UsernameAssignment.Deconstruct(out Signal.Domain.ValueObjects.Username Username, out string? Link) -> void
+Signal.Application.Abstractions.UsernameAssignment.Equals(Signal.Application.Abstractions.UsernameAssignment? other) -> bool
+Signal.Application.Abstractions.UsernameAssignment.Link.get -> string?
+Signal.Application.Abstractions.UsernameAssignment.Link.init -> void
+Signal.Application.Abstractions.UsernameAssignment.Username.get -> Signal.Domain.ValueObjects.Username
+Signal.Application.Abstractions.UsernameAssignment.Username.init -> void
+Signal.Application.Abstractions.UsernameAssignment.UsernameAssignment(Signal.Domain.ValueObjects.Username Username, string? Link) -> void
+static Signal.Application.Abstractions.AccountSettings.operator !=(Signal.Application.Abstractions.AccountSettings? left, Signal.Application.Abstractions.AccountSettings? right) -> bool
+static Signal.Application.Abstractions.AccountSettings.operator ==(Signal.Application.Abstractions.AccountSettings? left, Signal.Application.Abstractions.AccountSettings? right) -> bool
 static Signal.Application.Abstractions.RegistrationOptions.operator !=(Signal.Application.Abstractions.RegistrationOptions? left, Signal.Application.Abstractions.RegistrationOptions? right) -> bool
 static Signal.Application.Abstractions.RegistrationOptions.operator ==(Signal.Application.Abstractions.RegistrationOptions? left, Signal.Application.Abstractions.RegistrationOptions? right) -> bool
 Signal.Application.Abstractions.IMessageSender.RemoteDeleteAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient recipient, long targetTimestamp, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
@@ -37,3 +69,5 @@ Signal.Application.Abstractions.AttachmentDownload.Length.init -> void
 Signal.Application.Abstractions.IAttachmentService.OpenReadAsync(string! attachmentId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.AttachmentDownload!>!
 static Signal.Application.Abstractions.AttachmentDownload.operator !=(Signal.Application.Abstractions.AttachmentDownload? left, Signal.Application.Abstractions.AttachmentDownload? right) -> bool
 static Signal.Application.Abstractions.AttachmentDownload.operator ==(Signal.Application.Abstractions.AttachmentDownload? left, Signal.Application.Abstractions.AttachmentDownload? right) -> bool
+static Signal.Application.Abstractions.UsernameAssignment.operator !=(Signal.Application.Abstractions.UsernameAssignment? left, Signal.Application.Abstractions.UsernameAssignment? right) -> bool
+static Signal.Application.Abstractions.UsernameAssignment.operator ==(Signal.Application.Abstractions.UsernameAssignment? left, Signal.Application.Abstractions.UsernameAssignment? right) -> bool
