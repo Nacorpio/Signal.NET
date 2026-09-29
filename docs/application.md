@@ -38,7 +38,7 @@ implementations. You can replace any port, for example with a fake in tests or a
 | `IGroupService` | List, get, create, update, members, admins, quit, delete | `/v1/groups/{number}[/{groupid}[/members\|/admins\|/quit]]` |
 | `IAccountService` | List accounts; QR code for device linking | `GET /v1/accounts`, `GET /v1/qrcodelink` |
 | `IContactService` | List and update contacts | `GET`/`PUT /v1/contacts/{number}` |
-| `IAttachmentService` | List, download and delete stored attachments | `/v1/attachments[/{id}]` |
+| `IAttachmentService` | List, download (`DownloadAsync` into memory, or `OpenReadAsync` as a stream) and delete stored attachments | `/v1/attachments[/{id}]` |
 | `IProfileService` | Update name, about and avatar | `PUT /v1/profiles/{number}` |
 | `IIdentityService` | List identities; trust keys / safety numbers | `/v1/identities/{number}[/trust/{n}]` |
 | `ISystemService` | Version, mode and capabilities; health | `GET /v1/about`, `GET /v1/health` |
@@ -47,6 +47,7 @@ Supporting types:
 
 - **`SendResult(Timestamp)`**: the timestamp of a sent message. Keep it to edit the message, react to it or quote it later.
 - **`SignalApiInfo`**: the result of `/v1/about`. `Mode` parses the container mode into an `ExecutionMode`.
+- **`AttachmentDownload(Content, ContentType, Length)`**: the result of `IAttachmentService.OpenReadAsync`. `Content` reads directly from the HTTP response, so large attachments never have to fit in memory. Dispose it (`await using`) to release the connection. `OpenReadAsync` has a default interface implementation that buffers through `DownloadAsync`, so custom `IAttachmentService` implementations written before it existed keep working.
 - **`ProfileUpdate(Name, About, Base64Avatar)`**: the values passed to `IProfileService.UpdateAsync`.
 
 ### `ISignalClient`

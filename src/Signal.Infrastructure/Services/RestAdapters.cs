@@ -211,6 +211,9 @@ internal sealed class RestAttachmentService(SignalApiClient api) : IAttachmentSe
     public Task<byte[]> DownloadAsync(string attachmentId, CancellationToken cancellationToken = default) =>
         api.GetBytesAsync($"v1/attachments/{SignalApiClient.Escape(attachmentId)}", cancellationToken);
 
+    public Task<AttachmentDownload> OpenReadAsync(string attachmentId, CancellationToken cancellationToken = default) =>
+        api.GetStreamAsync($"v1/attachments/{SignalApiClient.Escape(attachmentId)}", cancellationToken);
+
     public Task DeleteAsync(string attachmentId, CancellationToken cancellationToken = default) =>
         api.SendAsync(HttpMethod.Delete, $"v1/attachments/{SignalApiClient.Escape(attachmentId)}", cancellationToken);
 }

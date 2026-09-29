@@ -75,7 +75,7 @@ Item 0.2.8 exists so that can't happen again.
 | 0.3.9 | **Contact sync and blocking** | A/I | S | Sync contacts to linked devices; block and unblock |
 | 0.3.10 | **Number search** | A/I | S | Check which numbers are registered with Signal |
 | 0.3.11 | **Rate-limit challenge** | A/I | S | Submit captcha challenges when Signal throttles the account |
-| 0.3.12 | **Streaming attachments** | A/I | S | `Stream`-based download and upload instead of `byte[]`, for large files |
+| 0.3.12 | **Streaming attachments** | A/I | S | ✅ `IAttachmentService.OpenReadAsync` streams downloads (added without breaking existing implementations). Uploads can't stream: `/v2/send` needs base64 in JSON. |
 | 0.3.13 | **Typed capabilities** | A | S | Check `SignalApiInfo.Capabilities` before using optional features, with clear errors |
 
 ## Milestone 0.4: Richer incoming model
