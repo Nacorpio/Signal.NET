@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **Release workflow:** waits until every package is listed on nuget.org before creating the GitHub Release (roadmap 0.2.8).
+- **Package validation:** compares against the published `0.2.0-preview.2` baseline, so breaking API changes fail `dotnet pack`.
+
 ## [0.2.0-preview.2] - 2026-09-29
 
 First release on nuget.org, under the new `Nacorpio.Signal.*` package IDs.
