@@ -45,6 +45,37 @@ internal sealed class SendMessageRequestDto
     public long? EditTimestamp { get; set; }
     public bool? ViewOnce { get; set; }
     public bool? NotifySelf { get; set; }
+
+    /// <summary><c>packId:stickerId</c>.</summary>
+    public string? Sticker { get; set; }
+
+    public LinkPreviewDto? LinkPreview { get; set; }
+}
+
+/// <summary>A link preview inside a send request.</summary>
+internal sealed class LinkPreviewDto
+{
+    public required string Url { get; set; }
+    public string? Title { get; set; }
+    public string? Description { get; set; }
+    public string? Base64Thumbnail { get; set; }
+}
+
+/// <summary>A sticker pack as returned by <c>GET /v1/sticker-packs/{number}</c>.</summary>
+internal sealed class StickerPackDto
+{
+    public string? PackId { get; set; }
+    public string? Url { get; set; }
+    public bool Installed { get; set; }
+    public string? Title { get; set; }
+    public string? Author { get; set; }
+}
+
+/// <summary>Body of <c>POST /v1/sticker-packs/{number}</c>.</summary>
+internal sealed class AddStickerPackRequestDto
+{
+    public required string PackId { get; set; }
+    public required string PackKey { get; set; }
 }
 
 /// <summary>A mention inside a send request.</summary>

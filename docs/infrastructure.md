@@ -92,6 +92,7 @@ the response back.
 | `RestGroupService` | `IGroupService` | `GetAsync` returns `null` for 404 or 400 (unknown group) |
 | `RestAccountService` | `IAccountService` | Invalid numbers in the list are skipped. `SetUsernameAsync` accepts both documented answers: 201 with `{username, username_link}`, or 204 without a body (via `SendForOptionalResultAsync`). |
 | `RestRegistrationService` | `IRegistrationService` | All POSTs, so never retried (a retry would request a second code). Removes separators from verification codes (`123-456` → `123456`). |
+| `RestStickerService` | `IStickerService` | Skips packs without an id; pack ids are lower-cased so they match `Sticker.PackId` |
 | `RestDeviceService` | `IDeviceService` | Timestamps of `0` (unknown) become `null`. `RemoveAsync` rejects the primary device (id 1) before calling the API. |
 | `RestContactService` | `IContactService` | The contact id is its UUID, falling back to the number |
 | `RestAttachmentService` | `IAttachmentService` | `DownloadAsync` returns the raw bytes; `OpenReadAsync` streams them via `GetStreamAsync` |

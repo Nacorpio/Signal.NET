@@ -1,1 +1,38 @@
 #nullable enable
+override Signal.Domain.Messaging.LinkPreview.Equals(object? obj) -> bool
+override Signal.Domain.Messaging.LinkPreview.GetHashCode() -> int
+override Signal.Domain.Messaging.LinkPreview.ToString() -> string!
+override Signal.Domain.Messaging.Sticker.GetHashCode() -> int
+override Signal.Domain.Messaging.Sticker.ToString() -> string!
+Signal.Domain.Messaging.LinkPreview
+Signal.Domain.Messaging.LinkPreview.<Clone>$() -> Signal.Domain.Messaging.LinkPreview!
+Signal.Domain.Messaging.LinkPreview.Base64Thumbnail.get -> string?
+Signal.Domain.Messaging.LinkPreview.Base64Thumbnail.init -> void
+Signal.Domain.Messaging.LinkPreview.Deconstruct(out string! Url, out string? Title, out string? Description, out string? Base64Thumbnail) -> void
+Signal.Domain.Messaging.LinkPreview.Description.get -> string?
+Signal.Domain.Messaging.LinkPreview.Description.init -> void
+Signal.Domain.Messaging.LinkPreview.Equals(Signal.Domain.Messaging.LinkPreview? other) -> bool
+Signal.Domain.Messaging.LinkPreview.LinkPreview(string! Url, string? Title = null, string? Description = null, string? Base64Thumbnail = null) -> void
+Signal.Domain.Messaging.LinkPreview.Title.get -> string?
+Signal.Domain.Messaging.LinkPreview.Title.init -> void
+Signal.Domain.Messaging.LinkPreview.Url.get -> string!
+Signal.Domain.Messaging.LinkPreview.Url.init -> void
+Signal.Domain.Messaging.OutgoingMessage.LinkPreview.get -> Signal.Domain.Messaging.LinkPreview?
+Signal.Domain.Messaging.OutgoingMessage.Sticker.get -> Signal.Domain.Messaging.Sticker?
+Signal.Domain.Messaging.OutgoingMessageBuilder.WithLinkPreview(Signal.Domain.Messaging.LinkPreview! preview) -> Signal.Domain.Messaging.OutgoingMessageBuilder!
+Signal.Domain.Messaging.OutgoingMessageBuilder.WithLinkPreview(string! url, string? title = null, string? description = null, string? base64Thumbnail = null) -> Signal.Domain.Messaging.OutgoingMessageBuilder!
+Signal.Domain.Messaging.OutgoingMessageBuilder.WithSticker(Signal.Domain.Messaging.Sticker sticker) -> Signal.Domain.Messaging.OutgoingMessageBuilder!
+Signal.Domain.Messaging.OutgoingMessageBuilder.WithSticker(string! packId, int stickerId) -> Signal.Domain.Messaging.OutgoingMessageBuilder!
+Signal.Domain.Messaging.Sticker
+Signal.Domain.Messaging.Sticker.Equals(Signal.Domain.Messaging.Sticker other) -> bool
+Signal.Domain.Messaging.Sticker.PackId.get -> string!
+Signal.Domain.Messaging.Sticker.Sticker() -> void
+Signal.Domain.Messaging.Sticker.Sticker(string! packId, int stickerId) -> void
+Signal.Domain.Messaging.Sticker.StickerId.get -> int
+static Signal.Domain.Messaging.LinkPreview.operator !=(Signal.Domain.Messaging.LinkPreview? left, Signal.Domain.Messaging.LinkPreview? right) -> bool
+static Signal.Domain.Messaging.LinkPreview.operator ==(Signal.Domain.Messaging.LinkPreview? left, Signal.Domain.Messaging.LinkPreview? right) -> bool
+static Signal.Domain.Messaging.Sticker.operator !=(Signal.Domain.Messaging.Sticker left, Signal.Domain.Messaging.Sticker right) -> bool
+static Signal.Domain.Messaging.Sticker.operator ==(Signal.Domain.Messaging.Sticker left, Signal.Domain.Messaging.Sticker right) -> bool
+static Signal.Domain.Messaging.Sticker.Parse(string! value) -> Signal.Domain.Messaging.Sticker
+static Signal.Domain.Messaging.Sticker.TryParse(string? value, out Signal.Domain.Messaging.Sticker sticker) -> bool
+~override Signal.Domain.Messaging.Sticker.Equals(object obj) -> bool

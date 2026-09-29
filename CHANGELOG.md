@@ -8,6 +8,10 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Stickers and link previews (roadmap 0.3.6, 0.3.7):**
+  - `OutgoingMessageBuilder.WithSticker` sends a sticker. The new `Sticker` value object parses `packId:stickerId` and binds as a command argument.
+  - The new `IStickerService` lists and installs sticker packs, by id and key or from a `signal.art` share link.
+  - `OutgoingMessageBuilder.WithLinkPreview` attaches a preview card. `Build()` rejects previews whose URL isn't in the text, and stickers combined with attachments.
 - **Device management (roadmap 0.3.2):**
   - The new `IDeviceService` lists (`LinkedDevice`), links and removes the devices of an account registered in the container.
   - `IAccountService.GetLinkUriAsync` returns the raw `sgnl://linkdevice` URI, so you can render your own QR code. It's a default interface member.

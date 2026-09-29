@@ -9,6 +9,9 @@ override Signal.Application.Abstractions.LinkedDevice.ToString() -> string!
 override Signal.Application.Abstractions.RegistrationOptions.Equals(object? obj) -> bool
 override Signal.Application.Abstractions.RegistrationOptions.GetHashCode() -> int
 override Signal.Application.Abstractions.RegistrationOptions.ToString() -> string!
+override Signal.Application.Abstractions.StickerPack.Equals(object? obj) -> bool
+override Signal.Application.Abstractions.StickerPack.GetHashCode() -> int
+override Signal.Application.Abstractions.StickerPack.ToString() -> string!
 override Signal.Application.Abstractions.UsernameAssignment.Equals(object? obj) -> bool
 override Signal.Application.Abstractions.UsernameAssignment.GetHashCode() -> int
 override Signal.Application.Abstractions.UsernameAssignment.ToString() -> string!
@@ -36,6 +39,10 @@ Signal.Application.Abstractions.IRegistrationService
 Signal.Application.Abstractions.IRegistrationService.RegisterAsync(Signal.Domain.ValueObjects.PhoneNumber number, Signal.Application.Abstractions.RegistrationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Signal.Application.Abstractions.IRegistrationService.UnregisterAsync(Signal.Domain.ValueObjects.PhoneNumber number, bool deleteAccount = false, bool deleteLocalData = false, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Signal.Application.Abstractions.IRegistrationService.VerifyAsync(Signal.Domain.ValueObjects.PhoneNumber number, string! verificationCode, string? pin = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IStickerService
+Signal.Application.Abstractions.IStickerService.InstallAsync(Signal.Domain.ValueObjects.PhoneNumber account, string! packId, string! packKey, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IStickerService.InstallAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Uri! addStickersUrl, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IStickerService.ListAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Signal.Application.Abstractions.StickerPack!>!>!
 Signal.Application.Abstractions.LinkedDevice
 Signal.Application.Abstractions.LinkedDevice.<Clone>$() -> Signal.Application.Abstractions.LinkedDevice!
 Signal.Application.Abstractions.LinkedDevice.Created.get -> System.DateTimeOffset?
@@ -59,6 +66,21 @@ Signal.Application.Abstractions.RegistrationOptions.Equals(Signal.Application.Ab
 Signal.Application.Abstractions.RegistrationOptions.RegistrationOptions(bool UseVoice = false, string? Captcha = null) -> void
 Signal.Application.Abstractions.RegistrationOptions.UseVoice.get -> bool
 Signal.Application.Abstractions.RegistrationOptions.UseVoice.init -> void
+Signal.Application.Abstractions.StickerPack
+Signal.Application.Abstractions.StickerPack.<Clone>$() -> Signal.Application.Abstractions.StickerPack!
+Signal.Application.Abstractions.StickerPack.Author.get -> string?
+Signal.Application.Abstractions.StickerPack.Author.init -> void
+Signal.Application.Abstractions.StickerPack.Deconstruct(out string! PackId, out string? Title, out string? Author, out bool Installed, out string? Url) -> void
+Signal.Application.Abstractions.StickerPack.Equals(Signal.Application.Abstractions.StickerPack? other) -> bool
+Signal.Application.Abstractions.StickerPack.Installed.get -> bool
+Signal.Application.Abstractions.StickerPack.Installed.init -> void
+Signal.Application.Abstractions.StickerPack.PackId.get -> string!
+Signal.Application.Abstractions.StickerPack.PackId.init -> void
+Signal.Application.Abstractions.StickerPack.StickerPack(string! PackId, string? Title, string? Author, bool Installed, string? Url) -> void
+Signal.Application.Abstractions.StickerPack.Title.get -> string?
+Signal.Application.Abstractions.StickerPack.Title.init -> void
+Signal.Application.Abstractions.StickerPack.Url.get -> string?
+Signal.Application.Abstractions.StickerPack.Url.init -> void
 Signal.Application.Abstractions.UsernameAssignment
 Signal.Application.Abstractions.UsernameAssignment.<Clone>$() -> Signal.Application.Abstractions.UsernameAssignment!
 Signal.Application.Abstractions.UsernameAssignment.Deconstruct(out Signal.Domain.ValueObjects.Username Username, out string? Link) -> void
@@ -94,5 +116,7 @@ Signal.Application.Abstractions.AttachmentDownload.Length.init -> void
 Signal.Application.Abstractions.IAttachmentService.OpenReadAsync(string! attachmentId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.AttachmentDownload!>!
 static Signal.Application.Abstractions.AttachmentDownload.operator !=(Signal.Application.Abstractions.AttachmentDownload? left, Signal.Application.Abstractions.AttachmentDownload? right) -> bool
 static Signal.Application.Abstractions.AttachmentDownload.operator ==(Signal.Application.Abstractions.AttachmentDownload? left, Signal.Application.Abstractions.AttachmentDownload? right) -> bool
+static Signal.Application.Abstractions.StickerPack.operator !=(Signal.Application.Abstractions.StickerPack? left, Signal.Application.Abstractions.StickerPack? right) -> bool
+static Signal.Application.Abstractions.StickerPack.operator ==(Signal.Application.Abstractions.StickerPack? left, Signal.Application.Abstractions.StickerPack? right) -> bool
 static Signal.Application.Abstractions.UsernameAssignment.operator !=(Signal.Application.Abstractions.UsernameAssignment? left, Signal.Application.Abstractions.UsernameAssignment? right) -> bool
 static Signal.Application.Abstractions.UsernameAssignment.operator ==(Signal.Application.Abstractions.UsernameAssignment? left, Signal.Application.Abstractions.UsernameAssignment? right) -> bool
