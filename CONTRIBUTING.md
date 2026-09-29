@@ -80,7 +80,19 @@ Versions come from git tags ([MinVer](https://github.com/adamralph/minver)). Unt
 4. Commit, then tag and push, e.g. `git tag v0.2.0 && git push origin v0.2.0`. Pre-releases use `v0.2.0-preview.1`.
 
 `.github/workflows/release.yml` then builds, tests and packs, checks that the package versions match the tag,
-publishes to nuget.org (secret `NUGET_API_KEY`), and creates the GitHub Release with the changelog section.
+publishes to nuget.org, and creates the GitHub Release with the changelog section.
+
+Publishing uses [NuGet Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing).
+The workflow exchanges a GitHub OIDC token for an API key that is valid for one hour, so no long-lived key is
+stored. One-time setup:
+
+1. **nuget.org** → your username → **Trusted Publishing** → add a policy: Repository Owner `Nacorpio`,
+   Repository `Signal.NET`, Workflow File `release.yml`, Environment `nuget`. Under **Select Scopes**, allow
+   *Push new packages* and *Push new package versions* with the glob pattern `Signal.*`. The first release
+   creates the package IDs, and the glob stops the policy from applying to your other packages.
+2. **GitHub** → Settings → **Environments** → create `nuget`. Add the environment secret `NUGET_USER`
+   (your nuget.org profile name, not your email). Optionally add yourself as a required reviewer, so every
+   release waits for approval before publishing.
 
 ## Pull requests
 
