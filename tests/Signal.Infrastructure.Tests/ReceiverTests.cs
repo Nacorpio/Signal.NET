@@ -119,7 +119,10 @@ public class WebSocketReceiverTests
         await server;
 
         Assert.Equal(["message 1", "message 2"], received.Select(e => e.Data!.Text));
-        Assert.Equal(2, connector.Connections);
+        // At least one reconnect must have happened. After the server closes connection 2 the receiver correctly
+        // reconnects again (backoff 10-50 ms here); under CPU load that third attempt can start before Take(2) has
+        // stopped the receiver, so "exactly 2" would be a race rather than a property of the receiver.
+        Assert.True(connector.Connections >= 2, $"Expected a reconnect, but only {connector.Connections} connection(s) were made.");
         Assert.Equal("ws://signal.test:8080/v1/receive/%2B15550000000", connector.LastUri!.AbsoluteUri);
     }
 
