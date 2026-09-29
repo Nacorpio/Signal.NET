@@ -8,6 +8,7 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Typed capabilities (roadmap 0.3.13):** `SignalCapability` (with `SendQuotes` and `SendMentions`), `SignalApiInfo.Supports` and `SignalApiInfo.EnsureSupported`. The latter throws a `NotSupportedException` naming the missing feature and the API version.
 - **Group extras, contact sync and number search (roadmap 0.3.8, 0.3.9, 0.3.10):**
   - New `IGroupService` members: `JoinAsync` (accept an invitation), `BlockAsync`, `UpdateSettingsAsync` (`GroupPermissions`, `GroupLinkMode`, disappearing-messages timer), `PinMessageAsync` and `UnpinMessageAsync`.
   - New `IContactService` members: `SyncAsync` sends contacts to linked devices; `CheckRegisteredAsync` reports which numbers are registered with Signal.

@@ -59,6 +59,8 @@ Item 0.2.8 exists so that can't happen again.
 
 ## Milestone 0.3: Complete API coverage
 
+**Status:** all items are merged into `main` and not yet released (see the [changelog](CHANGELOG.md)).
+
 *Goal: every signal-cli-rest-api capability reachable through a typed port. Check each endpoint against the
 [Swagger spec](https://bbernhard.github.io/signal-cli-rest-api/) when implementing.*
 
@@ -76,7 +78,7 @@ Item 0.2.8 exists so that can't happen again.
 | 0.3.10 | **Number search** | A/I | S | ✅ `IContactService.CheckRegisteredAsync` → `NumberRegistration` |
 | 0.3.11 | **Rate-limit challenge** | A/I | S | ✅ `IAccountService.SubmitRateLimitChallengeAsync(challengeToken, captcha)` |
 | 0.3.12 | **Streaming attachments** | A/I | S | ✅ `IAttachmentService.OpenReadAsync` streams downloads (added without breaking existing implementations). Uploads can't stream: `/v2/send` needs base64 in JSON. |
-| 0.3.13 | **Typed capabilities** | A | S | Check `SignalApiInfo.Capabilities` before using optional features, with clear errors |
+| 0.3.13 | **Typed capabilities** | A | S | ✅ `SignalCapability` plus `SignalApiInfo.Supports` / `EnsureSupported` (descriptive `NotSupportedException`). Upstream currently reports only `v2/send` → `quotes`, `mentions`, so there are two predefined values. |
 
 ## Milestone 0.4: Richer incoming model
 
