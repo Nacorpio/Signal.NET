@@ -18,7 +18,7 @@
       every release (see CONTRIBUTING.md → Releasing).
     -->
     <EnablePackageValidation>true</EnablePackageValidation>
-    <PackageValidationBaselineVersion>0.2.0-preview.2</PackageValidationBaselineVersion>
+    <PackageValidationBaselineVersion>0.3.0-preview.1</PackageValidationBaselineVersion>
 
     <!--
       RS0026/RS0027 forbid several overloads with optional parameters. Our overloads (e.g. ReplyAsync(string, …)
