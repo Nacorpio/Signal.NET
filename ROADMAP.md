@@ -39,9 +39,10 @@ These known limitations shape the plan below:
 
 **Status:** ✅ implemented, and the first pre-release is cut. Tag `v0.2.0-preview.1` produced the
 [GitHub Release](https://github.com/Nacorpio/Signal.NET/releases/tag/v0.2.0-preview.1) with all packages attached.
-**The nuget.org publication is still unconfirmed:** the workflow's push returned *409 Conflict* for every
-package (the version already existed on nuget.org before the workflow's single run pushed), and those packages have not yet
-appeared publicly on nuget.org. Item 0.2.8 addresses how this was able to look like a success.
+**Nothing was published to nuget.org:** the `Signal.` package ID prefix is **reserved by another owner**, so
+every push was rejected with *409 Conflict*. The packages are therefore moving to owner-prefixed IDs
+(`Nacorpio.Signal.*`, [#11](https://github.com/Nacorpio/Signal.NET/pull/11)), and the first nuget.org release
+will be `0.2.0-preview.2`. Item 0.2.8 covers how the rejection passed as a success.
 
 | # | Feature | Layer | Size | Status |
 |---|---|---|---|---|
@@ -51,8 +52,8 @@ appeared publicly on nuget.org. Item 0.2.8 addresses how this was able to look l
 | 0.2.4 | **Package validation** | T | S | ✅ Enabled; baseline set after the first release |
 | 0.2.5 | **Code coverage report** in CI | T | S | ✅ Job summary via ReportGenerator. A README coverage badge needs an external service (e.g. Codecov) and is deferred. |
 | 0.2.6 | **Documentation site**: guides plus API reference on GitHub Pages | T | M | ✅ DocFX, `.github/workflows/docs.yml` |
-| 0.2.7 | **`dotnet new signalbot` template** | T | M | ✅ `Signal.NET.Templates`, pinned to the matching package version |
-| 0.2.8 | **Post-publish verification**: after pushing, confirm that each package ID reports exactly the tagged version on nuget.org, and treat a 409 for a version this run didn't push as a failure | T | S | ⏳ open. `--skip-duplicate` let the 0.2.0-preview.1 run report success although none of the five pushes was accepted. |
+| 0.2.7 | **`dotnet new signalbot` template** | T | M | ✅ `Nacorpio.Signal.Templates`, pinned to the matching package version |
+| 0.2.8 | **Publish verification**: a rejected push must fail the release, and the workflow should confirm that each package ID reports the tagged version on nuget.org | T | S | 🔶 partly done. `--skip-duplicate` reported every 409, including the reserved-prefix rejection, as "already exists"; #11 removes it, so rejections now fail the run. Still open: a check after publishing that the packages are actually listed. |
 
 ## Milestone 0.3: Complete API coverage
 
