@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0-preview.2] - 2026-09-29
+
+First release on nuget.org, under the new `Nacorpio.Signal.*` package IDs.
+
 ### Changed
 
 - **NuGet package IDs are now owner-prefixed:**
@@ -41,5 +45,6 @@ First preview release. Available as a [GitHub Release](https://github.com/Nacorp
 - **Documentation:** full XML documentation (enforced by the build) and the `docs/` guides.
 - **Repository:** sample bot, Docker Compose file, CI workflow for GitHub Actions.
 
-[Unreleased]: https://github.com/Nacorpio/Signal.NET/compare/v0.2.0-preview.1...HEAD
+[Unreleased]: https://github.com/Nacorpio/Signal.NET/compare/v0.2.0-preview.2...HEAD
+[0.2.0-preview.2]: https://github.com/Nacorpio/Signal.NET/compare/v0.2.0-preview.1...v0.2.0-preview.2
 [0.2.0-preview.1]: https://github.com/Nacorpio/Signal.NET/releases/tag/v0.2.0-preview.1
