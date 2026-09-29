@@ -17,3 +17,23 @@ Signal.Application.Abstractions.RegistrationOptions.UseVoice.get -> bool
 Signal.Application.Abstractions.RegistrationOptions.UseVoice.init -> void
 static Signal.Application.Abstractions.RegistrationOptions.operator !=(Signal.Application.Abstractions.RegistrationOptions? left, Signal.Application.Abstractions.RegistrationOptions? right) -> bool
 static Signal.Application.Abstractions.RegistrationOptions.operator ==(Signal.Application.Abstractions.RegistrationOptions? left, Signal.Application.Abstractions.RegistrationOptions? right) -> bool
+Signal.Application.Abstractions.IMessageSender.RemoteDeleteAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient recipient, long targetTimestamp, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
+override Signal.Application.Abstractions.AttachmentDownload.Equals(object? obj) -> bool
+override Signal.Application.Abstractions.AttachmentDownload.GetHashCode() -> int
+override Signal.Application.Abstractions.AttachmentDownload.ToString() -> string!
+Signal.Application.Abstractions.AttachmentDownload
+Signal.Application.Abstractions.AttachmentDownload.<Clone>$() -> Signal.Application.Abstractions.AttachmentDownload!
+Signal.Application.Abstractions.AttachmentDownload.AttachmentDownload(System.IO.Stream! Content, string? ContentType, long? Length) -> void
+Signal.Application.Abstractions.AttachmentDownload.Content.get -> System.IO.Stream!
+Signal.Application.Abstractions.AttachmentDownload.Content.init -> void
+Signal.Application.Abstractions.AttachmentDownload.ContentType.get -> string?
+Signal.Application.Abstractions.AttachmentDownload.ContentType.init -> void
+Signal.Application.Abstractions.AttachmentDownload.Deconstruct(out System.IO.Stream! Content, out string? ContentType, out long? Length) -> void
+Signal.Application.Abstractions.AttachmentDownload.Dispose() -> void
+Signal.Application.Abstractions.AttachmentDownload.DisposeAsync() -> System.Threading.Tasks.ValueTask
+Signal.Application.Abstractions.AttachmentDownload.Equals(Signal.Application.Abstractions.AttachmentDownload? other) -> bool
+Signal.Application.Abstractions.AttachmentDownload.Length.get -> long?
+Signal.Application.Abstractions.AttachmentDownload.Length.init -> void
+Signal.Application.Abstractions.IAttachmentService.OpenReadAsync(string! attachmentId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.AttachmentDownload!>!
+static Signal.Application.Abstractions.AttachmentDownload.operator !=(Signal.Application.Abstractions.AttachmentDownload? left, Signal.Application.Abstractions.AttachmentDownload? right) -> bool
+static Signal.Application.Abstractions.AttachmentDownload.operator ==(Signal.Application.Abstractions.AttachmentDownload? left, Signal.Application.Abstractions.AttachmentDownload? right) -> bool

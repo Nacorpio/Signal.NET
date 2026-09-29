@@ -12,7 +12,11 @@ namespace Signal.Infrastructure.Services;
 // between domain types and DTOs; HTTP concerns (errors, resilience, serialization) live in SignalApiClient.
 // All adapters are transient because they wrap the typed HttpClient managed by IHttpClientFactory.
 
-/// <summary>Implements <see cref="IMessageSender"/> with <c>POST /v2/send</c>. Never retried by the resilience pipeline (POST), so a message is not sent twice.</summary>
+/// <summary>
+/// Implements <see cref="IMessageSender"/> with <c>POST /v2/send</c> (never retried by the resilience pipeline, so a
+/// message is not sent twice) and <c>DELETE /v1/remote-delete/{number}</c> (retried like any DELETE; deleting the same
+/// message twice is harmless).
+/// </summary>
 internal sealed class RestMessageSender(SignalApiClient api) : IMessageSender
 {
     public async Task<SendResult> SendAsync(PhoneNumber account, OutgoingMessage message, CancellationToken cancellationToken = default)
@@ -37,6 +41,14 @@ internal sealed class RestMessageSender(SignalApiClient api) : IMessageSender
 
         var response = await api.SendAsync(HttpMethod.Post, "v2/send", request,
             SignalRestJsonContext.Default.SendMessageRequestDto, SignalRestJsonContext.Default.SendMessageResponseDto, cancellationToken);
+        return new SendResult(response.Timestamp);
+    }
+
+    public async Task<SendResult> RemoteDeleteAsync(PhoneNumber account, Recipient recipient, long targetTimestamp, CancellationToken cancellationToken = default)
+    {
+        var response = await api.SendAsync(HttpMethod.Delete, $"v1/remote-delete/{SignalApiClient.Escape(account.Value)}",
+            new RemoteDeleteRequestDto { Recipient = recipient.Address, Timestamp = targetTimestamp },
+            SignalRestJsonContext.Default.RemoteDeleteRequestDto, SignalRestJsonContext.Default.SendMessageResponseDto, cancellationToken);
         return new SendResult(response.Timestamp);
     }
 }
@@ -235,6 +247,9 @@ internal sealed class RestAttachmentService(SignalApiClient api) : IAttachmentSe
 
     public Task<byte[]> DownloadAsync(string attachmentId, CancellationToken cancellationToken = default) =>
         api.GetBytesAsync($"v1/attachments/{SignalApiClient.Escape(attachmentId)}", cancellationToken);
+
+    public Task<AttachmentDownload> OpenReadAsync(string attachmentId, CancellationToken cancellationToken = default) =>
+        api.GetStreamAsync($"v1/attachments/{SignalApiClient.Escape(attachmentId)}", cancellationToken);
 
     public Task DeleteAsync(string attachmentId, CancellationToken cancellationToken = default) =>
         api.SendAsync(HttpMethod.Delete, $"v1/attachments/{SignalApiClient.Escape(attachmentId)}", cancellationToken);

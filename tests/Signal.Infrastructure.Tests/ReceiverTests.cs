@@ -94,7 +94,16 @@ public class WebSocketReceiverTests
                     await socket.SendAsync(json, WebSocketMessageType.Text, true, timeout.Token);
                 }
 
-                await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "bye", timeout.Token);
+                try
+                {
+                    await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "bye", timeout.Token);
+                }
+                catch (WebSocketException) when (connection == 2)
+                {
+                    // After the second message the test's Take(2) completes and stops the receiver, which may abort its
+                    // socket before answering this close handshake. That is expected, not a failure. (On the first
+                    // connection the handshake must complete, because it is what triggers the reconnect under test.)
+                }
             }
         }, timeout.Token);
 

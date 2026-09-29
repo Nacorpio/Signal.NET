@@ -29,6 +29,7 @@ detail of the wire protocol:
 translates errors.
 
 - **`GetAsync`, `GetBytesAsync`, `SendAsync`:** JSON or binary requests to relative paths such as `v2/send`.
+- **`GetStreamAsync`:** reads only the response headers and returns the body unbuffered. The returned stream (`ResponseStream`) owns the `HttpResponseMessage`, so the connection stays open until the caller disposes it.
 - **Error translation:** a non-success response becomes a `SignalApiException` carrying the API's `error` text.
 - **`Escape`:** escapes path segments. Phone numbers become `%2B49…`, and a `/` inside a base64 group id is escaped as well.
 
@@ -84,7 +85,7 @@ the response back.
 
 | Adapter | Port | Notes |
 |---|---|---|
-| `RestMessageSender` | `IMessageSender` | Maps `TextMode.Styled` → `text_mode: "styled"`, quotes, mentions, edits, view-once. Returns the timestamp. |
+| `RestMessageSender` | `IMessageSender` | Maps `TextMode.Styled` → `text_mode: "styled"`, quotes, mentions, edits, view-once. Returns the timestamp. `RemoteDeleteAsync` sends `{recipient, timestamp}`; as a DELETE it may be retried, which is harmless for deletes. |
 | `RestReactionService` | `IReactionService` | Same body for add (POST) and remove (DELETE) |
 | `RestReceiptService` | `IReceiptService` | Rejects `Delivery`, because Signal sends delivery receipts automatically |
 | `RestTypingIndicatorService` | `ITypingIndicatorService` | PUT to start, DELETE to stop |
@@ -92,7 +93,7 @@ the response back.
 | `RestAccountService` | `IAccountService` | Invalid numbers in the list are skipped |
 | `RestRegistrationService` | `IRegistrationService` | All POSTs, so never retried (a retry would request a second code). Removes separators from verification codes (`123-456` → `123456`). |
 | `RestContactService` | `IContactService` | The contact id is its UUID, falling back to the number |
-| `RestAttachmentService` | `IAttachmentService` | Returns the raw bytes |
+| `RestAttachmentService` | `IAttachmentService` | `DownloadAsync` returns the raw bytes; `OpenReadAsync` streams them via `GetStreamAsync` |
 | `RestProfileService` | `IProfileService` | |
 | `RestIdentityService` | `IIdentityService` | |
 | `RestSystemService` | `ISystemService` | `IsHealthyAsync` never throws for connection errors |

@@ -29,7 +29,7 @@ implementations. You can replace any port, for example with a fake in tests or a
 
 | Port | Purpose | REST endpoint(s) |
 |---|---|---|
-| `IMessageSender` | Send text, attachments, mentions, quotes and edits | `POST /v2/send` |
+| `IMessageSender` | Send text, attachments, mentions, quotes and edits; delete a sent message for everyone (`RemoteDeleteAsync`, by its `SendResult.Timestamp`) | `POST /v2/send`, `DELETE /v1/remote-delete/{number}` |
 | `IMessageReceiver` | Stream incoming envelopes for one account | `GET /v1/receive/{number}` (poll or WebSocket) |
 | `IMessageReceiverFactory` | Pick the receiver for an `ExecutionMode` | – |
 | `IReactionService` | Add or remove emoji reactions | `POST`/`DELETE /v1/reactions/{number}` |
@@ -39,7 +39,7 @@ implementations. You can replace any port, for example with a fake in tests or a
 | `IAccountService` | List accounts; QR code for device linking | `GET /v1/accounts`, `GET /v1/qrcodelink` |
 | `IRegistrationService` | Register a number as the container's primary device (SMS or voice, optional captcha), verify it with the code (and registration lock PIN), unregister it. Not part of `ISignalClient`, because it's account setup, not bot runtime. | `POST /v1/register/{number}[/verify/{code}]`, `POST /v1/unregister/{number}` |
 | `IContactService` | List and update contacts | `GET`/`PUT /v1/contacts/{number}` |
-| `IAttachmentService` | List, download and delete stored attachments | `/v1/attachments[/{id}]` |
+| `IAttachmentService` | List, download (`DownloadAsync` into memory, or `OpenReadAsync` as a stream) and delete stored attachments | `/v1/attachments[/{id}]` |
 | `IProfileService` | Update name, about and avatar | `PUT /v1/profiles/{number}` |
 | `IIdentityService` | List identities; trust keys / safety numbers | `/v1/identities/{number}[/trust/{n}]` |
 | `ISystemService` | Version, mode and capabilities; health | `GET /v1/about`, `GET /v1/health` |
@@ -49,6 +49,7 @@ Supporting types:
 - **`SendResult(Timestamp)`**: the timestamp of a sent message. Keep it to edit the message, react to it or quote it later.
 - **`SignalApiInfo`**: the result of `/v1/about`. `Mode` parses the container mode into an `ExecutionMode`.
 - **`RegistrationOptions(UseVoice, Captcha)`**: how `IRegistrationService.RegisterAsync` requests the code. When Signal answers with a captcha error, solve the captcha at `https://signalcaptchas.org/registration/generate.html` and retry with the `signalcaptcha://…` link as `Captcha`.
+- **`AttachmentDownload(Content, ContentType, Length)`**: the result of `IAttachmentService.OpenReadAsync`. `Content` reads directly from the HTTP response, so large attachments never have to fit in memory. Dispose it (`await using`) to release the connection. `OpenReadAsync` has a default interface implementation that buffers through `DownloadAsync`, so custom `IAttachmentService` implementations written before it existed keep working.
 - **`ProfileUpdate(Name, About, Base64Avatar)`**: the values passed to `IProfileService.UpdateAsync`.
 
 ### `ISignalClient`
