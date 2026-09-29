@@ -9,7 +9,7 @@ All notable changes to this project are documented here. The format follows
 ### Added
 
 - **Release process (roadmap 0.2):**
-  - A tag-driven release workflow (NuGet, then a GitHub Release).
+  - A tag-driven release workflow (NuGet via Trusted Publishing, then a GitHub Release).
   - MinVer versioning from git tags.
   - Public API tracking with `PublicAPI.*.txt`.
   - Package validation.
