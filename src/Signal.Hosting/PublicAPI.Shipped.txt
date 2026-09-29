@@ -1,1 +1,18 @@
 #nullable enable
+Signal.Hosting.ISignalBuilder
+Signal.Hosting.ISignalBuilder.AddArgumentConverter<TConverter>() -> Signal.Hosting.ISignalBuilder!
+Signal.Hosting.ISignalBuilder.AddCommand<TCommand>() -> Signal.Hosting.ISignalBuilder!
+Signal.Hosting.ISignalBuilder.AddCommandModule<TModule>() -> Signal.Hosting.ISignalBuilder!
+Signal.Hosting.ISignalBuilder.AddCommands(System.Reflection.Assembly! assembly) -> Signal.Hosting.ISignalBuilder!
+Signal.Hosting.ISignalBuilder.AddEventHandler<TEvent, THandler>() -> Signal.Hosting.ISignalBuilder!
+Signal.Hosting.ISignalBuilder.AddEventHandlers(System.Reflection.Assembly! assembly) -> Signal.Hosting.ISignalBuilder!
+Signal.Hosting.ISignalBuilder.AddMiddleware<TMiddleware>() -> Signal.Hosting.ISignalBuilder!
+Signal.Hosting.ISignalBuilder.Configure(System.Action<Signal.Application.Configuration.SignalOptions!>! configure) -> Signal.Hosting.ISignalBuilder!
+Signal.Hosting.ISignalBuilder.MapCommand(string! name, System.Func<Signal.Application.Commands.CommandContext!, System.Threading.Tasks.Task!>! handler, string? description = null, params string![]! aliases) -> Signal.Hosting.ISignalBuilder!
+Signal.Hosting.ISignalBuilder.Services.get -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+Signal.Hosting.ISignalBuilder.UseReceiver<TReceiver>(params Signal.Domain.ExecutionMode[]! modes) -> Signal.Hosting.ISignalBuilder!
+Signal.Hosting.SignalServiceCollectionExtensions
+static Signal.Hosting.SignalServiceCollectionExtensions.AddSignal(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, Microsoft.Extensions.Configuration.IConfiguration! configuration) -> Signal.Hosting.ISignalBuilder!
+static Signal.Hosting.SignalServiceCollectionExtensions.AddSignal(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, System.Action<Signal.Application.Configuration.SignalOptions!>! configure) -> Signal.Hosting.ISignalBuilder!
+static Signal.Hosting.SignalServiceCollectionExtensions.AddSignal(this Microsoft.Extensions.Hosting.IHostApplicationBuilder! builder) -> Signal.Hosting.ISignalBuilder!
+static Signal.Hosting.SignalServiceCollectionExtensions.AddSignalApi(this Microsoft.Extensions.DependencyInjection.IHealthChecksBuilder! builder, string! name = "signal-api", Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus? failureStatus = null, System.Collections.Generic.IEnumerable<string!>? tags = null) -> Microsoft.Extensions.DependencyInjection.IHealthChecksBuilder!
