@@ -73,7 +73,7 @@ Messages from different conversations are processed in parallel (`MaxConcurrency
    SIGNAL_MODE=json-rpc docker compose up -d
    ```
 
-2. Link the container to your Signal account. Open `http://localhost:8080/v1/qrcodelink?device_name=signal-net` and scan the QR code in the Signal app (Settings → Linked devices). You can also register a new number through `/v1/register`.
+2. Link the container to your Signal account. Open `http://localhost:8080/v1/qrcodelink?device_name=signal-net` and scan the QR code in the Signal app (Settings → Linked devices). You can also register a dedicated number for the bot with `IRegistrationService` (`RegisterAsync`, then `VerifyAsync` with the code you receive).
 
 3. Configure your number with user secrets, so it never ends up in the repository. The placeholder values in `appsettings.json` are overridden.
 

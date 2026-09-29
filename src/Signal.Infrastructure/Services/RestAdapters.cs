@@ -173,6 +173,43 @@ internal sealed class RestAccountService(SignalApiClient api) : IAccountService
     }
 }
 
+/// <summary>
+/// Implements <see cref="IRegistrationService"/> with <c>POST /v1/register/{number}</c>,
+/// <c>POST /v1/register/{number}/verify/{token}</c> and <c>POST /v1/unregister/{number}</c>.
+/// All are POSTs, so the resilience pipeline never retries them (no duplicate verification codes).
+/// </summary>
+internal sealed class RestRegistrationService(SignalApiClient api) : IRegistrationService
+{
+    public Task RegisterAsync(PhoneNumber number, RegistrationOptions? options = null, CancellationToken cancellationToken = default) =>
+        api.SendAsync(HttpMethod.Post, $"v1/register/{SignalApiClient.Escape(number.Value)}",
+            new RegisterNumberRequestDto
+            {
+                Captcha = string.IsNullOrWhiteSpace(options?.Captcha) ? null : options.Captcha.Trim(),
+                UseVoice = options?.UseVoice == true ? true : null,
+            },
+            SignalRestJsonContext.Default.RegisterNumberRequestDto, cancellationToken);
+
+    public Task VerifyAsync(PhoneNumber number, string verificationCode, string? pin = null, CancellationToken cancellationToken = default)
+    {
+        // Codes are often written as "123-456" or "123 456"; the API expects the digits only.
+        var code = new string([.. (verificationCode ?? string.Empty).Where(c => !char.IsWhiteSpace(c) && c != '-')]);
+        if (code.Length == 0)
+        {
+            throw new ArgumentException("The verification code must not be empty.", nameof(verificationCode));
+        }
+
+        return api.SendAsync(HttpMethod.Post,
+            $"v1/register/{SignalApiClient.Escape(number.Value)}/verify/{SignalApiClient.Escape(code)}",
+            new VerifyNumberRequestDto { Pin = string.IsNullOrWhiteSpace(pin) ? null : pin },
+            SignalRestJsonContext.Default.VerifyNumberRequestDto, cancellationToken);
+    }
+
+    public Task UnregisterAsync(PhoneNumber number, bool deleteAccount = false, bool deleteLocalData = false, CancellationToken cancellationToken = default) =>
+        api.SendAsync(HttpMethod.Post, $"v1/unregister/{SignalApiClient.Escape(number.Value)}",
+            new UnregisterNumberRequestDto { DeleteAccount = deleteAccount, DeleteLocalData = deleteLocalData },
+            SignalRestJsonContext.Default.UnregisterNumberRequestDto, cancellationToken);
+}
+
 /// <summary>Implements <see cref="IContactService"/> with <c>GET</c>/<c>PUT /v1/contacts/{number}</c>.</summary>
 internal sealed class RestContactService(SignalApiClient api) : IContactService
 {

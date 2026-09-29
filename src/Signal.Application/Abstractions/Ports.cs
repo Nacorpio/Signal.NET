@@ -209,6 +209,56 @@ public interface IAccountService
     Task<byte[]> GetLinkQrCodeAsync(string deviceName, CancellationToken cancellationToken = default);
 }
 
+/// <summary>How a verification code is requested when registering a number.</summary>
+/// <param name="UseVoice">Deliver the code by voice call instead of SMS (e.g. for landlines).</param>
+/// <param name="Captcha">
+/// A captcha token, required when Signal rejects the registration with a captcha error. Solve the captcha at
+/// <c>https://signalcaptchas.org/registration/generate.html</c> and pass the resulting <c>signalcaptcha://…</c> link.
+/// </param>
+public sealed record RegistrationOptions(bool UseVoice = false, string? Captcha = null);
+
+/// <summary>
+/// Registers a phone number as the container's primary Signal device, as an alternative to linking the container
+/// to an existing account (<see cref="IAccountService.GetLinkQrCodeAsync"/>).
+/// </summary>
+/// <remarks>
+/// <para>Typical flow: <see cref="RegisterAsync"/> sends a code by SMS or voice, then <see cref="VerifyAsync"/> completes the
+/// registration with that code. Registering a number that is active on a phone moves the account to the container:
+/// the phone's Signal app is signed out.</para>
+/// <para>Calls are never retried (they are POST requests): a retry would request another code and can run into
+/// Signal's rate limits.</para>
+/// </remarks>
+public interface IRegistrationService
+{
+    /// <summary>Requests a verification code for <paramref name="number"/> (<c>POST /v1/register/{number}</c>).</summary>
+    /// <param name="number">The number to register.</param>
+    /// <param name="options">Voice instead of SMS, and an optional captcha token; defaults to SMS without captcha.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>A task that completes when the code was requested.</returns>
+    /// <exception cref="SignalApiException">
+    /// The API rejected the request, e.g. because a captcha is required (retry with <see cref="RegistrationOptions.Captcha"/>).
+    /// </exception>
+    Task RegisterAsync(PhoneNumber number, RegistrationOptions? options = null, CancellationToken cancellationToken = default);
+
+    /// <summary>Completes a registration with the received code (<c>POST /v1/register/{number}/verify/{code}</c>).</summary>
+    /// <param name="number">The number being registered.</param>
+    /// <param name="verificationCode">The code from the SMS or call; separators such as <c>123-456</c> are removed.</param>
+    /// <param name="pin">The registration lock PIN, if the account has one.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>A task that completes when the number is registered.</returns>
+    /// <exception cref="ArgumentException"><paramref name="verificationCode"/> is empty.</exception>
+    /// <exception cref="SignalApiException">The code is wrong or expired, or the PIN is missing or wrong.</exception>
+    Task VerifyAsync(PhoneNumber number, string verificationCode, string? pin = null, CancellationToken cancellationToken = default);
+
+    /// <summary>Unregisters a number from the container (<c>POST /v1/unregister/{number}</c>).</summary>
+    /// <param name="number">The registered number.</param>
+    /// <param name="deleteAccount">Also delete the Signal account on Signal's servers. This cannot be undone.</param>
+    /// <param name="deleteLocalData">Also delete the account's local data (keys, messages) from the container.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>A task that completes when the number is unregistered.</returns>
+    Task UnregisterAsync(PhoneNumber number, bool deleteAccount = false, bool deleteLocalData = false, CancellationToken cancellationToken = default);
+}
+
 /// <summary>Reads and updates the account's contacts (<c>/v1/contacts/{number}</c>).</summary>
 public interface IContactService
 {

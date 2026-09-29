@@ -8,6 +8,12 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Registration and verification (roadmap 0.3.1):**
+  - The new `IRegistrationService` registers a number as the container's primary device (`RegisterAsync` by SMS or voice, with an optional captcha).
+  - `VerifyAsync` completes the registration with the received code and an optional registration-lock PIN.
+  - `UnregisterAsync` removes the number again.
+  - Calls are never retried, so no duplicate verification codes are sent.
+
 - **Release workflow:** waits until every package is listed on nuget.org before creating the GitHub Release (roadmap 0.2.8).
 - **Package validation:** compares against the published `0.2.0-preview.2` baseline, so breaking API changes fail `dotnet pack`.
 
