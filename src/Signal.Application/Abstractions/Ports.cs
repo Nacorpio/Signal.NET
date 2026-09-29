@@ -11,11 +11,11 @@ namespace Signal.Application.Abstractions;
 
 /// <summary>Result of a successful send.</summary>
 /// <param name="Timestamp">
-/// Timestamp assigned to the sent message (Unix milliseconds). Keep it to edit, react to, or quote the message later.
+/// Timestamp assigned to the sent message (Unix milliseconds). Keep it to edit, react to, quote or delete the message later.
 /// </param>
 public readonly record struct SendResult(long Timestamp);
 
-/// <summary>Sends messages.</summary>
+/// <summary>Sends and deletes messages.</summary>
 public interface IMessageSender
 {
     /// <summary>Sends a message (<c>POST /v2/send</c>).</summary>
@@ -25,6 +25,31 @@ public interface IMessageSender
     /// <returns>The timestamp of the sent message.</returns>
     /// <exception cref="SignalApiException">The API rejected the message (e.g. unregistered recipient).</exception>
     Task<SendResult> SendAsync(PhoneNumber account, OutgoingMessage message, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Deletes a message the account sent earlier, for everyone in the conversation (<c>DELETE /v1/remote-delete/{number}</c>).
+    /// Recipients see "This message was deleted".
+    /// </summary>
+    /// <remarks>
+    /// Only the account's own messages can be deleted, and Signal clients honor remote deletes only for a limited
+    /// time after sending. The default implementation throws <see cref="NotSupportedException"/>, so existing
+    /// <see cref="IMessageSender"/> implementations keep compiling.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var sent = await sender.SendAsync(account, OutgoingMessage.To(group).WithText("Oops").Build());
+    /// await sender.RemoteDeleteAsync(account, group, sent.Timestamp);
+    /// </code>
+    /// </example>
+    /// <param name="account">The account that sent the message.</param>
+    /// <param name="recipient">The conversation the message was sent to (the group, or the direct-message recipient).</param>
+    /// <param name="targetTimestamp">The <see cref="SendResult.Timestamp"/> of the message to delete.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The timestamp of the delete message itself.</returns>
+    /// <exception cref="SignalApiException">The API rejected the delete.</exception>
+    /// <exception cref="NotSupportedException">The implementation does not support remote deletes.</exception>
+    Task<SendResult> RemoteDeleteAsync(PhoneNumber account, Recipient recipient, long targetTimestamp, CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException($"{GetType().Name} does not support remote deletes.");
 }
 
 /// <summary>

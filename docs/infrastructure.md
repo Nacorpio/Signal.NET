@@ -85,7 +85,7 @@ the response back.
 
 | Adapter | Port | Notes |
 |---|---|---|
-| `RestMessageSender` | `IMessageSender` | Maps `TextMode.Styled` → `text_mode: "styled"`, quotes, mentions, edits, view-once. Returns the timestamp. |
+| `RestMessageSender` | `IMessageSender` | Maps `TextMode.Styled` → `text_mode: "styled"`, quotes, mentions, edits, view-once. Returns the timestamp. `RemoteDeleteAsync` sends `{recipient, timestamp}`; as a DELETE it may be retried, which is harmless for deletes. |
 | `RestReactionService` | `IReactionService` | Same body for add (POST) and remove (DELETE) |
 | `RestReceiptService` | `IReceiptService` | Rejects `Delivery`, because Signal sends delivery receipts automatically |
 | `RestTypingIndicatorService` | `ITypingIndicatorService` | PUT to start, DELETE to stop |

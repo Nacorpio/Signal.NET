@@ -55,9 +55,21 @@ internal sealed class MentionDto
     public int Length { get; set; }
 }
 
-/// <summary>Response of <c>POST /v2/send</c>. The timestamp is sent as a JSON string.</summary>
+/// <summary>
+/// Response of <c>POST /v2/send</c> and <c>DELETE /v1/remote-delete/{number}</c>. The timestamp is sent as a JSON string.
+/// </summary>
 internal sealed class SendMessageResponseDto
 {
+    public long Timestamp { get; set; }
+}
+
+/// <summary>Body of <c>DELETE /v1/remote-delete/{number}</c>.</summary>
+internal sealed class RemoteDeleteRequestDto
+{
+    /// <summary>The conversation of the message: phone number, UUID, username or <c>group.…</c> id.</summary>
+    public required string Recipient { get; set; }
+
+    /// <summary>Timestamp of the message to delete.</summary>
     public long Timestamp { get; set; }
 }
 

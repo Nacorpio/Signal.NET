@@ -1,4 +1,5 @@
 #nullable enable
+Signal.Application.Abstractions.IMessageSender.RemoteDeleteAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient recipient, long targetTimestamp, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
 override Signal.Application.Abstractions.AttachmentDownload.Equals(object? obj) -> bool
 override Signal.Application.Abstractions.AttachmentDownload.GetHashCode() -> int
 override Signal.Application.Abstractions.AttachmentDownload.ToString() -> string!
