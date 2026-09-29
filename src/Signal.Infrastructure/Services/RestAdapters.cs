@@ -169,7 +169,10 @@ internal sealed class RestGroupService(SignalApiClient api) : IGroupService
             : null;
 }
 
-/// <summary>Implements <see cref="IAccountService"/> with <c>GET /v1/accounts</c> and <c>GET /v1/qrcodelink</c>.</summary>
+/// <summary>
+/// Implements <see cref="IAccountService"/> with <c>GET /v1/accounts</c>, <c>GET /v1/qrcodelink</c> and the
+/// <c>/v1/accounts/{number}/…</c> endpoints (username, settings, PIN, rate-limit challenge).
+/// </summary>
 internal sealed class RestAccountService(SignalApiClient api) : IAccountService
 {
     public async Task<IReadOnlyList<PhoneNumber>> ListAsync(CancellationToken cancellationToken = default)
@@ -183,6 +186,51 @@ internal sealed class RestAccountService(SignalApiClient api) : IAccountService
         ArgumentException.ThrowIfNullOrWhiteSpace(deviceName);
         return api.GetBytesAsync($"v1/qrcodelink?device_name={Uri.EscapeDataString(deviceName)}", cancellationToken);
     }
+
+    public async Task<UsernameAssignment?> SetUsernameAsync(PhoneNumber account, string nickname, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(nickname);
+        var response = await api.SendForOptionalResultAsync(HttpMethod.Post, AccountPath(account, "username"),
+            new SetUsernameRequestDto { Username = nickname.Trim() },
+            SignalRestJsonContext.Default.SetUsernameRequestDto, SignalRestJsonContext.Default.SetUsernameResponseDto, cancellationToken);
+
+        return Username.TryParse(response?.Username, out var username)
+            ? new UsernameAssignment(username, string.IsNullOrWhiteSpace(response.UsernameLink) ? null : response.UsernameLink)
+            : null;
+    }
+
+    public Task DeleteUsernameAsync(PhoneNumber account, CancellationToken cancellationToken = default) =>
+        api.SendAsync(HttpMethod.Delete, AccountPath(account, "username"), cancellationToken);
+
+    public Task UpdateSettingsAsync(PhoneNumber account, AccountSettings settings, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        return api.SendAsync(HttpMethod.Put, AccountPath(account, "settings"),
+            new UpdateAccountSettingsRequestDto { DiscoverableByNumber = settings.DiscoverableByNumber, ShareNumber = settings.ShareNumber },
+            SignalRestJsonContext.Default.UpdateAccountSettingsRequestDto, cancellationToken);
+    }
+
+    public Task SetPinAsync(PhoneNumber account, string pin, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(pin);
+        return api.SendAsync(HttpMethod.Post, AccountPath(account, "pin"),
+            new SetPinRequestDto { Pin = pin }, SignalRestJsonContext.Default.SetPinRequestDto, cancellationToken);
+    }
+
+    public Task RemovePinAsync(PhoneNumber account, CancellationToken cancellationToken = default) =>
+        api.SendAsync(HttpMethod.Delete, AccountPath(account, "pin"), cancellationToken);
+
+    public Task SubmitRateLimitChallengeAsync(PhoneNumber account, string challengeToken, string captcha, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(challengeToken);
+        ArgumentException.ThrowIfNullOrWhiteSpace(captcha);
+        return api.SendAsync(HttpMethod.Post, AccountPath(account, "rate-limit-challenge"),
+            new RateLimitChallengeRequestDto { ChallengeToken = challengeToken.Trim(), Captcha = captcha.Trim() },
+            SignalRestJsonContext.Default.RateLimitChallengeRequestDto, cancellationToken);
+    }
+
+    private static string AccountPath(PhoneNumber account, string resource) =>
+        $"v1/accounts/{SignalApiClient.Escape(account.Value)}/{resource}";
 }
 
 /// <summary>

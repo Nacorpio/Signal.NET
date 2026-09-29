@@ -8,6 +8,14 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Account management (roadmap 0.3.3, 0.3.4, 0.3.11):** new `IAccountService` members:
+  - `SetUsernameAsync` and `DeleteUsernameAsync`;
+  - `UpdateSettingsAsync` (discoverability, number sharing);
+  - `SetPinAsync` and `RemovePinAsync` for the registration lock;
+  - `SubmitRateLimitChallengeAsync` to lift a rate limit with a captcha.
+
+  They are default interface members, so existing implementations keep compiling.
+
 - **Registration and verification (roadmap 0.3.1):**
   - The new `IRegistrationService` registers a number as the container's primary device (`RegisterAsync` by SMS or voice, with an optional captcha).
   - `VerifyAsync` completes the registration with the received code and an optional registration-lock PIN.

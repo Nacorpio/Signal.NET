@@ -63,6 +63,39 @@ internal sealed class SendMessageResponseDto
     public long Timestamp { get; set; }
 }
 
+/// <summary>Body of <c>POST /v1/accounts/{number}/username</c>.</summary>
+internal sealed class SetUsernameRequestDto
+{
+    public required string Username { get; set; }
+}
+
+/// <summary>Response of <c>POST /v1/accounts/{number}/username</c> (201; a 204 has no body).</summary>
+internal sealed class SetUsernameResponseDto
+{
+    public string? Username { get; set; }
+    public string? UsernameLink { get; set; }
+}
+
+/// <summary>Body of <c>PUT /v1/accounts/{number}/settings</c>; null fields are omitted and left unchanged.</summary>
+internal sealed class UpdateAccountSettingsRequestDto
+{
+    public bool? DiscoverableByNumber { get; set; }
+    public bool? ShareNumber { get; set; }
+}
+
+/// <summary>Body of <c>POST /v1/accounts/{number}/pin</c>.</summary>
+internal sealed class SetPinRequestDto
+{
+    public required string Pin { get; set; }
+}
+
+/// <summary>Body of <c>POST /v1/accounts/{number}/rate-limit-challenge</c>.</summary>
+internal sealed class RateLimitChallengeRequestDto
+{
+    public required string ChallengeToken { get; set; }
+    public required string Captcha { get; set; }
+}
+
 /// <summary>Body of <c>POST /v1/register/{number}</c>.</summary>
 internal sealed class RegisterNumberRequestDto
 {

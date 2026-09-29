@@ -232,7 +232,84 @@ public interface IAccountService
     /// <param name="cancellationToken">Cancels the request.</param>
     /// <returns>The PNG image bytes.</returns>
     Task<byte[]> GetLinkQrCodeAsync(string deviceName, CancellationToken cancellationToken = default);
+
+    // The members below were added after 0.2.0-preview.2. Their default implementations throw
+    // NotSupportedException, so IAccountService implementations written earlier keep compiling.
+
+    /// <summary>
+    /// Sets the account's username (<c>POST /v1/accounts/{number}/username</c>). Signal appends a numeric
+    /// discriminator, so requesting <c>alice</c> results in e.g. <c>alice.42</c>.
+    /// </summary>
+    /// <param name="account">The account.</param>
+    /// <param name="nickname">The requested name, without discriminator.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The assigned username and share link, or <see langword="null"/> if the API did not report them.</returns>
+    /// <exception cref="ArgumentException"><paramref name="nickname"/> is empty.</exception>
+    /// <exception cref="SignalApiException">The name is invalid or unavailable.</exception>
+    Task<UsernameAssignment?> SetUsernameAsync(PhoneNumber account, string nickname, CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException($"{GetType().Name} does not support usernames.");
+
+    /// <summary>Removes the account's username (<c>DELETE /v1/accounts/{number}/username</c>).</summary>
+    /// <param name="account">The account.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>A task that completes when the username was removed.</returns>
+    Task DeleteUsernameAsync(PhoneNumber account, CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException($"{GetType().Name} does not support usernames.");
+
+    /// <summary>Updates privacy settings (<c>PUT /v1/accounts/{number}/settings</c>). <see langword="null"/> values are left unchanged.</summary>
+    /// <param name="account">The account.</param>
+    /// <param name="settings">The settings to change.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>A task that completes when the settings were updated.</returns>
+    Task UpdateSettingsAsync(PhoneNumber account, AccountSettings settings, CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException($"{GetType().Name} does not support account settings.");
+
+    /// <summary>
+    /// Sets the registration lock PIN (<c>POST /v1/accounts/{number}/pin</c>). The PIN is then required to register
+    /// the number again (see <c>IRegistrationService.VerifyAsync</c>).
+    /// </summary>
+    /// <param name="account">The account.</param>
+    /// <param name="pin">The new PIN.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>A task that completes when the PIN was set.</returns>
+    /// <exception cref="ArgumentException"><paramref name="pin"/> is empty.</exception>
+    Task SetPinAsync(PhoneNumber account, string pin, CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException($"{GetType().Name} does not support registration lock PINs.");
+
+    /// <summary>Removes the registration lock PIN (<c>DELETE /v1/accounts/{number}/pin</c>).</summary>
+    /// <param name="account">The account.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>A task that completes when the PIN was removed.</returns>
+    Task RemovePinAsync(PhoneNumber account, CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException($"{GetType().Name} does not support registration lock PINs.");
+
+    /// <summary>
+    /// Lifts a rate limit imposed by Signal by submitting a solved captcha
+    /// (<c>POST /v1/accounts/{number}/rate-limit-challenge</c>).
+    /// </summary>
+    /// <remarks>
+    /// When sending fails with a rate-limit error, Signal provides a challenge token. Solve the captcha at
+    /// <c>https://signalcaptchas.org/challenge/generate.html</c> and submit both.
+    /// </remarks>
+    /// <param name="account">The rate-limited account.</param>
+    /// <param name="challengeToken">The challenge token from the rate-limit error.</param>
+    /// <param name="captcha">The solved captcha (<c>signalcaptcha://…</c>).</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>A task that completes when the challenge was accepted.</returns>
+    /// <exception cref="ArgumentException">A token or captcha is empty.</exception>
+    Task SubmitRateLimitChallengeAsync(PhoneNumber account, string challengeToken, string captcha, CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException($"{GetType().Name} does not support rate-limit challenges.");
 }
+
+/// <summary>The result of <see cref="IAccountService.SetUsernameAsync"/>.</summary>
+/// <param name="Username">The assigned username including its discriminator, e.g. <c>alice.42</c>.</param>
+/// <param name="Link">A shareable link that opens a chat with the account, if provided.</param>
+public sealed record UsernameAssignment(Username Username, string? Link);
+
+/// <summary>Account privacy settings for <see cref="IAccountService.UpdateSettingsAsync"/>. <see langword="null"/> leaves a setting unchanged.</summary>
+/// <param name="DiscoverableByNumber">Whether people who have the phone number can find the account.</param>
+/// <param name="ShareNumber">Whether the phone number is shown to people the account messages.</param>
+public sealed record AccountSettings(bool? DiscoverableByNumber = null, bool? ShareNumber = null);
 
 /// <summary>How a verification code is requested when registering a number.</summary>
 /// <param name="UseVoice">Deliver the code by voice call instead of SMS (e.g. for landlines).</param>

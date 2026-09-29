@@ -66,15 +66,15 @@ Item 0.2.8 exists so that can't happen again.
 |---|---|---|---|---|
 | 0.3.1 | **Registration and verification** | A/I | M | ✅ `IRegistrationService`: register (SMS/voice, captcha), verify (code plus registration-lock PIN), unregister. Enables bots without a primary phone. |
 | 0.3.2 | **Device management** | A/I | S | List, link and remove linked devices |
-| 0.3.3 | **Username management** | A/I | S | Set and delete the account's username; builds on `Username` |
-| 0.3.4 | **Account settings and PIN** | A/I | S | Privacy settings, registration lock PIN |
+| 0.3.3 | **Username management** | A/I | S | ✅ `IAccountService.SetUsernameAsync` (returns the assigned `alice.42` and share link) and `DeleteUsernameAsync` |
+| 0.3.4 | **Account settings and PIN** | A/I | S | ✅ `UpdateSettingsAsync(AccountSettings)` (discoverability, number sharing), `SetPinAsync` / `RemovePinAsync` |
 | 0.3.5 | **Remote delete** | D/A/I | S | ✅ `IMessageSender.RemoteDeleteAsync(account, recipient, sendResult.Timestamp)` (added without breaking existing implementations) |
 | 0.3.6 | **Stickers** | D/A/I | M | List and install sticker packs; send stickers via `OutgoingMessageBuilder.WithSticker` |
 | 0.3.7 | **Link previews** | D/I | S | `OutgoingMessageBuilder.WithLinkPreview(url, title, …)` |
 | 0.3.8 | **Group extras** | A/I | S | Join via invite link, block, avatar, group permissions |
 | 0.3.9 | **Contact sync and blocking** | A/I | S | Sync contacts to linked devices; block and unblock |
 | 0.3.10 | **Number search** | A/I | S | Check which numbers are registered with Signal |
-| 0.3.11 | **Rate-limit challenge** | A/I | S | Submit captcha challenges when Signal throttles the account |
+| 0.3.11 | **Rate-limit challenge** | A/I | S | ✅ `IAccountService.SubmitRateLimitChallengeAsync(challengeToken, captcha)` |
 | 0.3.12 | **Streaming attachments** | A/I | S | ✅ `IAttachmentService.OpenReadAsync` streams downloads (added without breaking existing implementations). Uploads can't stream: `/v2/send` needs base64 in JSON. |
 | 0.3.13 | **Typed capabilities** | A | S | Check `SignalApiInfo.Capabilities` before using optional features, with clear errors |
 

@@ -36,7 +36,7 @@ implementations. You can replace any port, for example with a fake in tests or a
 | `IReceiptService` | Send read or viewed receipts | `POST /v1/receipts/{number}` |
 | `ITypingIndicatorService` | Show or hide "typing…" | `PUT`/`DELETE /v1/typing-indicator/{number}` |
 | `IGroupService` | List, get, create, update, members, admins, quit, delete | `/v1/groups/{number}[/{groupid}[/members\|/admins\|/quit]]` |
-| `IAccountService` | List accounts; QR code for device linking | `GET /v1/accounts`, `GET /v1/qrcodelink` |
+| `IAccountService` | List accounts; QR code for device linking; set or delete the username; privacy settings; registration lock PIN; lift rate limits with a captcha | `GET /v1/accounts`, `GET /v1/qrcodelink`, `/v1/accounts/{number}/username`, `…/settings`, `…/pin`, `…/rate-limit-challenge` |
 | `IRegistrationService` | Register a number as the container's primary device (SMS or voice, optional captcha), verify it with the code (and registration lock PIN), unregister it. Not part of `ISignalClient`, because it's account setup, not bot runtime. | `POST /v1/register/{number}[/verify/{code}]`, `POST /v1/unregister/{number}` |
 | `IContactService` | List and update contacts | `GET`/`PUT /v1/contacts/{number}` |
 | `IAttachmentService` | List, download (`DownloadAsync` into memory, or `OpenReadAsync` as a stream) and delete stored attachments | `/v1/attachments[/{id}]` |
@@ -48,6 +48,8 @@ Supporting types:
 
 - **`SendResult(Timestamp)`**: the timestamp of a sent message. Keep it to edit the message, react to it or quote it later.
 - **`SignalApiInfo`**: the result of `/v1/about`. `Mode` parses the container mode into an `ExecutionMode`.
+- **`UsernameAssignment(Username, Link)`**: the result of `IAccountService.SetUsernameAsync`. Signal appends a discriminator (`alice` → `alice.42`); `Link` is a shareable chat link. It's `null` when the API answers without details (204).
+- **`AccountSettings(DiscoverableByNumber, ShareNumber)`**: privacy settings for `UpdateSettingsAsync`. `null` leaves a setting unchanged.
 - **`RegistrationOptions(UseVoice, Captcha)`**: how `IRegistrationService.RegisterAsync` requests the code. When Signal answers with a captcha error, solve the captcha at `https://signalcaptchas.org/registration/generate.html` and retry with the `signalcaptcha://…` link as `Captcha`.
 - **`AttachmentDownload(Content, ContentType, Length)`**: the result of `IAttachmentService.OpenReadAsync`. `Content` reads directly from the HTTP response, so large attachments never have to fit in memory. Dispose it (`await using`) to release the connection. `OpenReadAsync` has a default interface implementation that buffers through `DownloadAsync`, so custom `IAttachmentService` implementations written before it existed keep working.
 - **`ProfileUpdate(Name, About, Base64Avatar)`**: the values passed to `IProfileService.UpdateAsync`.
