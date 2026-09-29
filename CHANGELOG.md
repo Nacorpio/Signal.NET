@@ -8,6 +8,15 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Release process (roadmap 0.2):**
+  - A tag-driven release workflow (NuGet, then a GitHub Release).
+  - MinVer versioning from git tags.
+  - Public API tracking with `PublicAPI.*.txt`.
+  - Package validation.
+  - Coverage summaries in CI.
+  - A DocFX documentation site on GitHub Pages.
+  - The `Signal.NET.Templates` package with a `dotnet new signalbot` template.
+
 - **Layers:**
   - `Signal.Domain`: value objects, the `IncomingEnvelope` aggregate, `OutgoingMessage` builder, entities and domain events.
   - `Signal.Application`: ports, options with validation, the message pipeline with built-in middleware, and domain event dispatching.

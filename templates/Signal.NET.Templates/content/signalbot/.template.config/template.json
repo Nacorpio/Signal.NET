@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Nacorpio",
+  "classifications": [ "Signal", "Bot", "Worker", "Console" ],
+  "identity": "Signal.NET.Templates.SignalBot",
+  "groupIdentity": "Signal.NET.SignalBot",
+  "name": "Signal bot (Signal.NET)",
+  "description": "A Signal bot built with Signal.NET on top of signal-cli-rest-api.",
+  "shortName": "signalbot",
+  "sourceName": "SignalBot",
+  "preferNameDirectory": true,
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "symbols": {
+    "mode": {
+      "type": "parameter",
+      "datatype": "choice",
+      "description": "Execution mode of the signal-cli-rest-api container.",
+      "defaultValue": "JsonRpc",
+      "choices": [
+        { "choice": "Normal", "description": "normal: HTTP polling, JVM per request" },
+        { "choice": "Native", "description": "native: HTTP polling, native image" },
+        { "choice": "JsonRpc", "description": "json-rpc: WebSocket push, long-running daemon (recommended)" },
+        { "choice": "JsonRpcNative", "description": "json-rpc-native: WebSocket push, native daemon" }
+      ],
+      "replaces": "SIGNAL_MODE_VALUE"
+    },
+    "containerMode": {
+      "type": "generated",
+      "generator": "switch",
+      "replaces": "SIGNAL_CONTAINER_MODE",
+      "parameters": {
+        "evaluator": "C++",
+        "datatype": "string",
+        "cases": [
+          { "condition": "(mode == \"Normal\")", "value": "normal" },
+          { "condition": "(mode == \"Native\")", "value": "native" },
+          { "condition": "(mode == \"JsonRpcNative\")", "value": "json-rpc-native" },
+          { "condition": "(true)", "value": "json-rpc" }
+        ]
+      }
+    },
+    "account": {
+      "type": "parameter",
+      "datatype": "text",
+      "description": "The bot's phone number in E.164 format.",
+      "defaultValue": "+10000000000",
+      "replaces": "+10000000000"
+    },
+    "prefix": {
+      "type": "parameter",
+      "datatype": "text",
+      "description": "Command prefix.",
+      "defaultValue": "/",
+      "replaces": "SIGNAL_PREFIX"
+    },
+    "skipDocker": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Do not generate docker-compose.yml.",
+      "defaultValue": "false"
+    }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        { "condition": "(skipDocker)", "exclude": [ "docker-compose.yml" ] }
+      ]
+    }
+  ],
+  "primaryOutputs": [ { "path": "SignalBot.csproj" } ],
+  "postActions": [
+    {
+      "description": "Restore NuGet packages required by this project.",
+      "manualInstructions": [ { "text": "Run 'dotnet restore'" } ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    }
+  ]
+}

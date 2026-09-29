@@ -1,0 +1,12 @@
+- name: Guides
+  href: docs/
+- name: API reference
+  href: api/
+- name: Roadmap
+  href: ROADMAP.md
+- name: Changelog
+  href: CHANGELOG.md
+- name: Contributing
+  href: CONTRIBUTING.md
+- name: GitHub
+  href: https://github.com/Nacorpio/Signal.NET

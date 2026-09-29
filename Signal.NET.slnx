@@ -6,15 +6,22 @@
     <File Path="CONTRIBUTING.md" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
+    <File Path="docfx.json" />
     <File Path="docker-compose.yml" />
+    <File Path="dotnet-tools.json" />
     <File Path="global.json" />
+    <File Path="index.md" />
     <File Path="LICENSE" />
     <File Path="README.md" />
+    <File Path="ROADMAP.md" />
     <File Path="SECURITY.md" />
+    <File Path="toc.yml" />
   </Folder>
   <Folder Name="/Solution Items/.github/">
     <File Path=".github/dependabot.yml" />
     <File Path=".github/workflows/ci.yml" />
+    <File Path=".github/workflows/docs.yml" />
+    <File Path=".github/workflows/release.yml" />
   </Folder>
   <Folder Name="/docs/">
     <File Path="docs/README.md" />
@@ -38,6 +45,9 @@
     <Project Path="src/Signal.Domain/Signal.Domain.csproj" />
     <Project Path="src/Signal.Hosting/Signal.Hosting.csproj" />
     <Project Path="src/Signal.Infrastructure/Signal.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/templates/">
+    <Project Path="templates/Signal.NET.Templates/Signal.NET.Templates.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Signal.Application.Tests/Signal.Application.Tests.csproj" />

@@ -1,0 +1,11 @@
+# signal-cli-rest-api for SignalBot. MODE must match Signal:Mode in appsettings.json.
+services:
+  signal-cli-rest-api:
+    image: bbernhard/signal-cli-rest-api:latest
+    restart: unless-stopped
+    environment:
+      - MODE=SIGNAL_CONTAINER_MODE
+    ports:
+      - "127.0.0.1:8080:8080"   # the REST API has no authentication; keep it off the network
+    volumes:
+      - ./signal-cli-config:/home/.local/share/signal-cli   # contains account keys: never commit

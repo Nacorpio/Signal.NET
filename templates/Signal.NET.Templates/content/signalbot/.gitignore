@@ -1,0 +1,6 @@
+bin/
+obj/
+.vs/
+*.user
+# signal-cli-rest-api data (account keys!)
+signal-cli-config/

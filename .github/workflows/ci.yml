@@ -30,7 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Source Link and versioning need the full history
+          fetch-depth: 0 # MinVer and Source Link need the full history and tags
 
       - name: Set up .NET (from global.json)
         uses: actions/setup-dotnet@v4
@@ -49,6 +49,20 @@ jobs:
           --logger "trx;LogFilePrefix=results"
           --results-directory TestResults
           --collect "XPlat Code Coverage"
+
+      - name: Coverage report
+        if: matrix.os == 'ubuntu-latest'
+        uses: danielpalme/ReportGenerator-GitHub-Action@5
+        with:
+          reports: TestResults/**/coverage.cobertura.xml
+          targetdir: TestResults/coverage
+          reporttypes: MarkdownSummaryGithub;Cobertura;Badges
+          assemblyfilters: +Signal.*;-Signal.*.Tests;-Signal.Sample.*
+
+      - name: Publish coverage summary
+        if: matrix.os == 'ubuntu-latest'
+        shell: bash
+        run: cat TestResults/coverage/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload test results
         if: always()
@@ -71,10 +85,8 @@ jobs:
         with:
           global-json-file: global.json
 
-      - name: Pack
-        run: >
-          dotnet pack --configuration Release --output artifacts
-          --version-suffix "preview.${{ github.run_number }}"
+      - name: Pack (version from git tags via MinVer)
+        run: dotnet pack --configuration Release --output artifacts
 
       - uses: actions/upload-artifact@v4
         with:

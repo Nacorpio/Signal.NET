@@ -1,0 +1,22 @@
+- name: Architecture
+  href: architecture.md
+- name: Layers
+  items:
+    - name: Domain
+      href: domain.md
+    - name: Application
+      href: application.md
+    - name: Command system
+      href: commands.md
+    - name: Infrastructure
+      href: infrastructure.md
+    - name: Hosting
+      href: hosting.md
+- name: Configuration reference
+  href: configuration.md
+- name: Execution modes
+  href: execution-modes.md
+- name: Extensibility guide
+  href: extending.md
+- name: Sample bot and testing
+  href: samples-and-testing.md

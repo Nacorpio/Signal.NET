@@ -44,3 +44,8 @@ signal-cli-config/
 
 ## Claude Code local settings
 .claude/settings.local.json
+
+## DocFX output (api/index.md is handwritten and tracked)
+_site/
+api/*.yml
+api/.manifest
