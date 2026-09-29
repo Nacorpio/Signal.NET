@@ -592,3 +592,202 @@ virtual Signal.Application.Pipeline.MessageDelegate.Invoke(Signal.Application.Pi
 ~override Signal.Application.Commands.Parsing.CommandToken.ToString() -> string
 ~override Signal.Application.Commands.Preconditions.PreconditionResult.Equals(object obj) -> bool
 ~override Signal.Application.Commands.Preconditions.PreconditionResult.ToString() -> string
+const Signal.Application.Abstractions.LinkedDevice.PrimaryDeviceId = 1 -> long
+override Signal.Application.Abstractions.AccountSettings.Equals(object? obj) -> bool
+override Signal.Application.Abstractions.AccountSettings.GetHashCode() -> int
+override Signal.Application.Abstractions.AccountSettings.ToString() -> string!
+override Signal.Application.Abstractions.GroupPermissions.Equals(object? obj) -> bool
+override Signal.Application.Abstractions.GroupPermissions.GetHashCode() -> int
+override Signal.Application.Abstractions.GroupPermissions.ToString() -> string!
+override Signal.Application.Abstractions.GroupSettings.Equals(object? obj) -> bool
+override Signal.Application.Abstractions.GroupSettings.GetHashCode() -> int
+override Signal.Application.Abstractions.GroupSettings.ToString() -> string!
+override Signal.Application.Abstractions.LinkedDevice.Equals(object? obj) -> bool
+override Signal.Application.Abstractions.LinkedDevice.GetHashCode() -> int
+override Signal.Application.Abstractions.LinkedDevice.ToString() -> string!
+override Signal.Application.Abstractions.NumberRegistration.Equals(object? obj) -> bool
+override Signal.Application.Abstractions.NumberRegistration.GetHashCode() -> int
+override Signal.Application.Abstractions.NumberRegistration.ToString() -> string!
+override Signal.Application.Abstractions.RegistrationOptions.Equals(object? obj) -> bool
+override Signal.Application.Abstractions.RegistrationOptions.GetHashCode() -> int
+override Signal.Application.Abstractions.RegistrationOptions.ToString() -> string!
+override Signal.Application.Abstractions.SignalCapability.GetHashCode() -> int
+override Signal.Application.Abstractions.SignalCapability.ToString() -> string!
+override Signal.Application.Abstractions.StickerPack.Equals(object? obj) -> bool
+override Signal.Application.Abstractions.StickerPack.GetHashCode() -> int
+override Signal.Application.Abstractions.StickerPack.ToString() -> string!
+override Signal.Application.Abstractions.UsernameAssignment.Equals(object? obj) -> bool
+override Signal.Application.Abstractions.UsernameAssignment.GetHashCode() -> int
+override Signal.Application.Abstractions.UsernameAssignment.ToString() -> string!
+Signal.Application.Abstractions.AccountSettings
+Signal.Application.Abstractions.AccountSettings.<Clone>$() -> Signal.Application.Abstractions.AccountSettings!
+Signal.Application.Abstractions.AccountSettings.AccountSettings(bool? DiscoverableByNumber = null, bool? ShareNumber = null) -> void
+Signal.Application.Abstractions.AccountSettings.Deconstruct(out bool? DiscoverableByNumber, out bool? ShareNumber) -> void
+Signal.Application.Abstractions.AccountSettings.DiscoverableByNumber.get -> bool?
+Signal.Application.Abstractions.AccountSettings.DiscoverableByNumber.init -> void
+Signal.Application.Abstractions.AccountSettings.Equals(Signal.Application.Abstractions.AccountSettings? other) -> bool
+Signal.Application.Abstractions.AccountSettings.ShareNumber.get -> bool?
+Signal.Application.Abstractions.AccountSettings.ShareNumber.init -> void
+Signal.Application.Abstractions.GroupLinkMode
+Signal.Application.Abstractions.GroupLinkMode.Disabled = 0 -> Signal.Application.Abstractions.GroupLinkMode
+Signal.Application.Abstractions.GroupLinkMode.Enabled = 1 -> Signal.Application.Abstractions.GroupLinkMode
+Signal.Application.Abstractions.GroupLinkMode.EnabledWithApproval = 2 -> Signal.Application.Abstractions.GroupLinkMode
+Signal.Application.Abstractions.GroupPermission
+Signal.Application.Abstractions.GroupPermission.EveryMember = 0 -> Signal.Application.Abstractions.GroupPermission
+Signal.Application.Abstractions.GroupPermission.OnlyAdmins = 1 -> Signal.Application.Abstractions.GroupPermission
+Signal.Application.Abstractions.GroupPermissions
+Signal.Application.Abstractions.GroupPermissions.<Clone>$() -> Signal.Application.Abstractions.GroupPermissions!
+Signal.Application.Abstractions.GroupPermissions.AddMembers.get -> Signal.Application.Abstractions.GroupPermission
+Signal.Application.Abstractions.GroupPermissions.AddMembers.init -> void
+Signal.Application.Abstractions.GroupPermissions.Deconstruct(out Signal.Application.Abstractions.GroupPermission AddMembers, out Signal.Application.Abstractions.GroupPermission EditGroup, out Signal.Application.Abstractions.GroupPermission SendMessages) -> void
+Signal.Application.Abstractions.GroupPermissions.EditGroup.get -> Signal.Application.Abstractions.GroupPermission
+Signal.Application.Abstractions.GroupPermissions.EditGroup.init -> void
+Signal.Application.Abstractions.GroupPermissions.Equals(Signal.Application.Abstractions.GroupPermissions? other) -> bool
+Signal.Application.Abstractions.GroupPermissions.GroupPermissions(Signal.Application.Abstractions.GroupPermission AddMembers, Signal.Application.Abstractions.GroupPermission EditGroup, Signal.Application.Abstractions.GroupPermission SendMessages) -> void
+Signal.Application.Abstractions.GroupPermissions.SendMessages.get -> Signal.Application.Abstractions.GroupPermission
+Signal.Application.Abstractions.GroupPermissions.SendMessages.init -> void
+Signal.Application.Abstractions.GroupSettings
+Signal.Application.Abstractions.GroupSettings.<Clone>$() -> Signal.Application.Abstractions.GroupSettings!
+Signal.Application.Abstractions.GroupSettings.Deconstruct(out Signal.Application.Abstractions.GroupPermissions? Permissions, out Signal.Application.Abstractions.GroupLinkMode? Link, out System.TimeSpan? MessageExpiration) -> void
+Signal.Application.Abstractions.GroupSettings.Equals(Signal.Application.Abstractions.GroupSettings? other) -> bool
+Signal.Application.Abstractions.GroupSettings.GroupSettings(Signal.Application.Abstractions.GroupPermissions? Permissions = null, Signal.Application.Abstractions.GroupLinkMode? Link = null, System.TimeSpan? MessageExpiration = null) -> void
+Signal.Application.Abstractions.GroupSettings.Link.get -> Signal.Application.Abstractions.GroupLinkMode?
+Signal.Application.Abstractions.GroupSettings.Link.init -> void
+Signal.Application.Abstractions.GroupSettings.MessageExpiration.get -> System.TimeSpan?
+Signal.Application.Abstractions.GroupSettings.MessageExpiration.init -> void
+Signal.Application.Abstractions.GroupSettings.Permissions.get -> Signal.Application.Abstractions.GroupPermissions?
+Signal.Application.Abstractions.GroupSettings.Permissions.init -> void
+Signal.Application.Abstractions.IAccountService.DeleteUsernameAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IAccountService.GetLinkUriAsync(string! deviceName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
+Signal.Application.Abstractions.IAccountService.RemovePinAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IAccountService.SetPinAsync(Signal.Domain.ValueObjects.PhoneNumber account, string! pin, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IAccountService.SetUsernameAsync(Signal.Domain.ValueObjects.PhoneNumber account, string! nickname, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.UsernameAssignment?>!
+Signal.Application.Abstractions.IAccountService.SubmitRateLimitChallengeAsync(Signal.Domain.ValueObjects.PhoneNumber account, string! challengeToken, string! captcha, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IAccountService.UpdateSettingsAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Application.Abstractions.AccountSettings! settings, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IContactService.CheckRegisteredAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Collections.Generic.IEnumerable<Signal.Domain.ValueObjects.PhoneNumber>! numbers, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Signal.Application.Abstractions.NumberRegistration!>!>!
+Signal.Application.Abstractions.IContactService.SyncAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IDeviceService
+Signal.Application.Abstractions.IDeviceService.LinkAsync(Signal.Domain.ValueObjects.PhoneNumber account, string! deviceLinkUri, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IDeviceService.ListAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Signal.Application.Abstractions.LinkedDevice!>!>!
+Signal.Application.Abstractions.IDeviceService.RemoveAsync(Signal.Domain.ValueObjects.PhoneNumber account, long deviceId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IGroupService.BlockAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.GroupId group, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IGroupService.JoinAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.GroupId group, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IGroupService.PinMessageAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.GroupId group, string! targetAuthor, long targetTimestamp, System.TimeSpan? duration = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IGroupService.UnpinMessageAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.GroupId group, string! targetAuthor, long targetTimestamp, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IGroupService.UpdateSettingsAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.GroupId group, Signal.Application.Abstractions.GroupSettings! settings, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IRegistrationService
+Signal.Application.Abstractions.IRegistrationService.RegisterAsync(Signal.Domain.ValueObjects.PhoneNumber number, Signal.Application.Abstractions.RegistrationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IRegistrationService.UnregisterAsync(Signal.Domain.ValueObjects.PhoneNumber number, bool deleteAccount = false, bool deleteLocalData = false, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IRegistrationService.VerifyAsync(Signal.Domain.ValueObjects.PhoneNumber number, string! verificationCode, string? pin = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IStickerService
+Signal.Application.Abstractions.IStickerService.InstallAsync(Signal.Domain.ValueObjects.PhoneNumber account, string! packId, string! packKey, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IStickerService.InstallAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Uri! addStickersUrl, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IStickerService.ListAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Signal.Application.Abstractions.StickerPack!>!>!
+Signal.Application.Abstractions.LinkedDevice
+Signal.Application.Abstractions.LinkedDevice.<Clone>$() -> Signal.Application.Abstractions.LinkedDevice!
+Signal.Application.Abstractions.LinkedDevice.Created.get -> System.DateTimeOffset?
+Signal.Application.Abstractions.LinkedDevice.Created.init -> void
+Signal.Application.Abstractions.LinkedDevice.Deconstruct(out long Id, out string? Name, out System.DateTimeOffset? Created, out System.DateTimeOffset? LastSeen) -> void
+Signal.Application.Abstractions.LinkedDevice.Equals(Signal.Application.Abstractions.LinkedDevice? other) -> bool
+Signal.Application.Abstractions.LinkedDevice.Id.get -> long
+Signal.Application.Abstractions.LinkedDevice.Id.init -> void
+Signal.Application.Abstractions.LinkedDevice.IsPrimary.get -> bool
+Signal.Application.Abstractions.LinkedDevice.LastSeen.get -> System.DateTimeOffset?
+Signal.Application.Abstractions.LinkedDevice.LastSeen.init -> void
+Signal.Application.Abstractions.LinkedDevice.LinkedDevice(long Id, string? Name, System.DateTimeOffset? Created, System.DateTimeOffset? LastSeen) -> void
+Signal.Application.Abstractions.LinkedDevice.Name.get -> string?
+Signal.Application.Abstractions.LinkedDevice.Name.init -> void
+Signal.Application.Abstractions.NumberRegistration
+Signal.Application.Abstractions.NumberRegistration.<Clone>$() -> Signal.Application.Abstractions.NumberRegistration!
+Signal.Application.Abstractions.NumberRegistration.Deconstruct(out Signal.Domain.ValueObjects.PhoneNumber Number, out bool IsRegistered) -> void
+Signal.Application.Abstractions.NumberRegistration.Equals(Signal.Application.Abstractions.NumberRegistration? other) -> bool
+Signal.Application.Abstractions.NumberRegistration.IsRegistered.get -> bool
+Signal.Application.Abstractions.NumberRegistration.IsRegistered.init -> void
+Signal.Application.Abstractions.NumberRegistration.Number.get -> Signal.Domain.ValueObjects.PhoneNumber
+Signal.Application.Abstractions.NumberRegistration.Number.init -> void
+Signal.Application.Abstractions.NumberRegistration.NumberRegistration(Signal.Domain.ValueObjects.PhoneNumber Number, bool IsRegistered) -> void
+Signal.Application.Abstractions.RegistrationOptions
+Signal.Application.Abstractions.RegistrationOptions.<Clone>$() -> Signal.Application.Abstractions.RegistrationOptions!
+Signal.Application.Abstractions.RegistrationOptions.Captcha.get -> string?
+Signal.Application.Abstractions.RegistrationOptions.Captcha.init -> void
+Signal.Application.Abstractions.RegistrationOptions.Deconstruct(out bool UseVoice, out string? Captcha) -> void
+Signal.Application.Abstractions.RegistrationOptions.Equals(Signal.Application.Abstractions.RegistrationOptions? other) -> bool
+Signal.Application.Abstractions.RegistrationOptions.RegistrationOptions(bool UseVoice = false, string? Captcha = null) -> void
+Signal.Application.Abstractions.RegistrationOptions.UseVoice.get -> bool
+Signal.Application.Abstractions.RegistrationOptions.UseVoice.init -> void
+Signal.Application.Abstractions.SignalApiInfo.EnsureSupported(Signal.Application.Abstractions.SignalCapability capability) -> void
+Signal.Application.Abstractions.SignalApiInfo.Supports(Signal.Application.Abstractions.SignalCapability capability) -> bool
+Signal.Application.Abstractions.SignalCapability
+Signal.Application.Abstractions.SignalCapability.Deconstruct(out string! Endpoint, out string! Feature) -> void
+Signal.Application.Abstractions.SignalCapability.Endpoint.get -> string!
+Signal.Application.Abstractions.SignalCapability.Endpoint.init -> void
+Signal.Application.Abstractions.SignalCapability.Equals(Signal.Application.Abstractions.SignalCapability other) -> bool
+Signal.Application.Abstractions.SignalCapability.Feature.get -> string!
+Signal.Application.Abstractions.SignalCapability.Feature.init -> void
+Signal.Application.Abstractions.SignalCapability.SignalCapability() -> void
+Signal.Application.Abstractions.SignalCapability.SignalCapability(string! Endpoint, string! Feature) -> void
+Signal.Application.Abstractions.StickerPack
+Signal.Application.Abstractions.StickerPack.<Clone>$() -> Signal.Application.Abstractions.StickerPack!
+Signal.Application.Abstractions.StickerPack.Author.get -> string?
+Signal.Application.Abstractions.StickerPack.Author.init -> void
+Signal.Application.Abstractions.StickerPack.Deconstruct(out string! PackId, out string? Title, out string? Author, out bool Installed, out string? Url) -> void
+Signal.Application.Abstractions.StickerPack.Equals(Signal.Application.Abstractions.StickerPack? other) -> bool
+Signal.Application.Abstractions.StickerPack.Installed.get -> bool
+Signal.Application.Abstractions.StickerPack.Installed.init -> void
+Signal.Application.Abstractions.StickerPack.PackId.get -> string!
+Signal.Application.Abstractions.StickerPack.PackId.init -> void
+Signal.Application.Abstractions.StickerPack.StickerPack(string! PackId, string? Title, string? Author, bool Installed, string? Url) -> void
+Signal.Application.Abstractions.StickerPack.Title.get -> string?
+Signal.Application.Abstractions.StickerPack.Title.init -> void
+Signal.Application.Abstractions.StickerPack.Url.get -> string?
+Signal.Application.Abstractions.StickerPack.Url.init -> void
+Signal.Application.Abstractions.UsernameAssignment
+Signal.Application.Abstractions.UsernameAssignment.<Clone>$() -> Signal.Application.Abstractions.UsernameAssignment!
+Signal.Application.Abstractions.UsernameAssignment.Deconstruct(out Signal.Domain.ValueObjects.Username Username, out string? Link) -> void
+Signal.Application.Abstractions.UsernameAssignment.Equals(Signal.Application.Abstractions.UsernameAssignment? other) -> bool
+Signal.Application.Abstractions.UsernameAssignment.Link.get -> string?
+Signal.Application.Abstractions.UsernameAssignment.Link.init -> void
+Signal.Application.Abstractions.UsernameAssignment.Username.get -> Signal.Domain.ValueObjects.Username
+Signal.Application.Abstractions.UsernameAssignment.Username.init -> void
+Signal.Application.Abstractions.UsernameAssignment.UsernameAssignment(Signal.Domain.ValueObjects.Username Username, string? Link) -> void
+static Signal.Application.Abstractions.AccountSettings.operator !=(Signal.Application.Abstractions.AccountSettings? left, Signal.Application.Abstractions.AccountSettings? right) -> bool
+static Signal.Application.Abstractions.AccountSettings.operator ==(Signal.Application.Abstractions.AccountSettings? left, Signal.Application.Abstractions.AccountSettings? right) -> bool
+static Signal.Application.Abstractions.GroupPermissions.operator !=(Signal.Application.Abstractions.GroupPermissions? left, Signal.Application.Abstractions.GroupPermissions? right) -> bool
+static Signal.Application.Abstractions.GroupPermissions.operator ==(Signal.Application.Abstractions.GroupPermissions? left, Signal.Application.Abstractions.GroupPermissions? right) -> bool
+static Signal.Application.Abstractions.GroupSettings.operator !=(Signal.Application.Abstractions.GroupSettings? left, Signal.Application.Abstractions.GroupSettings? right) -> bool
+static Signal.Application.Abstractions.GroupSettings.operator ==(Signal.Application.Abstractions.GroupSettings? left, Signal.Application.Abstractions.GroupSettings? right) -> bool
+static Signal.Application.Abstractions.LinkedDevice.operator !=(Signal.Application.Abstractions.LinkedDevice? left, Signal.Application.Abstractions.LinkedDevice? right) -> bool
+static Signal.Application.Abstractions.LinkedDevice.operator ==(Signal.Application.Abstractions.LinkedDevice? left, Signal.Application.Abstractions.LinkedDevice? right) -> bool
+static Signal.Application.Abstractions.NumberRegistration.operator !=(Signal.Application.Abstractions.NumberRegistration? left, Signal.Application.Abstractions.NumberRegistration? right) -> bool
+static Signal.Application.Abstractions.NumberRegistration.operator ==(Signal.Application.Abstractions.NumberRegistration? left, Signal.Application.Abstractions.NumberRegistration? right) -> bool
+static Signal.Application.Abstractions.RegistrationOptions.operator !=(Signal.Application.Abstractions.RegistrationOptions? left, Signal.Application.Abstractions.RegistrationOptions? right) -> bool
+static Signal.Application.Abstractions.RegistrationOptions.operator ==(Signal.Application.Abstractions.RegistrationOptions? left, Signal.Application.Abstractions.RegistrationOptions? right) -> bool
+Signal.Application.Abstractions.IMessageSender.RemoteDeleteAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient recipient, long targetTimestamp, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
+override Signal.Application.Abstractions.AttachmentDownload.Equals(object? obj) -> bool
+override Signal.Application.Abstractions.AttachmentDownload.GetHashCode() -> int
+override Signal.Application.Abstractions.AttachmentDownload.ToString() -> string!
+Signal.Application.Abstractions.AttachmentDownload
+Signal.Application.Abstractions.AttachmentDownload.<Clone>$() -> Signal.Application.Abstractions.AttachmentDownload!
+Signal.Application.Abstractions.AttachmentDownload.AttachmentDownload(System.IO.Stream! Content, string? ContentType, long? Length) -> void
+Signal.Application.Abstractions.AttachmentDownload.Content.get -> System.IO.Stream!
+Signal.Application.Abstractions.AttachmentDownload.Content.init -> void
+Signal.Application.Abstractions.AttachmentDownload.ContentType.get -> string?
+Signal.Application.Abstractions.AttachmentDownload.ContentType.init -> void
+Signal.Application.Abstractions.AttachmentDownload.Deconstruct(out System.IO.Stream! Content, out string? ContentType, out long? Length) -> void
+Signal.Application.Abstractions.AttachmentDownload.Dispose() -> void
+Signal.Application.Abstractions.AttachmentDownload.DisposeAsync() -> System.Threading.Tasks.ValueTask
+Signal.Application.Abstractions.AttachmentDownload.Equals(Signal.Application.Abstractions.AttachmentDownload? other) -> bool
+Signal.Application.Abstractions.AttachmentDownload.Length.get -> long?
+Signal.Application.Abstractions.AttachmentDownload.Length.init -> void
+Signal.Application.Abstractions.IAttachmentService.OpenReadAsync(string! attachmentId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.AttachmentDownload!>!
+static Signal.Application.Abstractions.AttachmentDownload.operator !=(Signal.Application.Abstractions.AttachmentDownload? left, Signal.Application.Abstractions.AttachmentDownload? right) -> bool
+static Signal.Application.Abstractions.AttachmentDownload.operator ==(Signal.Application.Abstractions.AttachmentDownload? left, Signal.Application.Abstractions.AttachmentDownload? right) -> bool
+static Signal.Application.Abstractions.SignalCapability.operator !=(Signal.Application.Abstractions.SignalCapability left, Signal.Application.Abstractions.SignalCapability right) -> bool
+static Signal.Application.Abstractions.SignalCapability.operator ==(Signal.Application.Abstractions.SignalCapability left, Signal.Application.Abstractions.SignalCapability right) -> bool
+static Signal.Application.Abstractions.SignalCapability.SendMentions.get -> Signal.Application.Abstractions.SignalCapability
+static Signal.Application.Abstractions.SignalCapability.SendQuotes.get -> Signal.Application.Abstractions.SignalCapability
+static Signal.Application.Abstractions.StickerPack.operator !=(Signal.Application.Abstractions.StickerPack? left, Signal.Application.Abstractions.StickerPack? right) -> bool
+static Signal.Application.Abstractions.StickerPack.operator ==(Signal.Application.Abstractions.StickerPack? left, Signal.Application.Abstractions.StickerPack? right) -> bool
+static Signal.Application.Abstractions.UsernameAssignment.operator !=(Signal.Application.Abstractions.UsernameAssignment? left, Signal.Application.Abstractions.UsernameAssignment? right) -> bool
+static Signal.Application.Abstractions.UsernameAssignment.operator ==(Signal.Application.Abstractions.UsernameAssignment? left, Signal.Application.Abstractions.UsernameAssignment? right) -> bool
+~override Signal.Application.Abstractions.SignalCapability.Equals(object obj) -> bool

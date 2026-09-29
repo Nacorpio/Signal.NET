@@ -10,16 +10,16 @@ The layer column shows where the work mainly lands (**D**omain, **A**pplication,
 
 ---
 
-## Where the project stands today (0.2.0-preview.2)
+## Where the project stands today (0.3.0-preview.1)
 
 | Area | State |
 |---|---|
 | Architecture | Four layers (Domain → Application → Infrastructure → Hosting), DI throughout, `TryAdd` everywhere |
-| Transport | REST adapters for 15 endpoint groups; HTTP polling (`normal`/`native`) and WebSocket (`json-rpc*`) receivers with backoff and reconnect |
+| Transport | REST adapters for 14 ports (messaging, groups, contacts, accounts, registration, devices, stickers, attachments, profiles, identities and more); HTTP polling (`normal`/`native`) and WebSocket (`json-rpc*`) receivers with backoff and reconnect |
 | Commands | Modules, class and lambda commands; typed binding, flags, remainder; five preconditions and cooldowns; generated help |
 | Processing | Middleware pipeline, domain events, conversation-partitioned concurrency |
 | Language | .NET 11 **RC1** SDK; C# 15 unions (`Recipient`, `EnvelopeContent`, `CommandResult`, `ArgumentBindingResult`), C# 14 extension members |
-| Quality | 118 tests, XML docs and public API tracking enforced by the build, CI with coverage on Linux and Windows |
+| Quality | 180 tests, XML docs and public API tracking enforced by the build, CI with coverage on Linux and Windows |
 | Delivery | Tag-driven releases with NuGet Trusted Publishing (approval-gated `nuget` environment), a [docs site](https://nacorpio.github.io/Signal.NET/), a `dotnet new signalbot` template. Published on nuget.org as [`Nacorpio.Signal.*`](https://www.nuget.org/packages/Nacorpio.Signal.Hosting) since [v0.2.0-preview.2](https://github.com/Nacorpio/Signal.NET/releases/tag/v0.2.0-preview.2). |
 
 These known limitations shape the plan below:
@@ -59,7 +59,7 @@ Item 0.2.8 exists so that can't happen again.
 
 ## Milestone 0.3: Complete API coverage
 
-**Status:** all items are merged into `main` and not yet released (see the [changelog](CHANGELOG.md)).
+**Status:** complete, released in [v0.3.0-preview.1](https://github.com/Nacorpio/Signal.NET/releases/tag/v0.3.0-preview.1).
 
 *Goal: every signal-cli-rest-api capability reachable through a typed port. Check each endpoint against the
 [Swagger spec](https://bbernhard.github.io/signal-cli-rest-api/) when implementing.*

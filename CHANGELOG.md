@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0-preview.1] - 2026-09-29
+
+Milestone 0.3 (complete API coverage). Every change is additive: members added to existing interfaces have default
+implementations, so code written against 0.2.0-preview.2 keeps compiling.
+
 ### Added
 
 - **Typed capabilities (roadmap 0.3.13):** `SignalCapability` (with `SendQuotes` and `SendMentions`), `SignalApiInfo.Supports` and `SignalApiInfo.EnsureSupported`. The latter throws a `NotSupportedException` naming the missing feature and the API version.
@@ -78,6 +83,7 @@ First preview release. Available as a [GitHub Release](https://github.com/Nacorp
 - **Documentation:** full XML documentation (enforced by the build) and the `docs/` guides.
 - **Repository:** sample bot, Docker Compose file, CI workflow for GitHub Actions.
 
-[Unreleased]: https://github.com/Nacorpio/Signal.NET/compare/v0.2.0-preview.2...HEAD
+[Unreleased]: https://github.com/Nacorpio/Signal.NET/compare/v0.3.0-preview.1...HEAD
+[0.3.0-preview.1]: https://github.com/Nacorpio/Signal.NET/compare/v0.2.0-preview.2...v0.3.0-preview.1
 [0.2.0-preview.2]: https://github.com/Nacorpio/Signal.NET/compare/v0.2.0-preview.1...v0.2.0-preview.2
 [0.2.0-preview.1]: https://github.com/Nacorpio/Signal.NET/releases/tag/v0.2.0-preview.1
