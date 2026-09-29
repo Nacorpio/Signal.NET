@@ -19,8 +19,6 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>signal;signal-cli;signal-cli-rest-api;bot;messaging;ddd</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <VersionPrefix>0.1.0</VersionPrefix>
-    <VersionSuffix>preview</VersionSuffix>
 
     <!-- Source Link: the repository URL is taken from the git remote at build time. -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -28,6 +26,23 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <!--
+    Versioning (MinVer): the version is computed from the latest git tag.
+      tag v0.2.0            -> 0.2.0
+      3 commits after tag   -> 0.2.1-preview.0.3
+      no tag yet            -> 0.2.0-preview.0.<height>   (MinVerMinimumMajorMinor)
+    Release by pushing a tag such as v0.2.0 or v0.2.0-preview.1 (see .github/workflows/release.yml).
+  -->
+  <PropertyGroup>
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+    <MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
+    <MinVerMinimumMajorMinor>0.2</MinVerMinimumMajorMinor>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MinVer" PrivateAssets="all" />
+  </ItemGroup>
 
   <!-- Deterministic builds on CI (GitHub Actions sets GITHUB_ACTIONS=true). -->
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">

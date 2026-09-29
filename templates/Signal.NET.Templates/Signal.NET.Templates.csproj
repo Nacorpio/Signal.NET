@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    `dotnet new` template package; see README.md for installation and options.
+    The generated project references the Signal.NET packages of the same version as this template package.
+  -->
+  <PropertyGroup>
+    <PackageId>Signal.NET.Templates</PackageId>
+    <PackageType>Template</PackageType>
+    <Title>Signal.NET templates</Title>
+    <Description>dotnet new templates for Signal.NET: a ready-to-run Signal bot project (signalbot).</Description>
+    <PackageTags>$(PackageTags);dotnet-new;templates</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <IncludeContentInPack>true</IncludeContentInPack>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <ContentTargetFolders>content</ContentTargetFolders>
+    <NoDefaultExcludes>true</NoDefaultExcludes>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <!-- No library code, so no symbols; package validation does not apply. -->
+    <IncludeSymbols>false</IncludeSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Template files are packed verbatim, except the project file, which gets the version stamped in (below). -->
+    <Content Include="content/**/*" Exclude="content/**/bin/**;content/**/obj/**;content/signalbot/SignalBot.csproj"
+             Pack="true" PackagePath="content/%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Remove="**/*" />
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+  <!--
+    Replace SIGNALNET_VERSION in the template's project file with this package's version (from MinVer),
+    so `dotnet new signalbot` produces a project pinned to the matching Signal.NET release.
+  -->
+  <Target Name="StampTemplateVersion" BeforeTargets="_GetPackageFiles" DependsOnTargets="MinVer">
+    <PropertyGroup>
+      <_TemplateProject>$(MSBuildThisFileDirectory)content/signalbot/SignalBot.csproj</_TemplateProject>
+      <_StampedProject>$(IntermediateOutputPath)template/SignalBot.csproj</_StampedProject>
+      <_StampedText>$([System.IO.File]::ReadAllText('$(_TemplateProject)').Replace('SIGNALNET_VERSION', '$(PackageVersion)'))</_StampedText>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(_StampedProject)" Lines="$(_StampedText)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <ItemGroup>
+      <Content Include="$(_StampedProject)" Pack="true" PackagePath="content/signalbot/SignalBot.csproj" />
+    </ItemGroup>
+  </Target>
+</Project>

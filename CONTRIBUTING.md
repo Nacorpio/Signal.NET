@@ -4,7 +4,7 @@ Thanks for your interest! This guide covers the local setup and the conventions 
 
 ## Prerequisites
 
-- The .NET SDK pinned in [`global.json`](global.json) (.NET 11 preview; C# 15 preview features such as unions are used)
+- The .NET SDK pinned in [`global.json`](https://github.com/Nacorpio/Signal.NET/blob/main/global.json) (.NET 11 preview; C# 15 preview features such as unions are used)
 - Docker, only for end-to-end testing against a real signal-cli-rest-api container
 
 ## Build and test
@@ -18,7 +18,7 @@ dotnet test
 The unit and integration tests need no container, and neither does CI.
 
 For an end-to-end check, start the container with `docker compose up -d` and link a device (see the
-[README](README.md#quick-start)). Put your number into user secrets rather than `appsettings.json`:
+[README](https://github.com/Nacorpio/Signal.NET#quick-start)). Put your number into user secrets rather than `appsettings.json`:
 
 ```bash
 dotnet user-secrets --project samples/Signal.Sample.Bot set "Signal:Accounts:0" "+4915112345678"
@@ -34,6 +34,53 @@ dotnet run --project samples/Signal.Sample.Bot
 - **Tests:** add or adjust tests for every behaviour change.
 - **Docs:** update `docs/` and `CHANGELOG.md` when behaviour, configuration or public API changes.
 - **Never commit account data:** phone numbers, `signal-cli-config/` or secrets. The `.gitignore` covers the usual locations.
+
+## Public API changes
+
+Each library has `PublicAPI.Shipped.txt` (APIs in released versions) and `PublicAPI.Unshipped.txt` (APIs
+added since). The build fails (RS0016/RS0017) when the public surface and these files disagree:
+
+- **Adding API:** run the analyzer's code fix (the lightbulb in the IDE), or fix everything at once:
+
+  ```bash
+  dotnet format analyzers src/Signal.Domain/Signal.Domain.csproj --diagnostics RS0016 --severity info
+  ```
+
+- **Removing or changing shipped API** is a breaking change. Discuss it in an issue first.
+
+The diff of these files is the API review of a pull request.
+
+## Documentation site
+
+```bash
+dotnet tool restore
+dotnet docfx docfx.json --serve --port 8090   # 8080 is taken by signal-cli-rest-api
+```
+
+The site is published to GitHub Pages by `.github/workflows/docs.yml` on every push to `main`.
+
+## Templates
+
+Test changes to `templates/Signal.NET.Templates` against locally packed libraries:
+
+```bash
+dotnet pack -c Release -o ./feed
+dotnet new install ./feed/Signal.NET.Templates.<version>.nupkg
+dotnet new signalbot -n TestBot -o ../TestBot   # outside the repo, then add ./feed as a NuGet source
+```
+
+## Releasing (maintainers)
+
+Versions come from git tags ([MinVer](https://github.com/adamralph/minver)). Untagged builds are
+`0.2.0-preview.0.<height>`.
+
+1. In `CHANGELOG.md`, move the *Unreleased* entries under `## [x.y.z] - YYYY-MM-DD`.
+2. Move the contents of every `PublicAPI.Unshipped.txt` into the matching `PublicAPI.Shipped.txt`.
+3. After the first release, set `PackageValidationBaselineVersion` in `src/Directory.Build.props` to the previous version.
+4. Commit, then tag and push, e.g. `git tag v0.2.0 && git push origin v0.2.0`. Pre-releases use `v0.2.0-preview.1`.
+
+`.github/workflows/release.yml` then builds, tests and packs, checks that the package versions match the tag,
+publishes to nuget.org (secret `NUGET_API_KEY`), and creates the GitHub Release with the changelog section.
 
 ## Pull requests
 

@@ -1,5 +1,10 @@
 # Signal.NET
 
+[![CI](https://github.com/Nacorpio/Signal.NET/actions/workflows/ci.yml/badge.svg)](https://github.com/Nacorpio/Signal.NET/actions/workflows/ci.yml)
+[![Docs](https://github.com/Nacorpio/Signal.NET/actions/workflows/docs.yml/badge.svg)](https://nacorpio.github.io/Signal.NET/)
+[![NuGet](https://img.shields.io/nuget/vpre/Signal.Hosting?label=nuget)](https://www.nuget.org/packages/Signal.Hosting)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 A .NET 11 / C# 15 framework for building Signal bots and integrations on top of
 [bbernhard/signal-cli-rest-api](https://github.com/bbernhard/signal-cli-rest-api)
 ([Swagger](https://bbernhard.github.io/signal-cli-rest-api/)).
@@ -10,9 +15,27 @@ A .NET 11 / C# 15 framework for building Signal bots and integrations on top of
 - **`appsettings.json` configuration** – validated on startup, hot-reloadable command/access settings.
 - **All four container modes** – `normal`, `native` (HTTP polling) and `json-rpc`, `json-rpc-native` (WebSocket push).
 
+## Installation
+
+Start a new bot from the template:
+
+```bash
+dotnet new install Signal.NET.Templates
+dotnet new signalbot -n MyBot --mode JsonRpc --account +4915112345678
+```
+
+Or add Signal.NET to an existing project. Signal.NET uses C# 15 unions, so set `<LangVersion>preview</LangVersion>`.
+
+```bash
+dotnet add package Signal.Hosting --prerelease
+```
+
+`Signal.Hosting` pulls in `Signal.Infrastructure`, `Signal.Application` and `Signal.Domain`.
+
 ## Documentation
 
-The full documentation is in [`docs/`](docs/README.md): [architecture](docs/architecture.md), [domain](docs/domain.md), [application](docs/application.md), the [command system](docs/commands.md), [infrastructure](docs/infrastructure.md), [hosting](docs/hosting.md), the [configuration reference](docs/configuration.md), [execution modes](docs/execution-modes.md), [extensibility](docs/extending.md), and [samples and testing](docs/samples-and-testing.md).
+The documentation site is at **https://nacorpio.github.io/Signal.NET/**. It contains the guides and the full API reference.
+The guides are also in [`docs/`](docs/README.md): [architecture](docs/architecture.md), [domain](docs/domain.md), [application](docs/application.md), the [command system](docs/commands.md), [infrastructure](docs/infrastructure.md), [hosting](docs/hosting.md), the [configuration reference](docs/configuration.md), [execution modes](docs/execution-modes.md), [extensibility](docs/extending.md), and [samples and testing](docs/samples-and-testing.md).
 
 Every public type and member also has XML documentation comments, which IntelliSense shows. Any public member without a comment fails the build.
 
@@ -193,7 +216,7 @@ The tests cover the domain invariants, the parser, binding and preconditions, an
 
 ## Contributing
 
-Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the build setup and conventions, and [SECURITY.md](SECURITY.md) for how to report vulnerabilities and run a bot safely. Changes are tracked in [CHANGELOG.md](CHANGELOG.md).
+Planned features are listed in the [ROADMAP](ROADMAP.md). Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the build setup and conventions, and [SECURITY.md](SECURITY.md) for how to report vulnerabilities and run a bot safely. Changes are tracked in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 
