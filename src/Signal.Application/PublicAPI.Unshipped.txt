@@ -18,6 +18,8 @@ override Signal.Application.Abstractions.NumberRegistration.ToString() -> string
 override Signal.Application.Abstractions.RegistrationOptions.Equals(object? obj) -> bool
 override Signal.Application.Abstractions.RegistrationOptions.GetHashCode() -> int
 override Signal.Application.Abstractions.RegistrationOptions.ToString() -> string!
+override Signal.Application.Abstractions.SignalCapability.GetHashCode() -> int
+override Signal.Application.Abstractions.SignalCapability.ToString() -> string!
 override Signal.Application.Abstractions.StickerPack.Equals(object? obj) -> bool
 override Signal.Application.Abstractions.StickerPack.GetHashCode() -> int
 override Signal.Application.Abstractions.StickerPack.ToString() -> string!
@@ -120,6 +122,17 @@ Signal.Application.Abstractions.RegistrationOptions.Equals(Signal.Application.Ab
 Signal.Application.Abstractions.RegistrationOptions.RegistrationOptions(bool UseVoice = false, string? Captcha = null) -> void
 Signal.Application.Abstractions.RegistrationOptions.UseVoice.get -> bool
 Signal.Application.Abstractions.RegistrationOptions.UseVoice.init -> void
+Signal.Application.Abstractions.SignalApiInfo.EnsureSupported(Signal.Application.Abstractions.SignalCapability capability) -> void
+Signal.Application.Abstractions.SignalApiInfo.Supports(Signal.Application.Abstractions.SignalCapability capability) -> bool
+Signal.Application.Abstractions.SignalCapability
+Signal.Application.Abstractions.SignalCapability.Deconstruct(out string! Endpoint, out string! Feature) -> void
+Signal.Application.Abstractions.SignalCapability.Endpoint.get -> string!
+Signal.Application.Abstractions.SignalCapability.Endpoint.init -> void
+Signal.Application.Abstractions.SignalCapability.Equals(Signal.Application.Abstractions.SignalCapability other) -> bool
+Signal.Application.Abstractions.SignalCapability.Feature.get -> string!
+Signal.Application.Abstractions.SignalCapability.Feature.init -> void
+Signal.Application.Abstractions.SignalCapability.SignalCapability() -> void
+Signal.Application.Abstractions.SignalCapability.SignalCapability(string! Endpoint, string! Feature) -> void
 Signal.Application.Abstractions.StickerPack
 Signal.Application.Abstractions.StickerPack.<Clone>$() -> Signal.Application.Abstractions.StickerPack!
 Signal.Application.Abstractions.StickerPack.Author.get -> string?
@@ -176,7 +189,12 @@ Signal.Application.Abstractions.AttachmentDownload.Length.init -> void
 Signal.Application.Abstractions.IAttachmentService.OpenReadAsync(string! attachmentId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.AttachmentDownload!>!
 static Signal.Application.Abstractions.AttachmentDownload.operator !=(Signal.Application.Abstractions.AttachmentDownload? left, Signal.Application.Abstractions.AttachmentDownload? right) -> bool
 static Signal.Application.Abstractions.AttachmentDownload.operator ==(Signal.Application.Abstractions.AttachmentDownload? left, Signal.Application.Abstractions.AttachmentDownload? right) -> bool
+static Signal.Application.Abstractions.SignalCapability.operator !=(Signal.Application.Abstractions.SignalCapability left, Signal.Application.Abstractions.SignalCapability right) -> bool
+static Signal.Application.Abstractions.SignalCapability.operator ==(Signal.Application.Abstractions.SignalCapability left, Signal.Application.Abstractions.SignalCapability right) -> bool
+static Signal.Application.Abstractions.SignalCapability.SendMentions.get -> Signal.Application.Abstractions.SignalCapability
+static Signal.Application.Abstractions.SignalCapability.SendQuotes.get -> Signal.Application.Abstractions.SignalCapability
 static Signal.Application.Abstractions.StickerPack.operator !=(Signal.Application.Abstractions.StickerPack? left, Signal.Application.Abstractions.StickerPack? right) -> bool
 static Signal.Application.Abstractions.StickerPack.operator ==(Signal.Application.Abstractions.StickerPack? left, Signal.Application.Abstractions.StickerPack? right) -> bool
 static Signal.Application.Abstractions.UsernameAssignment.operator !=(Signal.Application.Abstractions.UsernameAssignment? left, Signal.Application.Abstractions.UsernameAssignment? right) -> bool
 static Signal.Application.Abstractions.UsernameAssignment.operator ==(Signal.Application.Abstractions.UsernameAssignment? left, Signal.Application.Abstractions.UsernameAssignment? right) -> bool
+~override Signal.Application.Abstractions.SignalCapability.Equals(object obj) -> bool

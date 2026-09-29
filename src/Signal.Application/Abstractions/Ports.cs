@@ -723,6 +723,58 @@ public sealed record SignalApiInfo(
 {
     /// <summary><see cref="RawMode"/> as <see cref="ExecutionMode"/>, or <see langword="null"/> if unknown.</summary>
     public ExecutionMode? Mode => ExecutionModeExtensions.TryParseContainerValue(RawMode, out var mode) ? mode : null;
+
+    /// <summary>Whether the API reports <paramref name="capability"/> in <see cref="Capabilities"/>.</summary>
+    /// <param name="capability">The capability, e.g. <see cref="SignalCapability.SendMentions"/>.</param>
+    /// <returns><see langword="true"/> if the feature is listed for the endpoint (case-insensitive).</returns>
+    /// <exception cref="ArgumentException"><paramref name="capability"/> is <see langword="default"/>.</exception>
+    public bool Supports(SignalCapability capability)
+    {
+        if (string.IsNullOrWhiteSpace(capability.Endpoint) || string.IsNullOrWhiteSpace(capability.Feature))
+        {
+            throw new ArgumentException("The capability needs an endpoint and a feature.", nameof(capability));
+        }
+
+        return Capabilities.TryGetValue(capability.Endpoint, out var features)
+            && features.Contains(capability.Feature, StringComparer.OrdinalIgnoreCase);
+    }
+
+    /// <summary>Throws a descriptive exception unless the API reports <paramref name="capability"/>.</summary>
+    /// <param name="capability">The required capability.</param>
+    /// <exception cref="NotSupportedException">The capability is not reported, typically because the container is outdated.</exception>
+    /// <exception cref="ArgumentException"><paramref name="capability"/> is <see langword="default"/>.</exception>
+    public void EnsureSupported(SignalCapability capability)
+    {
+        if (!Supports(capability))
+        {
+            throw new NotSupportedException(
+                $"signal-cli-rest-api {Version ?? "(unknown version)"} does not report the '{capability.Feature}' capability " +
+                $"for {capability.Endpoint}. Update the container image or avoid this feature.");
+        }
+    }
+}
+
+/// <summary>
+/// An optional feature of an API endpoint, as listed in <see cref="SignalApiInfo.Capabilities"/>. Check it with
+/// <see cref="SignalApiInfo.Supports"/> or <see cref="SignalApiInfo.EnsureSupported"/>.
+/// </summary>
+/// <remarks>
+/// signal-cli-rest-api currently reports only <see cref="SendQuotes"/> and <see cref="SendMentions"/>. Create other
+/// values with the constructor if a newer version reports more.
+/// </remarks>
+/// <param name="Endpoint">The endpoint, e.g. <c>v2/send</c>.</param>
+/// <param name="Feature">The feature, e.g. <c>mentions</c>.</param>
+public readonly record struct SignalCapability(string Endpoint, string Feature)
+{
+    /// <summary>Quoting (replying to) messages with <c>v2/send</c>.</summary>
+    public static SignalCapability SendQuotes { get; } = new("v2/send", "quotes");
+
+    /// <summary>Mentions in messages sent with <c>v2/send</c>.</summary>
+    public static SignalCapability SendMentions { get; } = new("v2/send", "mentions");
+
+    /// <summary>Returns <c>endpoint:feature</c>.</summary>
+    /// <returns>The capability as text.</returns>
+    public override string ToString() => $"{Endpoint}:{Feature}";
 }
 
 /// <summary>Container-level information and health.</summary>

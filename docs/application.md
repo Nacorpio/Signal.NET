@@ -49,7 +49,7 @@ implementations. You can replace any port, for example with a fake in tests or a
 Supporting types:
 
 - **`SendResult(Timestamp)`**: the timestamp of a sent message. Keep it to edit the message, react to it or quote it later.
-- **`SignalApiInfo`**: the result of `/v1/about`. `Mode` parses the container mode into an `ExecutionMode`.
+- **`SignalApiInfo`**: the result of `/v1/about`. `Mode` parses the container mode into an `ExecutionMode`. `Supports(SignalCapability)` and `EnsureSupported(SignalCapability)` check optional endpoint features. The latter throws a `NotSupportedException` that names the feature, endpoint and API version, for example `info.EnsureSupported(SignalCapability.SendMentions)` before sending mentions. signal-cli-rest-api currently reports only `SendQuotes` and `SendMentions`.
 - **`UsernameAssignment(Username, Link)`**: the result of `IAccountService.SetUsernameAsync`. Signal appends a discriminator (`alice` → `alice.42`); `Link` is a shareable chat link. It's `null` when the API answers without details (204).
 - **`AccountSettings(DiscoverableByNumber, ShareNumber)`**: privacy settings for `UpdateSettingsAsync`. `null` leaves a setting unchanged.
 - **`RegistrationOptions(UseVoice, Captcha)`**: how `IRegistrationService.RegisterAsync` requests the code. When Signal answers with a captcha error, solve the captcha at `https://signalcaptchas.org/registration/generate.html` and retry with the `signalcaptcha://…` link as `Captcha`.
