@@ -71,9 +71,9 @@ Item 0.2.8 exists so that can't happen again.
 | 0.3.5 | **Remote delete** | D/A/I | S | ✅ `IMessageSender.RemoteDeleteAsync(account, recipient, sendResult.Timestamp)` (added without breaking existing implementations) |
 | 0.3.6 | **Stickers** | D/A/I | M | ✅ `Sticker` value object (`packId:stickerId`, `IParsable`); `OutgoingMessageBuilder.WithSticker`; `IStickerService` lists and installs packs (also from `signal.art` share links) |
 | 0.3.7 | **Link previews** | D/I | S | ✅ `OutgoingMessageBuilder.WithLinkPreview(url, title, …)`; `Build()` requires the URL in the text |
-| 0.3.8 | **Group extras** | A/I | S | Join via invite link, block, avatar, group permissions |
-| 0.3.9 | **Contact sync and blocking** | A/I | S | Sync contacts to linked devices; block and unblock |
-| 0.3.10 | **Number search** | A/I | S | Check which numbers are registered with Signal |
+| 0.3.8 | **Group extras** | A/I | S | ✅ `IGroupService`: `JoinAsync` (accepts an invitation; the API has no join-by-link), `BlockAsync`, `UpdateSettingsAsync` (permissions, invite link mode, timer), `PinMessageAsync`/`UnpinMessageAsync`. Avatars were already covered by `UpdateAsync`. |
+| 0.3.9 | **Contact sync** | A/I | S | ✅ `IContactService.SyncAsync`. Contact blocking isn't offered by signal-cli-rest-api, so it's dropped here. |
+| 0.3.10 | **Number search** | A/I | S | ✅ `IContactService.CheckRegisteredAsync` → `NumberRegistration` |
 | 0.3.11 | **Rate-limit challenge** | A/I | S | ✅ `IAccountService.SubmitRateLimitChallengeAsync(challengeToken, captcha)` |
 | 0.3.12 | **Streaming attachments** | A/I | S | ✅ `IAttachmentService.OpenReadAsync` streams downloads (added without breaking existing implementations). Uploads can't stream: `/v2/send` needs base64 in JSON. |
 | 0.3.13 | **Typed capabilities** | A | S | Check `SignalApiInfo.Capabilities` before using optional features, with clear errors |

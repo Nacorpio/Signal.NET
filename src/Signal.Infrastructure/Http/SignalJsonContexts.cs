@@ -45,6 +45,8 @@ namespace Signal.Infrastructure.Http;
 [JsonSerializable(typeof(CreateGroupRequestDto))]
 [JsonSerializable(typeof(CreateGroupResponseDto))]
 [JsonSerializable(typeof(UpdateGroupRequestDto))]
+[JsonSerializable(typeof(PinMessageRequestDto))]
+[JsonSerializable(typeof(List<SearchResponseDto>))]
 [JsonSerializable(typeof(GroupMembersRequestDto))]
 [JsonSerializable(typeof(GroupAdminsRequestDto))]
 [JsonSerializable(typeof(List<ContactDto>))]

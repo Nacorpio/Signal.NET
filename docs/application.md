@@ -35,12 +35,12 @@ implementations. You can replace any port, for example with a fake in tests or a
 | `IReactionService` | Add or remove emoji reactions | `POST`/`DELETE /v1/reactions/{number}` |
 | `IReceiptService` | Send read or viewed receipts | `POST /v1/receipts/{number}` |
 | `ITypingIndicatorService` | Show or hide "typing…" | `PUT`/`DELETE /v1/typing-indicator/{number}` |
-| `IGroupService` | List, get, create, update, members, admins, quit, delete | `/v1/groups/{number}[/{groupid}[/members\|/admins\|/quit]]` |
+| `IGroupService` | List, get, create, update, members, admins, quit, delete; accept an invitation (`JoinAsync`), block, permissions/invite link/timer (`UpdateSettingsAsync`), pin and unpin messages | `/v1/groups/{number}[/{groupid}[/members\|/admins\|/quit\|/join\|/block\|/pin-message]]` |
 | `IAccountService` | List accounts; QR code or raw `sgnl://linkdevice` URI (`GetLinkUriAsync`) for linking the container to an account; set or delete the username; privacy settings; registration lock PIN; lift rate limits with a captcha | `GET /v1/accounts`, `GET /v1/qrcodelink[/raw]`, `/v1/accounts/{number}/username`, `…/settings`, `…/pin`, `…/rate-limit-challenge` |
 | `IDeviceService` | The reverse direction: list, link and remove the devices of an account registered in the container. Like `IRegistrationService`, not part of `ISignalClient`. | `GET`/`POST /v1/devices/{number}`, `DELETE /v1/devices/{number}/{deviceId}` |
 | `IRegistrationService` | Register a number as the container's primary device (SMS or voice, optional captcha), verify it with the code (and registration lock PIN), unregister it. Not part of `ISignalClient`, because it's account setup, not bot runtime. | `POST /v1/register/{number}[/verify/{code}]`, `POST /v1/unregister/{number}` |
 | `IStickerService` | List and install sticker packs, by id and key or from a `https://signal.art/addstickers/#pack_id=…&pack_key=…` share link | `GET`/`POST /v1/sticker-packs/{number}` |
-| `IContactService` | List and update contacts | `GET`/`PUT /v1/contacts/{number}` |
+| `IContactService` | List and update contacts; sync them to linked devices (`SyncAsync`); check which numbers are registered with Signal (`CheckRegisteredAsync`) | `GET`/`PUT /v1/contacts/{number}`, `POST …/sync`, `GET /v1/search/{number}?numbers=…` |
 | `IAttachmentService` | List, download (`DownloadAsync` into memory, or `OpenReadAsync` as a stream) and delete stored attachments | `/v1/attachments[/{id}]` |
 | `IProfileService` | Update name, about and avatar | `PUT /v1/profiles/{number}` |
 | `IIdentityService` | List identities; trust keys / safety numbers | `/v1/identities/{number}[/trust/{n}]` |
@@ -54,6 +54,8 @@ Supporting types:
 - **`AccountSettings(DiscoverableByNumber, ShareNumber)`**: privacy settings for `UpdateSettingsAsync`. `null` leaves a setting unchanged.
 - **`RegistrationOptions(UseVoice, Captcha)`**: how `IRegistrationService.RegisterAsync` requests the code. When Signal answers with a captcha error, solve the captcha at `https://signalcaptchas.org/registration/generate.html` and retry with the `signalcaptcha://…` link as `Captcha`.
 - **`AttachmentDownload(Content, ContentType, Length)`**: the result of `IAttachmentService.OpenReadAsync`. `Content` reads directly from the HTTP response, so large attachments never have to fit in memory. Dispose it (`await using`) to release the connection. `OpenReadAsync` has a default interface implementation that buffers through `DownloadAsync`, so custom `IAttachmentService` implementations written before it existed keep working.
+- **`GroupSettings(Permissions, Link, MessageExpiration)`**: settings for `IGroupService.UpdateSettingsAsync`; `null` leaves a setting unchanged. `GroupPermissions(AddMembers, EditGroup, SendMessages)` sets all three together, because the API requires that. `SendMessages = OnlyAdmins` makes an announcement group. `GroupLinkMode` is `Disabled`, `Enabled` or `EnabledWithApproval`.
+- **`NumberRegistration(Number, IsRegistered)`**: an entry of `IContactService.CheckRegisteredAsync`.
 - **`StickerPack(PackId, Title, Author, Installed, Url)`**: an entry of `IStickerService.ListAsync`. Only stickers of installed packs can be sent.
 - **`LinkedDevice(Id, Name, Created, LastSeen)`**: an entry of `IDeviceService.ListAsync`. `IsPrimary` marks the primary device (id `1`), which `RemoveAsync` refuses to unlink. Timestamps are `null` when signal-cli doesn't know them.
 - **`ProfileUpdate(Name, About, Base64Avatar)`**: the values passed to `IProfileService.UpdateAsync`.
