@@ -1,4 +1,22 @@
 #nullable enable
+override Signal.Application.Abstractions.RegistrationOptions.Equals(object? obj) -> bool
+override Signal.Application.Abstractions.RegistrationOptions.GetHashCode() -> int
+override Signal.Application.Abstractions.RegistrationOptions.ToString() -> string!
+Signal.Application.Abstractions.IRegistrationService
+Signal.Application.Abstractions.IRegistrationService.RegisterAsync(Signal.Domain.ValueObjects.PhoneNumber number, Signal.Application.Abstractions.RegistrationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IRegistrationService.UnregisterAsync(Signal.Domain.ValueObjects.PhoneNumber number, bool deleteAccount = false, bool deleteLocalData = false, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IRegistrationService.VerifyAsync(Signal.Domain.ValueObjects.PhoneNumber number, string! verificationCode, string? pin = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.RegistrationOptions
+Signal.Application.Abstractions.RegistrationOptions.<Clone>$() -> Signal.Application.Abstractions.RegistrationOptions!
+Signal.Application.Abstractions.RegistrationOptions.Captcha.get -> string?
+Signal.Application.Abstractions.RegistrationOptions.Captcha.init -> void
+Signal.Application.Abstractions.RegistrationOptions.Deconstruct(out bool UseVoice, out string? Captcha) -> void
+Signal.Application.Abstractions.RegistrationOptions.Equals(Signal.Application.Abstractions.RegistrationOptions? other) -> bool
+Signal.Application.Abstractions.RegistrationOptions.RegistrationOptions(bool UseVoice = false, string? Captcha = null) -> void
+Signal.Application.Abstractions.RegistrationOptions.UseVoice.get -> bool
+Signal.Application.Abstractions.RegistrationOptions.UseVoice.init -> void
+static Signal.Application.Abstractions.RegistrationOptions.operator !=(Signal.Application.Abstractions.RegistrationOptions? left, Signal.Application.Abstractions.RegistrationOptions? right) -> bool
+static Signal.Application.Abstractions.RegistrationOptions.operator ==(Signal.Application.Abstractions.RegistrationOptions? left, Signal.Application.Abstractions.RegistrationOptions? right) -> bool
 Signal.Application.Abstractions.IMessageSender.RemoteDeleteAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient recipient, long targetTimestamp, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
 override Signal.Application.Abstractions.AttachmentDownload.Equals(object? obj) -> bool
 override Signal.Application.Abstractions.AttachmentDownload.GetHashCode() -> int

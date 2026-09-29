@@ -64,7 +64,7 @@ Item 0.2.8 exists so that can't happen again.
 
 | # | Feature | Layer | Size | Notes |
 |---|---|---|---|---|
-| 0.3.1 | **Registration and verification** | A/I | M | `IRegistrationService`: register (SMS/voice, captcha), verify, unregister. Enables bots without a primary phone. |
+| 0.3.1 | **Registration and verification** | A/I | M | ✅ `IRegistrationService`: register (SMS/voice, captcha), verify (code plus registration-lock PIN), unregister. Enables bots without a primary phone. |
 | 0.3.2 | **Device management** | A/I | S | List, link and remove linked devices |
 | 0.3.3 | **Username management** | A/I | S | Set and delete the account's username; builds on `Username` |
 | 0.3.4 | **Account settings and PIN** | A/I | S | Privacy settings, registration lock PIN |

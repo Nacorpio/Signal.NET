@@ -63,6 +63,26 @@ internal sealed class SendMessageResponseDto
     public long Timestamp { get; set; }
 }
 
+/// <summary>Body of <c>POST /v1/register/{number}</c>.</summary>
+internal sealed class RegisterNumberRequestDto
+{
+    public string? Captcha { get; set; }
+    public bool? UseVoice { get; set; }
+}
+
+/// <summary>Body of <c>POST /v1/register/{number}/verify/{token}</c>.</summary>
+internal sealed class VerifyNumberRequestDto
+{
+    public string? Pin { get; set; }
+}
+
+/// <summary>Body of <c>POST /v1/unregister/{number}</c>.</summary>
+internal sealed class UnregisterNumberRequestDto
+{
+    public bool DeleteAccount { get; set; }
+    public bool DeleteLocalData { get; set; }
+}
+
 /// <summary>Body of <c>DELETE /v1/remote-delete/{number}</c>.</summary>
 internal sealed class RemoteDeleteRequestDto
 {

@@ -8,6 +8,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Registration and verification (roadmap 0.3.1):**
+  - The new `IRegistrationService` registers a number as the container's primary device (`RegisterAsync` by SMS or voice, with an optional captcha).
+  - `VerifyAsync` completes the registration with the received code and an optional registration-lock PIN.
+  - `UnregisterAsync` removes the number again.
+  - Calls are never retried, so no duplicate verification codes are sent.
 - **Remote delete (roadmap 0.3.5):** `IMessageSender.RemoteDeleteAsync` deletes a sent message for everyone, identified by its `SendResult.Timestamp`. It's a default interface member, so existing `IMessageSender` implementations keep compiling.
 - **Streaming attachment downloads (roadmap 0.3.12):** `IAttachmentService.OpenReadAsync` returns an `AttachmentDownload` whose stream reads directly from the HTTP response, with content type and length. It's a default interface member, so existing `IAttachmentService` implementations keep compiling.
 

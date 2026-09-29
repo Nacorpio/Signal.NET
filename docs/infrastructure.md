@@ -91,6 +91,7 @@ the response back.
 | `RestTypingIndicatorService` | `ITypingIndicatorService` | PUT to start, DELETE to stop |
 | `RestGroupService` | `IGroupService` | `GetAsync` returns `null` for 404 or 400 (unknown group) |
 | `RestAccountService` | `IAccountService` | Invalid numbers in the list are skipped |
+| `RestRegistrationService` | `IRegistrationService` | All POSTs, so never retried (a retry would request a second code). Removes separators from verification codes (`123-456` → `123456`). |
 | `RestContactService` | `IContactService` | The contact id is its UUID, falling back to the number |
 | `RestAttachmentService` | `IAttachmentService` | `DownloadAsync` returns the raw bytes; `OpenReadAsync` streams them via `GetStreamAsync` |
 | `RestProfileService` | `IProfileService` | |

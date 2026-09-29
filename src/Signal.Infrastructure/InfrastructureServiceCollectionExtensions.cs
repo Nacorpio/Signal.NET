@@ -70,6 +70,7 @@ public static class InfrastructureServiceCollectionExtensions
         services.TryAddTransient<ITypingIndicatorService, RestTypingIndicatorService>();
         services.TryAddTransient<IGroupService, RestGroupService>();
         services.TryAddTransient<IAccountService, RestAccountService>();
+        services.TryAddTransient<IRegistrationService, RestRegistrationService>();
         services.TryAddTransient<IContactService, RestContactService>();
         services.TryAddTransient<IAttachmentService, RestAttachmentService>();
         services.TryAddTransient<IProfileService, RestProfileService>();
