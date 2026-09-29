@@ -10,7 +10,7 @@ The layer column shows where the work mainly lands (**D**omain, **A**pplication,
 
 ---
 
-## Where the project stands today (0.2.0-preview.1)
+## Where the project stands today (0.2.0-preview.2)
 
 | Area | State |
 |---|---|
@@ -20,7 +20,7 @@ The layer column shows where the work mainly lands (**D**omain, **A**pplication,
 | Processing | Middleware pipeline, domain events, conversation-partitioned concurrency |
 | Language | .NET 11 **RC1** SDK; C# 15 unions (`Recipient`, `EnvelopeContent`, `CommandResult`, `ArgumentBindingResult`), C# 14 extension members |
 | Quality | 118 tests, XML docs and public API tracking enforced by the build, CI with coverage on Linux and Windows |
-| Delivery | Tag-driven releases with NuGet Trusted Publishing (approval-gated `nuget` environment), a [docs site](https://nacorpio.github.io/Signal.NET/), a `dotnet new signalbot` template. First pre-release: [v0.2.0-preview.1](https://github.com/Nacorpio/Signal.NET/releases/tag/v0.2.0-preview.1). |
+| Delivery | Tag-driven releases with NuGet Trusted Publishing (approval-gated `nuget` environment), a [docs site](https://nacorpio.github.io/Signal.NET/), a `dotnet new signalbot` template. Published on nuget.org as [`Nacorpio.Signal.*`](https://www.nuget.org/packages/Nacorpio.Signal.Hosting) since [v0.2.0-preview.2](https://github.com/Nacorpio/Signal.NET/releases/tag/v0.2.0-preview.2). |
 
 These known limitations shape the plan below:
 
@@ -37,23 +37,25 @@ These known limitations shape the plan below:
 
 *Goal: installable from nuget.org, with a reproducible release process.*
 
-**Status:** ✅ implemented, and the first pre-release is cut. Tag `v0.2.0-preview.1` produced the
-[GitHub Release](https://github.com/Nacorpio/Signal.NET/releases/tag/v0.2.0-preview.1) with all packages attached.
-**Nothing was published to nuget.org:** the `Signal.` package ID prefix is **reserved by another owner**, so
-every push was rejected with *409 Conflict*. The packages are therefore moving to owner-prefixed IDs
-(`Nacorpio.Signal.*`, [#11](https://github.com/Nacorpio/Signal.NET/pull/11)), and the first nuget.org release
-will be `0.2.0-preview.2`. Item 0.2.8 covers how the rejection passed as a success.
+**Status:** ✅ **complete.** The first nuget.org release is
+[`0.2.0-preview.2`](https://github.com/Nacorpio/Signal.NET/releases/tag/v0.2.0-preview.2), under the owner-prefixed
+IDs `Nacorpio.Signal.*`. It was verified from a clean machine: `dotnet add package Nacorpio.Signal.Hosting` resolves
+the full chain, and the template installs from nuget.org and builds.
+
+The earlier `v0.2.0-preview.1` exists only as a GitHub Release. Its `Signal.*` IDs fall under a prefix reserved by
+another owner, so every push was rejected with *409 Conflict*, which `--skip-duplicate` reported as success.
+Item 0.2.8 exists so that can't happen again.
 
 | # | Feature | Layer | Size | Status |
 |---|---|---|---|---|
 | 0.2.1 | **Release workflow**: tag `v*` → build, test, pack, verify versions, push to nuget.org, GitHub Release with the `CHANGELOG.md` section | T | S | ✅ `.github/workflows/release.yml`, publishing through **NuGet Trusted Publishing** (no stored API key), gated by the `nuget` environment (tag rule `v*`, required reviewer) |
 | 0.2.2 | **Versioning** from git tags | T | S | ✅ MinVer (`v` prefix, `preview.0` default) |
 | 0.2.3 | **Public API tracking**, so breaking changes show up in review | T | S | ✅ `PublicAPI.*.txt` per library |
-| 0.2.4 | **Package validation** | T | S | ✅ Enabled; baseline set after the first release |
+| 0.2.4 | **Package validation** | T | S | ✅ Baseline is the published `0.2.0-preview.2`; a removed public member fails `dotnet pack` (CP0002) |
 | 0.2.5 | **Code coverage report** in CI | T | S | ✅ Job summary via ReportGenerator. A README coverage badge needs an external service (e.g. Codecov) and is deferred. |
 | 0.2.6 | **Documentation site**: guides plus API reference on GitHub Pages | T | M | ✅ DocFX, `.github/workflows/docs.yml` |
 | 0.2.7 | **`dotnet new signalbot` template** | T | M | ✅ `Nacorpio.Signal.Templates`, pinned to the matching package version |
-| 0.2.8 | **Publish verification**: a rejected push must fail the release, and the workflow should confirm that each package ID reports the tagged version on nuget.org | T | S | 🔶 partly done. `--skip-duplicate` reported every 409, including the reserved-prefix rejection, as "already exists"; #11 removes it, so rejections now fail the run. Still open: a check after publishing that the packages are actually listed. |
+| 0.2.8 | **Publish verification**: a rejected push fails the release, and the workflow confirms that each package is listed at the tagged version on nuget.org before announcing it | T | S | ✅ No `--skip-duplicate` (#11); `.github/scripts/wait-for-nuget.sh` polls the flat container index (what `dotnet restore` reads) for up to 45 minutes before the GitHub Release is created |
 
 ## Milestone 0.3: Complete API coverage
 

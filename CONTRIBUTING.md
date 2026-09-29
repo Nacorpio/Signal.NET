@@ -76,11 +76,18 @@ Versions come from git tags ([MinVer](https://github.com/adamralph/minver)). Unt
 
 1. In `CHANGELOG.md`, move the *Unreleased* entries under `## [x.y.z] - YYYY-MM-DD`.
 2. Move the contents of every `PublicAPI.Unshipped.txt` into the matching `PublicAPI.Shipped.txt`.
-3. After the first release, set `PackageValidationBaselineVersion` in `src/Directory.Build.props` to the previous version.
-4. Commit, then tag and push, e.g. `git tag v0.2.0 && git push origin v0.2.0`. Pre-releases use `v0.2.0-preview.1`.
+3. Commit, then tag and push, e.g. `git tag v0.2.0 && git push origin v0.2.0`. Pre-releases use `v0.2.0-preview.1`.
+4. Once the release is published, set `PackageValidationBaselineVersion` in `src/Directory.Build.props` to the
+   new version, so the next release is checked for breaking changes against it.
 
-`.github/workflows/release.yml` then builds, tests and packs, checks that the package versions match the tag,
-publishes to nuget.org, and creates the GitHub Release with the changelog section.
+`.github/workflows/release.yml` then:
+1. builds, tests and packs, and checks that the package versions match the tag;
+2. waits for your approval (environment `nuget`), then publishes to nuget.org;
+3. **waits until every package is listed on nuget.org** (`.github/scripts/wait-for-nuget.sh`, up to 45 minutes);
+4. creates the GitHub Release with the changelog section.
+
+A rejected push or a package that never gets listed fails the run, so the GitHub Release is only created once the
+packages can actually be installed.
 
 Publishing uses [NuGet Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing).
 The workflow exchanges a GitHub OIDC token for an API key that is valid for one hour, so no long-lived key is

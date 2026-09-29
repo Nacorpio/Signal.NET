@@ -96,6 +96,12 @@ jobs:
           --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}"
           --source https://api.nuget.org/v3/index.json
 
+      # A push is only accepted, not yet published: nuget.org validates and indexes asynchronously.
+      # Wait until every package is listed (what `dotnet restore` reads) before announcing the release.
+      - name: Wait until packages are listed on nuget.org
+        timeout-minutes: 50
+        run: bash .github/scripts/wait-for-nuget.sh "${GITHUB_REF_NAME#v}" artifacts 2700 30
+
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
