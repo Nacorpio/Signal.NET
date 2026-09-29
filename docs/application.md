@@ -29,7 +29,7 @@ implementations. You can replace any port, for example with a fake in tests or a
 
 | Port | Purpose | REST endpoint(s) |
 |---|---|---|
-| `IMessageSender` | Send text, attachments, mentions, quotes and edits | `POST /v2/send` |
+| `IMessageSender` | Send text, attachments, mentions, quotes and edits; delete a sent message for everyone (`RemoteDeleteAsync`, by its `SendResult.Timestamp`) | `POST /v2/send`, `DELETE /v1/remote-delete/{number}` |
 | `IMessageReceiver` | Stream incoming envelopes for one account | `GET /v1/receive/{number}` (poll or WebSocket) |
 | `IMessageReceiverFactory` | Pick the receiver for an `ExecutionMode` | – |
 | `IReactionService` | Add or remove emoji reactions | `POST`/`DELETE /v1/reactions/{number}` |

@@ -68,7 +68,7 @@ Item 0.2.8 exists so that can't happen again.
 | 0.3.2 | **Device management** | A/I | S | List, link and remove linked devices |
 | 0.3.3 | **Username management** | A/I | S | Set and delete the account's username; builds on `Username` |
 | 0.3.4 | **Account settings and PIN** | A/I | S | Privacy settings, registration lock PIN |
-| 0.3.5 | **Remote delete** | D/A/I | S | Delete a sent message for everyone, using `SendResult.Timestamp` |
+| 0.3.5 | **Remote delete** | D/A/I | S | ✅ `IMessageSender.RemoteDeleteAsync(account, recipient, sendResult.Timestamp)` (added without breaking existing implementations) |
 | 0.3.6 | **Stickers** | D/A/I | M | List and install sticker packs; send stickers via `OutgoingMessageBuilder.WithSticker` |
 | 0.3.7 | **Link previews** | D/I | S | `OutgoingMessageBuilder.WithLinkPreview(url, title, …)` |
 | 0.3.8 | **Group extras** | A/I | S | Join via invite link, block, avatar, group permissions |

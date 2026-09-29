@@ -23,6 +23,7 @@ namespace Signal.Infrastructure.Http;
 [JsonSerializable(typeof(AboutDto))]
 [JsonSerializable(typeof(SendMessageRequestDto))]
 [JsonSerializable(typeof(SendMessageResponseDto))]
+[JsonSerializable(typeof(RemoteDeleteRequestDto))]
 [JsonSerializable(typeof(ReactionRequestDto))]
 [JsonSerializable(typeof(ReceiptRequestDto))]
 [JsonSerializable(typeof(TypingIndicatorRequestDto))]
