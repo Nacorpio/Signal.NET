@@ -33,7 +33,7 @@ body:
     attributes:
       label: Versions
       description: Signal.NET version, signal-cli-rest-api version (from /v1/about), .NET SDK version
-      placeholder: "Signal.NET 0.1.0-preview, signal-cli-rest-api 0.100, .NET 11.0.100-preview.6"
+      placeholder: "Signal.NET 0.1.0-preview, signal-cli-rest-api 0.100, .NET 11.0.100-rc.1"
   - type: textarea
     id: logs
     attributes:
