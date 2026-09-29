@@ -171,7 +171,7 @@ internal sealed class RestGroupService(SignalApiClient api) : IGroupService
 
 /// <summary>
 /// Implements <see cref="IAccountService"/> with <c>GET /v1/accounts</c>, <c>GET /v1/qrcodelink</c> and the
-/// <c>/v1/accounts/{number}/…</c> endpoints (username, settings, PIN, rate-limit challenge).
+/// <c>/v1/accounts/{number}/â€¦</c> endpoints (username, settings, PIN, rate-limit challenge).
 /// </summary>
 internal sealed class RestAccountService(SignalApiClient api) : IAccountService
 {
@@ -229,8 +229,53 @@ internal sealed class RestAccountService(SignalApiClient api) : IAccountService
             SignalRestJsonContext.Default.RateLimitChallengeRequestDto, cancellationToken);
     }
 
+    public async Task<string> GetLinkUriAsync(string deviceName, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(deviceName);
+        const string path = "v1/qrcodelink/raw";
+        var response = await api.GetAsync($"{path}?device_name={Uri.EscapeDataString(deviceName)}",
+            SignalRestJsonContext.Default.DeviceLinkUriResponseDto, cancellationToken);
+        return string.IsNullOrWhiteSpace(response.DeviceLinkUri)
+            ? throw new SignalApiException(HttpStatusCode.OK, "The response contained no device link URI.", path)
+            : response.DeviceLinkUri;
+    }
+
     private static string AccountPath(PhoneNumber account, string resource) =>
         $"v1/accounts/{SignalApiClient.Escape(account.Value)}/{resource}";
+}
+
+/// <summary>Implements <see cref="IDeviceService"/> with the <c>/v1/devices/{number}</c> endpoints.</summary>
+internal sealed class RestDeviceService(SignalApiClient api) : IDeviceService
+{
+    public async Task<IReadOnlyList<LinkedDevice>> ListAsync(PhoneNumber account, CancellationToken cancellationToken = default)
+    {
+        var devices = await api.GetAsync(DevicesPath(account), SignalRestJsonContext.Default.ListDeviceDto, cancellationToken);
+        return [.. devices.Select(d => new LinkedDevice(
+            d.Id,
+            string.IsNullOrWhiteSpace(d.Name) ? null : d.Name,
+            FromUnixMilliseconds(d.CreationTimestamp),
+            FromUnixMilliseconds(d.LastSeenTimestamp)))];
+    }
+
+    public Task LinkAsync(PhoneNumber account, string deviceLinkUri, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(deviceLinkUri);
+        return api.SendAsync(HttpMethod.Post, DevicesPath(account),
+            new AddDeviceRequestDto { Uri = deviceLinkUri.Trim() }, SignalRestJsonContext.Default.AddDeviceRequestDto, cancellationToken);
+    }
+
+    public Task RemoveAsync(PhoneNumber account, long deviceId, CancellationToken cancellationToken = default)
+    {
+        // The primary device cannot be unlinked; the API would only answer with a less helpful error.
+        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(deviceId, LinkedDevice.PrimaryDeviceId);
+        return api.SendAsync(HttpMethod.Delete, $"{DevicesPath(account)}/{deviceId}", cancellationToken);
+    }
+
+    private static string DevicesPath(PhoneNumber account) => $"v1/devices/{SignalApiClient.Escape(account.Value)}";
+
+    /// <summary>signal-cli reports 0 for unknown timestamps.</summary>
+    private static DateTimeOffset? FromUnixMilliseconds(long? value) =>
+        value is > 0 ? DateTimeOffset.FromUnixTimeMilliseconds(value.Value) : null;
 }
 
 /// <summary>

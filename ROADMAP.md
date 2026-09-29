@@ -65,7 +65,7 @@ Item 0.2.8 exists so that can't happen again.
 | # | Feature | Layer | Size | Notes |
 |---|---|---|---|---|
 | 0.3.1 | **Registration and verification** | A/I | M | ✅ `IRegistrationService`: register (SMS/voice, captcha), verify (code plus registration-lock PIN), unregister. Enables bots without a primary phone. |
-| 0.3.2 | **Device management** | A/I | S | List, link and remove linked devices |
+| 0.3.2 | **Device management** | A/I | S | ✅ `IDeviceService`: list (`LinkedDevice`), link by `sgnl://linkdevice` URI, remove. `IAccountService.GetLinkUriAsync` returns the raw link URI. |
 | 0.3.3 | **Username management** | A/I | S | ✅ `IAccountService.SetUsernameAsync` (returns the assigned `alice.42` and share link) and `DeleteUsernameAsync` |
 | 0.3.4 | **Account settings and PIN** | A/I | S | ✅ `UpdateSettingsAsync(AccountSettings)` (discoverability, number sharing), `SetPinAsync` / `RemovePinAsync` |
 | 0.3.5 | **Remote delete** | D/A/I | S | ✅ `IMessageSender.RemoteDeleteAsync(account, recipient, sendResult.Timestamp)` (added without breaking existing implementations) |

@@ -96,6 +96,27 @@ internal sealed class RateLimitChallengeRequestDto
     public required string Captcha { get; set; }
 }
 
+/// <summary>Response of <c>GET /v1/qrcodelink/raw</c>.</summary>
+internal sealed class DeviceLinkUriResponseDto
+{
+    public string? DeviceLinkUri { get; set; }
+}
+
+/// <summary>A device as returned by <c>GET /v1/devices/{number}</c>; timestamps are Unix milliseconds.</summary>
+internal sealed class DeviceDto
+{
+    public long Id { get; set; }
+    public string? Name { get; set; }
+    public long? CreationTimestamp { get; set; }
+    public long? LastSeenTimestamp { get; set; }
+}
+
+/// <summary>Body of <c>POST /v1/devices/{number}</c>.</summary>
+internal sealed class AddDeviceRequestDto
+{
+    public required string Uri { get; set; }
+}
+
 /// <summary>Body of <c>POST /v1/register/{number}</c>.</summary>
 internal sealed class RegisterNumberRequestDto
 {

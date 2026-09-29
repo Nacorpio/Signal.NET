@@ -299,6 +299,63 @@ public interface IAccountService
     /// <exception cref="ArgumentException">A token or captcha is empty.</exception>
     Task SubmitRateLimitChallengeAsync(PhoneNumber account, string challengeToken, string captcha, CancellationToken cancellationToken = default) =>
         throw new NotSupportedException($"{GetType().Name} does not support rate-limit challenges.");
+
+    /// <summary>
+    /// Gets the raw device link URI (<c>sgnl://linkdevice?…</c>) for linking the container as a secondary device
+    /// (<c>GET /v1/qrcodelink/raw</c>). Use it to render your own QR code instead of <see cref="GetLinkQrCodeAsync"/>.
+    /// </summary>
+    /// <param name="deviceName">Name shown for the linked device in the Signal app.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The device link URI.</returns>
+    /// <exception cref="ArgumentException"><paramref name="deviceName"/> is empty.</exception>
+    Task<string> GetLinkUriAsync(string deviceName, CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException($"{GetType().Name} does not support raw device link URIs.");
+}
+
+/// <summary>A device linked to an account, from <see cref="IDeviceService.ListAsync"/>.</summary>
+/// <param name="Id">The device id; the primary device is <c>1</c>.</param>
+/// <param name="Name">The device name, if set.</param>
+/// <param name="Created">When the device was linked, if reported.</param>
+/// <param name="LastSeen">When the device was last active, if reported.</param>
+public sealed record LinkedDevice(long Id, string? Name, DateTimeOffset? Created, DateTimeOffset? LastSeen)
+{
+    /// <summary>The id of an account's primary device (the phone that registered the number).</summary>
+    public const long PrimaryDeviceId = 1;
+
+    /// <summary>Whether this is the account's primary device.</summary>
+    public bool IsPrimary => Id == PrimaryDeviceId;
+}
+
+/// <summary>
+/// Manages the devices linked to an account that is registered in the container (<c>/v1/devices/{number}</c>), i.e.
+/// the container acts as the primary device. To link the container itself to another account, use
+/// <see cref="IAccountService.GetLinkQrCodeAsync"/> instead.
+/// </summary>
+public interface IDeviceService
+{
+    /// <summary>Lists the account's devices (<c>GET /v1/devices/{number}</c>).</summary>
+    /// <param name="account">The account.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The devices, including the primary device.</returns>
+    Task<IReadOnlyList<LinkedDevice>> ListAsync(PhoneNumber account, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Links a new device to the account (<c>POST /v1/devices/{number}</c>), like scanning its QR code in the Signal app.
+    /// </summary>
+    /// <param name="account">The account.</param>
+    /// <param name="deviceLinkUri">The URI encoded in the new device's QR code (<c>sgnl://linkdevice?…</c>).</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>A task that completes when the device was linked.</returns>
+    /// <exception cref="ArgumentException"><paramref name="deviceLinkUri"/> is empty.</exception>
+    Task LinkAsync(PhoneNumber account, string deviceLinkUri, CancellationToken cancellationToken = default);
+
+    /// <summary>Unlinks a device from the account (<c>DELETE /v1/devices/{number}/{deviceId}</c>).</summary>
+    /// <param name="account">The account.</param>
+    /// <param name="deviceId">The id of the device to remove, from <see cref="ListAsync"/>.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>A task that completes when the device was removed.</returns>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="deviceId"/> is the primary device or not positive.</exception>
+    Task RemoveAsync(PhoneNumber account, long deviceId, CancellationToken cancellationToken = default);
 }
 
 /// <summary>The result of <see cref="IAccountService.SetUsernameAsync"/>.</summary>
