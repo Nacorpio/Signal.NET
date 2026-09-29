@@ -10,7 +10,7 @@ The layer column shows where the work mainly lands (**D**omain, **A**pplication,
 
 ---
 
-## Where the project stands today (0.1.0-preview)
+## Where the project stands today (0.2.0-preview.1)
 
 | Area | State |
 |---|---|
@@ -18,8 +18,9 @@ The layer column shows where the work mainly lands (**D**omain, **A**pplication,
 | Transport | REST adapters for 15 endpoint groups; HTTP polling (`normal`/`native`) and WebSocket (`json-rpc*`) receivers with backoff and reconnect |
 | Commands | Modules, class and lambda commands; typed binding, flags, remainder; five preconditions and cooldowns; generated help |
 | Processing | Middleware pipeline, domain events, conversation-partitioned concurrency |
-| Language | C# 15 unions (`Recipient`, `EnvelopeContent`, `CommandResult`, `ArgumentBindingResult`), C# 14 extension members |
-| Quality | 118 tests, XML docs enforced by the build, CI on Linux and Windows, NuGet packing |
+| Language | .NET 11 **RC1** SDK; C# 15 unions (`Recipient`, `EnvelopeContent`, `CommandResult`, `ArgumentBindingResult`), C# 14 extension members |
+| Quality | 118 tests, XML docs and public API tracking enforced by the build, CI with coverage on Linux and Windows |
+| Delivery | Tag-driven releases with NuGet Trusted Publishing (approval-gated `nuget` environment), a [docs site](https://nacorpio.github.io/Signal.NET/), a `dotnet new signalbot` template. First pre-release: [v0.2.0-preview.1](https://github.com/Nacorpio/Signal.NET/releases/tag/v0.2.0-preview.1). |
 
 These known limitations shape the plan below:
 
@@ -28,7 +29,7 @@ These known limitations shape the plan below:
 3. **Unmodelled envelope content.** Sync, story, edit, remote-delete, sticker and call messages are dropped by `EnvelopeMapper`.
 4. **State is in memory only.** Cooldowns and rate limits don't survive restarts and aren't shared between instances.
 5. **Partial API coverage.** Registration, devices, stickers, username, account settings, remote delete and search are missing.
-6. **Preview SDK dependency.** The project needs a .NET 11 preview SDK and cannot declare a stable 1.0 before .NET 11 and C# 15 are generally available.
+6. **Pre-release SDK dependency.** The project builds with the .NET 11 RC1 SDK and `LangVersion=preview`. It cannot declare a stable 1.0 before .NET 11 and C# 15 are generally available.
 
 ---
 
@@ -36,17 +37,23 @@ These known limitations shape the plan below:
 
 *Goal: installable from nuget.org, with a reproducible release process.*
 
-**Status:** ✅ implemented. The first release still needs one-time repository setup (see [CONTRIBUTING.md](CONTRIBUTING.md#releasing-maintainers)).
+**Status:** ✅ implemented, and the first pre-release is cut. Tag `v0.2.0-preview.1` produced the
+[GitHub Release](https://github.com/Nacorpio/Signal.NET/releases/tag/v0.2.0-preview.1) with all packages attached.
+**Nothing was published to nuget.org:** the `Signal.` package ID prefix is **reserved by another owner**, so
+every push was rejected with *409 Conflict*. The packages are therefore moving to owner-prefixed IDs
+(`Nacorpio.Signal.*`, [#11](https://github.com/Nacorpio/Signal.NET/pull/11)), and the first nuget.org release
+will be `0.2.0-preview.2`. Item 0.2.8 covers how the rejection passed as a success.
 
 | # | Feature | Layer | Size | Status |
 |---|---|---|---|---|
-| 0.2.1 | **Release workflow**: tag `v*` → build, test, pack, verify versions, push to nuget.org, GitHub Release with the `CHANGELOG.md` section | T | S | ✅ `.github/workflows/release.yml` |
+| 0.2.1 | **Release workflow**: tag `v*` → build, test, pack, verify versions, push to nuget.org, GitHub Release with the `CHANGELOG.md` section | T | S | ✅ `.github/workflows/release.yml`, publishing through **NuGet Trusted Publishing** (no stored API key), gated by the `nuget` environment (tag rule `v*`, required reviewer) |
 | 0.2.2 | **Versioning** from git tags | T | S | ✅ MinVer (`v` prefix, `preview.0` default) |
 | 0.2.3 | **Public API tracking**, so breaking changes show up in review | T | S | ✅ `PublicAPI.*.txt` per library |
 | 0.2.4 | **Package validation** | T | S | ✅ Enabled; baseline set after the first release |
 | 0.2.5 | **Code coverage report** in CI | T | S | ✅ Job summary via ReportGenerator. A README coverage badge needs an external service (e.g. Codecov) and is deferred. |
 | 0.2.6 | **Documentation site**: guides plus API reference on GitHub Pages | T | M | ✅ DocFX, `.github/workflows/docs.yml` |
-| 0.2.7 | **`dotnet new signalbot` template** | T | M | ✅ `Signal.NET.Templates`, pinned to the matching package version |
+| 0.2.7 | **`dotnet new signalbot` template** | T | M | ✅ `Nacorpio.Signal.Templates`, pinned to the matching package version |
+| 0.2.8 | **Publish verification**: a rejected push must fail the release, and the workflow should confirm that each package ID reports the tagged version on nuget.org | T | S | 🔶 partly done. `--skip-duplicate` reported every 409, including the reserved-prefix rejection, as "already exists"; #11 removes it, so rejections now fail the run. Still open: a check after publishing that the packages are actually listed. |
 
 ## Milestone 0.3: Complete API coverage
 
@@ -139,7 +146,7 @@ it are exhaustive, the compiler points at every place that needs updating.*
 
 | # | Item | Notes |
 |---|---|---|
-| 1.0.1 | **Target the .NET 11 GA SDK** | Update `global.json` and drop `LangVersion=preview` once C# 15 ships |
+| 1.0.1 | **Target the .NET 11 GA SDK** | Update `global.json` and drop `LangVersion=preview` once C# 15 ships. *Partly done:* the SDK is pinned to RC1 (from preview 6), and the code builds cleanly on it. |
 | 1.0.2 | **API review and freeze** | Review the public surface with the tracked API files; remove experimental members or mark them `[Experimental]` |
 | 1.0.3 | **Compatibility policy** | Document semantic versioning, the deprecation process and supported signal-cli-rest-api versions |
 | 1.0.4 | **End-to-end test suite** | Testcontainers-based tests against the real signal-cli-rest-api image, covering container-level behaviour without a Signal account (about, health, mode detection, error handling) |
