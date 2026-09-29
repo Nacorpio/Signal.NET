@@ -8,6 +8,9 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Device management (roadmap 0.3.2):**
+  - The new `IDeviceService` lists (`LinkedDevice`), links and removes the devices of an account registered in the container.
+  - `IAccountService.GetLinkUriAsync` returns the raw `sgnl://linkdevice` URI, so you can render your own QR code. It's a default interface member.
 - **Account management (roadmap 0.3.3, 0.3.4, 0.3.11):** new `IAccountService` members:
   - `SetUsernameAsync` and `DeleteUsernameAsync`;
   - `UpdateSettingsAsync` (discoverability, number sharing);

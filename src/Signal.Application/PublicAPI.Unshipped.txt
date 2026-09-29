@@ -1,7 +1,11 @@
 #nullable enable
+const Signal.Application.Abstractions.LinkedDevice.PrimaryDeviceId = 1 -> long
 override Signal.Application.Abstractions.AccountSettings.Equals(object? obj) -> bool
 override Signal.Application.Abstractions.AccountSettings.GetHashCode() -> int
 override Signal.Application.Abstractions.AccountSettings.ToString() -> string!
+override Signal.Application.Abstractions.LinkedDevice.Equals(object? obj) -> bool
+override Signal.Application.Abstractions.LinkedDevice.GetHashCode() -> int
+override Signal.Application.Abstractions.LinkedDevice.ToString() -> string!
 override Signal.Application.Abstractions.RegistrationOptions.Equals(object? obj) -> bool
 override Signal.Application.Abstractions.RegistrationOptions.GetHashCode() -> int
 override Signal.Application.Abstractions.RegistrationOptions.ToString() -> string!
@@ -18,15 +22,34 @@ Signal.Application.Abstractions.AccountSettings.Equals(Signal.Application.Abstra
 Signal.Application.Abstractions.AccountSettings.ShareNumber.get -> bool?
 Signal.Application.Abstractions.AccountSettings.ShareNumber.init -> void
 Signal.Application.Abstractions.IAccountService.DeleteUsernameAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IAccountService.GetLinkUriAsync(string! deviceName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<string!>!
 Signal.Application.Abstractions.IAccountService.RemovePinAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Signal.Application.Abstractions.IAccountService.SetPinAsync(Signal.Domain.ValueObjects.PhoneNumber account, string! pin, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Signal.Application.Abstractions.IAccountService.SetUsernameAsync(Signal.Domain.ValueObjects.PhoneNumber account, string! nickname, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.UsernameAssignment?>!
 Signal.Application.Abstractions.IAccountService.SubmitRateLimitChallengeAsync(Signal.Domain.ValueObjects.PhoneNumber account, string! challengeToken, string! captcha, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Signal.Application.Abstractions.IAccountService.UpdateSettingsAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Application.Abstractions.AccountSettings! settings, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IDeviceService
+Signal.Application.Abstractions.IDeviceService.LinkAsync(Signal.Domain.ValueObjects.PhoneNumber account, string! deviceLinkUri, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IDeviceService.ListAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Signal.Application.Abstractions.LinkedDevice!>!>!
+Signal.Application.Abstractions.IDeviceService.RemoveAsync(Signal.Domain.ValueObjects.PhoneNumber account, long deviceId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Signal.Application.Abstractions.IRegistrationService
 Signal.Application.Abstractions.IRegistrationService.RegisterAsync(Signal.Domain.ValueObjects.PhoneNumber number, Signal.Application.Abstractions.RegistrationOptions? options = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Signal.Application.Abstractions.IRegistrationService.UnregisterAsync(Signal.Domain.ValueObjects.PhoneNumber number, bool deleteAccount = false, bool deleteLocalData = false, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Signal.Application.Abstractions.IRegistrationService.VerifyAsync(Signal.Domain.ValueObjects.PhoneNumber number, string! verificationCode, string? pin = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.LinkedDevice
+Signal.Application.Abstractions.LinkedDevice.<Clone>$() -> Signal.Application.Abstractions.LinkedDevice!
+Signal.Application.Abstractions.LinkedDevice.Created.get -> System.DateTimeOffset?
+Signal.Application.Abstractions.LinkedDevice.Created.init -> void
+Signal.Application.Abstractions.LinkedDevice.Deconstruct(out long Id, out string? Name, out System.DateTimeOffset? Created, out System.DateTimeOffset? LastSeen) -> void
+Signal.Application.Abstractions.LinkedDevice.Equals(Signal.Application.Abstractions.LinkedDevice? other) -> bool
+Signal.Application.Abstractions.LinkedDevice.Id.get -> long
+Signal.Application.Abstractions.LinkedDevice.Id.init -> void
+Signal.Application.Abstractions.LinkedDevice.IsPrimary.get -> bool
+Signal.Application.Abstractions.LinkedDevice.LastSeen.get -> System.DateTimeOffset?
+Signal.Application.Abstractions.LinkedDevice.LastSeen.init -> void
+Signal.Application.Abstractions.LinkedDevice.LinkedDevice(long Id, string? Name, System.DateTimeOffset? Created, System.DateTimeOffset? LastSeen) -> void
+Signal.Application.Abstractions.LinkedDevice.Name.get -> string?
+Signal.Application.Abstractions.LinkedDevice.Name.init -> void
 Signal.Application.Abstractions.RegistrationOptions
 Signal.Application.Abstractions.RegistrationOptions.<Clone>$() -> Signal.Application.Abstractions.RegistrationOptions!
 Signal.Application.Abstractions.RegistrationOptions.Captcha.get -> string?
@@ -47,6 +70,8 @@ Signal.Application.Abstractions.UsernameAssignment.Username.init -> void
 Signal.Application.Abstractions.UsernameAssignment.UsernameAssignment(Signal.Domain.ValueObjects.Username Username, string? Link) -> void
 static Signal.Application.Abstractions.AccountSettings.operator !=(Signal.Application.Abstractions.AccountSettings? left, Signal.Application.Abstractions.AccountSettings? right) -> bool
 static Signal.Application.Abstractions.AccountSettings.operator ==(Signal.Application.Abstractions.AccountSettings? left, Signal.Application.Abstractions.AccountSettings? right) -> bool
+static Signal.Application.Abstractions.LinkedDevice.operator !=(Signal.Application.Abstractions.LinkedDevice? left, Signal.Application.Abstractions.LinkedDevice? right) -> bool
+static Signal.Application.Abstractions.LinkedDevice.operator ==(Signal.Application.Abstractions.LinkedDevice? left, Signal.Application.Abstractions.LinkedDevice? right) -> bool
 static Signal.Application.Abstractions.RegistrationOptions.operator !=(Signal.Application.Abstractions.RegistrationOptions? left, Signal.Application.Abstractions.RegistrationOptions? right) -> bool
 static Signal.Application.Abstractions.RegistrationOptions.operator ==(Signal.Application.Abstractions.RegistrationOptions? left, Signal.Application.Abstractions.RegistrationOptions? right) -> bool
 Signal.Application.Abstractions.IMessageSender.RemoteDeleteAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient recipient, long targetTimestamp, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
