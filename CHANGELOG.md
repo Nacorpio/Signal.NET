@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0-preview.1] - 2026-09-29
+
+First preview release.
+
 ### Added
 
 - **Release process (roadmap 0.2):**
@@ -27,3 +31,6 @@ All notable changes to this project are documented here. The format follows
 - **C# 15 unions:** `Recipient`, `EnvelopeContent`, `CommandResult`, `ArgumentBindingResult`.
 - **Documentation:** full XML documentation (enforced by the build) and the `docs/` guides.
 - **Repository:** sample bot, Docker Compose file, CI workflow for GitHub Actions.
+
+[Unreleased]: https://github.com/Nacorpio/Signal.NET/compare/v0.2.0-preview.1...HEAD
+[0.2.0-preview.1]: https://github.com/Nacorpio/Signal.NET/releases/tag/v0.2.0-preview.1

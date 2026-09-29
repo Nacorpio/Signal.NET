@@ -1,1 +1,594 @@
 #nullable enable
+abstract Signal.Application.Commands.Binding.ArgumentConverter<T>.TryConvert(string! input, Signal.Application.Commands.CommandContext! context, out T value) -> bool
+abstract Signal.Application.Commands.CommandBase.ExecuteAsync(Signal.Application.Commands.CommandContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+abstract Signal.Application.Commands.Preconditions.PreconditionAttribute.CheckAsync(Signal.Application.Commands.CommandContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Signal.Application.Commands.Preconditions.PreconditionResult>
+const Signal.Application.Configuration.CommandOptions.DefaultPrefix = "/" -> string!
+const Signal.Application.Configuration.SignalOptions.SectionName = "Signal" -> string!
+override Signal.Application.Abstractions.ProfileUpdate.Equals(object? obj) -> bool
+override Signal.Application.Abstractions.ProfileUpdate.GetHashCode() -> int
+override Signal.Application.Abstractions.ProfileUpdate.ToString() -> string!
+override Signal.Application.Abstractions.SendResult.GetHashCode() -> int
+override Signal.Application.Abstractions.SignalApiInfo.Equals(object? obj) -> bool
+override Signal.Application.Abstractions.SignalApiInfo.GetHashCode() -> int
+override Signal.Application.Abstractions.SignalApiInfo.ToString() -> string!
+override Signal.Application.Commands.Binding.ArgumentBindingError.Equals(object? obj) -> bool
+override Signal.Application.Commands.Binding.ArgumentBindingError.GetHashCode() -> int
+override Signal.Application.Commands.Binding.ArgumentBindingError.ToString() -> string!
+override Signal.Application.Commands.Binding.BoundArguments.Equals(object? obj) -> bool
+override Signal.Application.Commands.Binding.BoundArguments.GetHashCode() -> int
+override Signal.Application.Commands.Binding.BoundArguments.ToString() -> string!
+override Signal.Application.Commands.CommandBindingFailed.Equals(object? obj) -> bool
+override Signal.Application.Commands.CommandBindingFailed.GetHashCode() -> int
+override Signal.Application.Commands.CommandBindingFailed.ToString() -> string!
+override Signal.Application.Commands.CommandDescriptor.ToString() -> string!
+override Signal.Application.Commands.CommandFaulted.Equals(object? obj) -> bool
+override Signal.Application.Commands.CommandFaulted.GetHashCode() -> int
+override Signal.Application.Commands.CommandFaulted.ToString() -> string!
+override Signal.Application.Commands.CommandNotFound.Equals(object? obj) -> bool
+override Signal.Application.Commands.CommandNotFound.GetHashCode() -> int
+override Signal.Application.Commands.CommandNotFound.ToString() -> string!
+override Signal.Application.Commands.CommandParameter.Equals(object? obj) -> bool
+override Signal.Application.Commands.CommandParameter.GetHashCode() -> int
+override Signal.Application.Commands.CommandParameter.ToString() -> string!
+override Signal.Application.Commands.CommandPreconditionFailed.Equals(object? obj) -> bool
+override Signal.Application.Commands.CommandPreconditionFailed.GetHashCode() -> int
+override Signal.Application.Commands.CommandPreconditionFailed.ToString() -> string!
+override Signal.Application.Commands.CommandSucceeded.Equals(object? obj) -> bool
+override Signal.Application.Commands.CommandSucceeded.GetHashCode() -> int
+override Signal.Application.Commands.CommandSucceeded.ToString() -> string!
+override Signal.Application.Commands.Parsing.CommandArguments.Equals(object? obj) -> bool
+override Signal.Application.Commands.Parsing.CommandArguments.GetHashCode() -> int
+override Signal.Application.Commands.Parsing.CommandArguments.ToString() -> string!
+override Signal.Application.Commands.Parsing.CommandToken.GetHashCode() -> int
+override Signal.Application.Commands.Parsing.ParsedCommand.ToString() -> string!
+override Signal.Application.Commands.Preconditions.CooldownAttribute.CheckAsync(Signal.Application.Commands.CommandContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Signal.Application.Commands.Preconditions.PreconditionResult>
+override Signal.Application.Commands.Preconditions.CooldownAttribute.Order.get -> int
+override Signal.Application.Commands.Preconditions.PreconditionResult.GetHashCode() -> int
+override Signal.Application.Commands.Preconditions.RequireAdminAttribute.CheckAsync(Signal.Application.Commands.CommandContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Signal.Application.Commands.Preconditions.PreconditionResult>
+override Signal.Application.Commands.Preconditions.RequireDirectMessageAttribute.CheckAsync(Signal.Application.Commands.CommandContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Signal.Application.Commands.Preconditions.PreconditionResult>
+override Signal.Application.Commands.Preconditions.RequireGroupAdminAttribute.CheckAsync(Signal.Application.Commands.CommandContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Signal.Application.Commands.Preconditions.PreconditionResult>
+override Signal.Application.Commands.Preconditions.RequireGroupAttribute.CheckAsync(Signal.Application.Commands.CommandContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Signal.Application.Commands.Preconditions.PreconditionResult>
+Signal.Application.Abstractions.IAccountService
+Signal.Application.Abstractions.IAccountService.GetLinkQrCodeAsync(string! deviceName, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<byte[]!>!
+Signal.Application.Abstractions.IAccountService.ListAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Signal.Domain.ValueObjects.PhoneNumber>!>!
+Signal.Application.Abstractions.IAttachmentService
+Signal.Application.Abstractions.IAttachmentService.DeleteAsync(string! attachmentId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IAttachmentService.DownloadAsync(string! attachmentId, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<byte[]!>!
+Signal.Application.Abstractions.IAttachmentService.ListAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<string!>!>!
+Signal.Application.Abstractions.IContactService
+Signal.Application.Abstractions.IContactService.ListAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Signal.Domain.Entities.Contact!>!>!
+Signal.Application.Abstractions.IContactService.UpdateAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient contact, string? name, int? expirationInSeconds = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IGroupService
+Signal.Application.Abstractions.IGroupService.AddAdminsAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.GroupId group, System.Collections.Generic.IEnumerable<string!>! admins, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IGroupService.AddMembersAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.GroupId group, System.Collections.Generic.IEnumerable<string!>! members, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IGroupService.CreateAsync(Signal.Domain.ValueObjects.PhoneNumber account, string! name, System.Collections.Generic.IEnumerable<string!>! members, string? description = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Domain.ValueObjects.GroupId>!
+Signal.Application.Abstractions.IGroupService.DeleteAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.GroupId group, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IGroupService.GetAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.GroupId group, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Domain.Entities.Group?>!
+Signal.Application.Abstractions.IGroupService.ListAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Signal.Domain.Entities.Group!>!>!
+Signal.Application.Abstractions.IGroupService.QuitAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.GroupId group, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IGroupService.RemoveAdminsAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.GroupId group, System.Collections.Generic.IEnumerable<string!>! admins, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IGroupService.RemoveMembersAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.GroupId group, System.Collections.Generic.IEnumerable<string!>! members, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IGroupService.UpdateAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.GroupId group, string? name = null, string? description = null, string? base64Avatar = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IIdentityService
+Signal.Application.Abstractions.IIdentityService.ListAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Signal.Domain.Entities.Identity!>!>!
+Signal.Application.Abstractions.IIdentityService.TrustAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.PhoneNumber numberToTrust, string? verifiedSafetyNumber = null, bool trustAllKnownKeys = false, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IMessageReceiver
+Signal.Application.Abstractions.IMessageReceiver.ReceiveAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Collections.Generic.IAsyncEnumerable<Signal.Domain.Messaging.IncomingEnvelope!>!
+Signal.Application.Abstractions.IMessageReceiverFactory
+Signal.Application.Abstractions.IMessageReceiverFactory.Create(Signal.Domain.ExecutionMode mode) -> Signal.Application.Abstractions.IMessageReceiver!
+Signal.Application.Abstractions.IMessageSender
+Signal.Application.Abstractions.IMessageSender.SendAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.Messaging.OutgoingMessage! message, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
+Signal.Application.Abstractions.IProfileService
+Signal.Application.Abstractions.IProfileService.UpdateAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Application.Abstractions.ProfileUpdate! profile, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IReactionService
+Signal.Application.Abstractions.IReactionService.RemoveReactionAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient recipient, string! emoji, string! targetAuthor, long targetTimestamp, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IReactionService.SendReactionAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient recipient, string! emoji, string! targetAuthor, long targetTimestamp, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.IReceiptService
+Signal.Application.Abstractions.IReceiptService.SendReceiptAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient recipient, long timestamp, Signal.Domain.Messaging.ReceiptType type = Signal.Domain.Messaging.ReceiptType.Read, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.ISignalClient
+Signal.Application.Abstractions.ISignalClient.Accounts.get -> Signal.Application.Abstractions.IAccountService!
+Signal.Application.Abstractions.ISignalClient.Attachments.get -> Signal.Application.Abstractions.IAttachmentService!
+Signal.Application.Abstractions.ISignalClient.Contacts.get -> Signal.Application.Abstractions.IContactService!
+Signal.Application.Abstractions.ISignalClient.Groups.get -> Signal.Application.Abstractions.IGroupService!
+Signal.Application.Abstractions.ISignalClient.Identities.get -> Signal.Application.Abstractions.IIdentityService!
+Signal.Application.Abstractions.ISignalClient.Messages.get -> Signal.Application.Abstractions.IMessageSender!
+Signal.Application.Abstractions.ISignalClient.Profiles.get -> Signal.Application.Abstractions.IProfileService!
+Signal.Application.Abstractions.ISignalClient.Reactions.get -> Signal.Application.Abstractions.IReactionService!
+Signal.Application.Abstractions.ISignalClient.Receipts.get -> Signal.Application.Abstractions.IReceiptService!
+Signal.Application.Abstractions.ISignalClient.System.get -> Signal.Application.Abstractions.ISystemService!
+Signal.Application.Abstractions.ISignalClient.Typing.get -> Signal.Application.Abstractions.ITypingIndicatorService!
+Signal.Application.Abstractions.ISystemService
+Signal.Application.Abstractions.ISystemService.GetAboutAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SignalApiInfo!>!
+Signal.Application.Abstractions.ISystemService.IsHealthyAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
+Signal.Application.Abstractions.ITypingIndicatorService
+Signal.Application.Abstractions.ITypingIndicatorService.StartTypingAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient recipient, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.ITypingIndicatorService.StopTypingAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient recipient, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Abstractions.ProfileUpdate
+Signal.Application.Abstractions.ProfileUpdate.<Clone>$() -> Signal.Application.Abstractions.ProfileUpdate!
+Signal.Application.Abstractions.ProfileUpdate.About.get -> string?
+Signal.Application.Abstractions.ProfileUpdate.About.init -> void
+Signal.Application.Abstractions.ProfileUpdate.Base64Avatar.get -> string?
+Signal.Application.Abstractions.ProfileUpdate.Base64Avatar.init -> void
+Signal.Application.Abstractions.ProfileUpdate.Deconstruct(out string! Name, out string? About, out string? Base64Avatar) -> void
+Signal.Application.Abstractions.ProfileUpdate.Equals(Signal.Application.Abstractions.ProfileUpdate? other) -> bool
+Signal.Application.Abstractions.ProfileUpdate.Name.get -> string!
+Signal.Application.Abstractions.ProfileUpdate.Name.init -> void
+Signal.Application.Abstractions.ProfileUpdate.ProfileUpdate(string! Name, string? About = null, string? Base64Avatar = null) -> void
+Signal.Application.Abstractions.SendResult
+Signal.Application.Abstractions.SendResult.Deconstruct(out long Timestamp) -> void
+Signal.Application.Abstractions.SendResult.Equals(Signal.Application.Abstractions.SendResult other) -> bool
+Signal.Application.Abstractions.SendResult.SendResult() -> void
+Signal.Application.Abstractions.SendResult.SendResult(long Timestamp) -> void
+Signal.Application.Abstractions.SendResult.Timestamp.get -> long
+Signal.Application.Abstractions.SendResult.Timestamp.init -> void
+Signal.Application.Abstractions.SignalApiException
+Signal.Application.Abstractions.SignalApiException.ApiError.get -> string?
+Signal.Application.Abstractions.SignalApiException.SignalApiException(System.Net.HttpStatusCode statusCode, string? apiError, string? path = null) -> void
+Signal.Application.Abstractions.SignalApiException.StatusCode.get -> System.Net.HttpStatusCode
+Signal.Application.Abstractions.SignalApiInfo
+Signal.Application.Abstractions.SignalApiInfo.<Clone>$() -> Signal.Application.Abstractions.SignalApiInfo!
+Signal.Application.Abstractions.SignalApiInfo.ApiVersions.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Signal.Application.Abstractions.SignalApiInfo.ApiVersions.init -> void
+Signal.Application.Abstractions.SignalApiInfo.Build.get -> int
+Signal.Application.Abstractions.SignalApiInfo.Build.init -> void
+Signal.Application.Abstractions.SignalApiInfo.Capabilities.get -> System.Collections.Generic.IReadOnlyDictionary<string!, System.Collections.Generic.IReadOnlyList<string!>!>!
+Signal.Application.Abstractions.SignalApiInfo.Capabilities.init -> void
+Signal.Application.Abstractions.SignalApiInfo.Deconstruct(out string? Version, out int Build, out string? RawMode, out System.Collections.Generic.IReadOnlyList<string!>! ApiVersions, out System.Collections.Generic.IReadOnlyDictionary<string!, System.Collections.Generic.IReadOnlyList<string!>!>! Capabilities) -> void
+Signal.Application.Abstractions.SignalApiInfo.Equals(Signal.Application.Abstractions.SignalApiInfo? other) -> bool
+Signal.Application.Abstractions.SignalApiInfo.Mode.get -> Signal.Domain.ExecutionMode?
+Signal.Application.Abstractions.SignalApiInfo.RawMode.get -> string?
+Signal.Application.Abstractions.SignalApiInfo.RawMode.init -> void
+Signal.Application.Abstractions.SignalApiInfo.SignalApiInfo(string? Version, int Build, string? RawMode, System.Collections.Generic.IReadOnlyList<string!>! ApiVersions, System.Collections.Generic.IReadOnlyDictionary<string!, System.Collections.Generic.IReadOnlyList<string!>!>! Capabilities) -> void
+Signal.Application.Abstractions.SignalApiInfo.Version.get -> string?
+Signal.Application.Abstractions.SignalApiInfo.Version.init -> void
+Signal.Application.ApplicationServiceCollectionExtensions
+Signal.Application.Commands.Binding.ArgumentBindingError
+Signal.Application.Commands.Binding.ArgumentBindingError.<Clone>$() -> Signal.Application.Commands.Binding.ArgumentBindingError!
+Signal.Application.Commands.Binding.ArgumentBindingError.ArgumentBindingError(string! Message) -> void
+Signal.Application.Commands.Binding.ArgumentBindingError.Deconstruct(out string! Message) -> void
+Signal.Application.Commands.Binding.ArgumentBindingError.Equals(Signal.Application.Commands.Binding.ArgumentBindingError? other) -> bool
+Signal.Application.Commands.Binding.ArgumentBindingError.Message.get -> string!
+Signal.Application.Commands.Binding.ArgumentBindingError.Message.init -> void
+Signal.Application.Commands.Binding.ArgumentBindingResult
+Signal.Application.Commands.Binding.ArgumentBindingResult.ArgumentBindingResult() -> void
+Signal.Application.Commands.Binding.ArgumentBindingResult.ArgumentBindingResult(Signal.Application.Commands.Binding.ArgumentBindingError! value) -> void
+Signal.Application.Commands.Binding.ArgumentBindingResult.ArgumentBindingResult(Signal.Application.Commands.Binding.BoundArguments! value) -> void
+Signal.Application.Commands.Binding.ArgumentBindingResult.Value.get -> object?
+Signal.Application.Commands.Binding.ArgumentConverter<T>
+Signal.Application.Commands.Binding.ArgumentConverter<T>.ArgumentConverter() -> void
+Signal.Application.Commands.Binding.ArgumentConverter<T>.TargetType.get -> System.Type!
+Signal.Application.Commands.Binding.BoundArguments
+Signal.Application.Commands.Binding.BoundArguments.<Clone>$() -> Signal.Application.Commands.Binding.BoundArguments!
+Signal.Application.Commands.Binding.BoundArguments.BoundArguments(object?[]! Values) -> void
+Signal.Application.Commands.Binding.BoundArguments.Deconstruct(out object?[]! Values) -> void
+Signal.Application.Commands.Binding.BoundArguments.Equals(Signal.Application.Commands.Binding.BoundArguments? other) -> bool
+Signal.Application.Commands.Binding.BoundArguments.Values.get -> object?[]!
+Signal.Application.Commands.Binding.BoundArguments.Values.init -> void
+Signal.Application.Commands.Binding.IArgumentConverter
+Signal.Application.Commands.Binding.IArgumentConverter.DisplayName.get -> string!
+Signal.Application.Commands.Binding.IArgumentConverter.TargetType.get -> System.Type!
+Signal.Application.Commands.Binding.IArgumentConverter.TryConvert(string! input, Signal.Application.Commands.CommandContext! context, out object? value) -> bool
+Signal.Application.Commands.Binding.IArgumentConverterProvider
+Signal.Application.Commands.Binding.IArgumentConverterProvider.TryGetConverter(System.Type! type, out Signal.Application.Commands.Binding.IArgumentConverter? converter) -> bool
+Signal.Application.Commands.Binding.ICommandArgumentBinder
+Signal.Application.Commands.Binding.ICommandArgumentBinder.Bind(Signal.Application.Commands.CommandContext! context) -> Signal.Application.Commands.Binding.ArgumentBindingResult
+Signal.Application.Commands.CommandAttribute
+Signal.Application.Commands.CommandAttribute.Aliases.get -> string![]!
+Signal.Application.Commands.CommandAttribute.Aliases.set -> void
+Signal.Application.Commands.CommandAttribute.CommandAttribute(string! name) -> void
+Signal.Application.Commands.CommandAttribute.Description.get -> string?
+Signal.Application.Commands.CommandAttribute.Description.set -> void
+Signal.Application.Commands.CommandAttribute.Hidden.get -> bool
+Signal.Application.Commands.CommandAttribute.Hidden.set -> void
+Signal.Application.Commands.CommandAttribute.Name.get -> string!
+Signal.Application.Commands.CommandAttribute.Usage.get -> string?
+Signal.Application.Commands.CommandAttribute.Usage.set -> void
+Signal.Application.Commands.CommandBase
+Signal.Application.Commands.CommandBase.CommandBase() -> void
+Signal.Application.Commands.CommandBindingFailed
+Signal.Application.Commands.CommandBindingFailed.<Clone>$() -> Signal.Application.Commands.CommandBindingFailed!
+Signal.Application.Commands.CommandBindingFailed.Command.get -> Signal.Application.Commands.CommandDescriptor!
+Signal.Application.Commands.CommandBindingFailed.Command.init -> void
+Signal.Application.Commands.CommandBindingFailed.CommandBindingFailed(Signal.Application.Commands.Parsing.ParsedCommand! Parsed, Signal.Application.Commands.CommandDescriptor! Command, string! Error) -> void
+Signal.Application.Commands.CommandBindingFailed.Deconstruct(out Signal.Application.Commands.Parsing.ParsedCommand! Parsed, out Signal.Application.Commands.CommandDescriptor! Command, out string! Error) -> void
+Signal.Application.Commands.CommandBindingFailed.Equals(Signal.Application.Commands.CommandBindingFailed? other) -> bool
+Signal.Application.Commands.CommandBindingFailed.Error.get -> string!
+Signal.Application.Commands.CommandBindingFailed.Error.init -> void
+Signal.Application.Commands.CommandBindingFailed.Parsed.get -> Signal.Application.Commands.Parsing.ParsedCommand!
+Signal.Application.Commands.CommandBindingFailed.Parsed.init -> void
+Signal.Application.Commands.CommandCatalog
+Signal.Application.Commands.CommandCatalog.Add(Signal.Application.Commands.CommandDescriptor! descriptor) -> void
+Signal.Application.Commands.CommandCatalog.AddCommand(System.Type! commandType) -> void
+Signal.Application.Commands.CommandCatalog.AddModule(System.Type! moduleType) -> void
+Signal.Application.Commands.CommandCatalog.CommandCatalog() -> void
+Signal.Application.Commands.CommandCatalog.CommandTypes.get -> System.Collections.Generic.IReadOnlyList<System.Type!>!
+Signal.Application.Commands.CommandCatalog.Descriptors.get -> System.Collections.Generic.IReadOnlyList<Signal.Application.Commands.CommandDescriptor!>!
+Signal.Application.Commands.CommandCatalog.ModuleTypes.get -> System.Collections.Generic.IReadOnlyList<System.Type!>!
+Signal.Application.Commands.CommandContext
+Signal.Application.Commands.CommandContext.Account.get -> Signal.Domain.ValueObjects.PhoneNumber
+Signal.Application.Commands.CommandContext.Arguments.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Signal.Application.Commands.CommandContext.CancellationToken.get -> System.Threading.CancellationToken
+Signal.Application.Commands.CommandContext.Command.get -> Signal.Application.Commands.CommandDescriptor!
+Signal.Application.Commands.CommandContext.CommandContext(Signal.Application.Pipeline.MessageContext! message, Signal.Application.Commands.Parsing.ParsedCommand! parsed, Signal.Application.Commands.CommandDescriptor! command) -> void
+Signal.Application.Commands.CommandContext.Conversation.get -> Signal.Domain.ValueObjects.Recipient
+Signal.Application.Commands.CommandContext.Data.get -> Signal.Domain.Messaging.DataMessage!
+Signal.Application.Commands.CommandContext.Envelope.get -> Signal.Domain.Messaging.IncomingEnvelope!
+Signal.Application.Commands.CommandContext.Flags.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string?>!
+Signal.Application.Commands.CommandContext.Group.get -> Signal.Domain.ValueObjects.GroupId?
+Signal.Application.Commands.CommandContext.IsGroup.get -> bool
+Signal.Application.Commands.CommandContext.Message.get -> Signal.Application.Pipeline.MessageContext!
+Signal.Application.Commands.CommandContext.Parsed.get -> Signal.Application.Commands.Parsing.ParsedCommand!
+Signal.Application.Commands.CommandContext.ReactAsync(string! emoji, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Commands.CommandContext.ReplyAsync(Signal.Domain.Messaging.OutgoingMessage! message, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
+Signal.Application.Commands.CommandContext.ReplyAsync(string! text, bool? quote = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
+Signal.Application.Commands.CommandContext.ReplyStyledAsync(string! text, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
+Signal.Application.Commands.CommandContext.Sender.get -> Signal.Domain.Messaging.Sender!
+Signal.Application.Commands.CommandContext.Services.get -> System.IServiceProvider!
+Signal.Application.Commands.CommandDescriptor
+Signal.Application.Commands.CommandDescriptor.Aliases.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Signal.Application.Commands.CommandDescriptor.CommandDescriptor(string! name, System.Func<Signal.Application.Commands.CommandContext!, object?[]!, System.Threading.Tasks.Task!>! executor, System.Type! declaringType, System.Collections.Generic.IEnumerable<string!>? aliases = null, string? description = null, string? usage = null, System.Collections.Generic.IEnumerable<Signal.Application.Commands.CommandParameter!>? parameters = null, System.Collections.Generic.IEnumerable<Signal.Application.Commands.Preconditions.PreconditionAttribute!>? preconditions = null, bool hidden = false, System.Reflection.MethodInfo? method = null) -> void
+Signal.Application.Commands.CommandDescriptor.DeclaringType.get -> System.Type!
+Signal.Application.Commands.CommandDescriptor.Description.get -> string?
+Signal.Application.Commands.CommandDescriptor.Executor.get -> System.Func<Signal.Application.Commands.CommandContext!, object?[]!, System.Threading.Tasks.Task!>!
+Signal.Application.Commands.CommandDescriptor.FormatUsage(string! prefix) -> string!
+Signal.Application.Commands.CommandDescriptor.Hidden.get -> bool
+Signal.Application.Commands.CommandDescriptor.Method.get -> System.Reflection.MethodInfo?
+Signal.Application.Commands.CommandDescriptor.Name.get -> string!
+Signal.Application.Commands.CommandDescriptor.Parameters.get -> System.Collections.Generic.IReadOnlyList<Signal.Application.Commands.CommandParameter!>!
+Signal.Application.Commands.CommandDescriptor.Preconditions.get -> System.Collections.Generic.IReadOnlyList<Signal.Application.Commands.Preconditions.PreconditionAttribute!>!
+Signal.Application.Commands.CommandDescriptor.Usage.get -> string?
+Signal.Application.Commands.CommandFaulted
+Signal.Application.Commands.CommandFaulted.<Clone>$() -> Signal.Application.Commands.CommandFaulted!
+Signal.Application.Commands.CommandFaulted.Command.get -> Signal.Application.Commands.CommandDescriptor!
+Signal.Application.Commands.CommandFaulted.Command.init -> void
+Signal.Application.Commands.CommandFaulted.CommandFaulted(Signal.Application.Commands.Parsing.ParsedCommand! Parsed, Signal.Application.Commands.CommandDescriptor! Command, System.Exception! Exception) -> void
+Signal.Application.Commands.CommandFaulted.Deconstruct(out Signal.Application.Commands.Parsing.ParsedCommand! Parsed, out Signal.Application.Commands.CommandDescriptor! Command, out System.Exception! Exception) -> void
+Signal.Application.Commands.CommandFaulted.Equals(Signal.Application.Commands.CommandFaulted? other) -> bool
+Signal.Application.Commands.CommandFaulted.Exception.get -> System.Exception!
+Signal.Application.Commands.CommandFaulted.Exception.init -> void
+Signal.Application.Commands.CommandFaulted.Parsed.get -> Signal.Application.Commands.Parsing.ParsedCommand!
+Signal.Application.Commands.CommandFaulted.Parsed.init -> void
+Signal.Application.Commands.CommandMiddleware
+Signal.Application.Commands.CommandMiddleware.CommandMiddleware(Signal.Application.Commands.Parsing.ICommandParser! parser, Signal.Application.Commands.ICommandExecutor! executor, Signal.Application.Commands.ICommandResultHandler! results) -> void
+Signal.Application.Commands.CommandMiddleware.InvokeAsync(Signal.Application.Pipeline.MessageContext! context, Signal.Application.Pipeline.MessageDelegate! next) -> System.Threading.Tasks.Task!
+Signal.Application.Commands.CommandModule
+Signal.Application.Commands.CommandModule.CommandModule() -> void
+Signal.Application.Commands.CommandModule.Context.get -> Signal.Application.Commands.CommandContext!
+Signal.Application.Commands.CommandModule.ReactAsync(string! emoji) -> System.Threading.Tasks.Task!
+Signal.Application.Commands.CommandModule.ReplyAsync(string! text, bool? quote = null) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
+Signal.Application.Commands.CommandNotFound
+Signal.Application.Commands.CommandNotFound.<Clone>$() -> Signal.Application.Commands.CommandNotFound!
+Signal.Application.Commands.CommandNotFound.CommandNotFound(Signal.Application.Commands.Parsing.ParsedCommand! Parsed) -> void
+Signal.Application.Commands.CommandNotFound.Deconstruct(out Signal.Application.Commands.Parsing.ParsedCommand! Parsed) -> void
+Signal.Application.Commands.CommandNotFound.Equals(Signal.Application.Commands.CommandNotFound? other) -> bool
+Signal.Application.Commands.CommandNotFound.Parsed.get -> Signal.Application.Commands.Parsing.ParsedCommand!
+Signal.Application.Commands.CommandNotFound.Parsed.init -> void
+Signal.Application.Commands.CommandParameter
+Signal.Application.Commands.CommandParameter.<Clone>$() -> Signal.Application.Commands.CommandParameter!
+Signal.Application.Commands.CommandParameter.CommandParameter(string! Name, System.Type! ParameterType, bool IsOptional, object? DefaultValue, bool IsRemainder, string? FlagName, string? Summary) -> void
+Signal.Application.Commands.CommandParameter.Deconstruct(out string! Name, out System.Type! ParameterType, out bool IsOptional, out object? DefaultValue, out bool IsRemainder, out string? FlagName, out string? Summary) -> void
+Signal.Application.Commands.CommandParameter.DefaultValue.get -> object?
+Signal.Application.Commands.CommandParameter.DefaultValue.init -> void
+Signal.Application.Commands.CommandParameter.Equals(Signal.Application.Commands.CommandParameter? other) -> bool
+Signal.Application.Commands.CommandParameter.FlagName.get -> string?
+Signal.Application.Commands.CommandParameter.FlagName.init -> void
+Signal.Application.Commands.CommandParameter.IsFlag.get -> bool
+Signal.Application.Commands.CommandParameter.IsOptional.get -> bool
+Signal.Application.Commands.CommandParameter.IsOptional.init -> void
+Signal.Application.Commands.CommandParameter.IsRemainder.get -> bool
+Signal.Application.Commands.CommandParameter.IsRemainder.init -> void
+Signal.Application.Commands.CommandParameter.IsSwitch.get -> bool
+Signal.Application.Commands.CommandParameter.Name.get -> string!
+Signal.Application.Commands.CommandParameter.Name.init -> void
+Signal.Application.Commands.CommandParameter.ParameterType.get -> System.Type!
+Signal.Application.Commands.CommandParameter.ParameterType.init -> void
+Signal.Application.Commands.CommandParameter.Summary.get -> string?
+Signal.Application.Commands.CommandParameter.Summary.init -> void
+Signal.Application.Commands.CommandPreconditionFailed
+Signal.Application.Commands.CommandPreconditionFailed.<Clone>$() -> Signal.Application.Commands.CommandPreconditionFailed!
+Signal.Application.Commands.CommandPreconditionFailed.Command.get -> Signal.Application.Commands.CommandDescriptor!
+Signal.Application.Commands.CommandPreconditionFailed.Command.init -> void
+Signal.Application.Commands.CommandPreconditionFailed.CommandPreconditionFailed(Signal.Application.Commands.Parsing.ParsedCommand! Parsed, Signal.Application.Commands.CommandDescriptor! Command, string? Reason) -> void
+Signal.Application.Commands.CommandPreconditionFailed.Deconstruct(out Signal.Application.Commands.Parsing.ParsedCommand! Parsed, out Signal.Application.Commands.CommandDescriptor! Command, out string? Reason) -> void
+Signal.Application.Commands.CommandPreconditionFailed.Equals(Signal.Application.Commands.CommandPreconditionFailed? other) -> bool
+Signal.Application.Commands.CommandPreconditionFailed.Parsed.get -> Signal.Application.Commands.Parsing.ParsedCommand!
+Signal.Application.Commands.CommandPreconditionFailed.Parsed.init -> void
+Signal.Application.Commands.CommandPreconditionFailed.Reason.get -> string?
+Signal.Application.Commands.CommandPreconditionFailed.Reason.init -> void
+Signal.Application.Commands.CommandResult
+Signal.Application.Commands.CommandResult.CommandResult() -> void
+Signal.Application.Commands.CommandResult.CommandResult(Signal.Application.Commands.CommandBindingFailed! value) -> void
+Signal.Application.Commands.CommandResult.CommandResult(Signal.Application.Commands.CommandFaulted! value) -> void
+Signal.Application.Commands.CommandResult.CommandResult(Signal.Application.Commands.CommandNotFound! value) -> void
+Signal.Application.Commands.CommandResult.CommandResult(Signal.Application.Commands.CommandPreconditionFailed! value) -> void
+Signal.Application.Commands.CommandResult.CommandResult(Signal.Application.Commands.CommandSucceeded! value) -> void
+Signal.Application.Commands.CommandResult.IsSuccess.get -> bool
+Signal.Application.Commands.CommandResult.Parsed.get -> Signal.Application.Commands.Parsing.ParsedCommand!
+Signal.Application.Commands.CommandResult.Value.get -> object?
+Signal.Application.Commands.CommandSucceeded
+Signal.Application.Commands.CommandSucceeded.<Clone>$() -> Signal.Application.Commands.CommandSucceeded!
+Signal.Application.Commands.CommandSucceeded.Command.get -> Signal.Application.Commands.CommandDescriptor!
+Signal.Application.Commands.CommandSucceeded.Command.init -> void
+Signal.Application.Commands.CommandSucceeded.CommandSucceeded(Signal.Application.Commands.Parsing.ParsedCommand! Parsed, Signal.Application.Commands.CommandDescriptor! Command) -> void
+Signal.Application.Commands.CommandSucceeded.Deconstruct(out Signal.Application.Commands.Parsing.ParsedCommand! Parsed, out Signal.Application.Commands.CommandDescriptor! Command) -> void
+Signal.Application.Commands.CommandSucceeded.Equals(Signal.Application.Commands.CommandSucceeded? other) -> bool
+Signal.Application.Commands.CommandSucceeded.Parsed.get -> Signal.Application.Commands.Parsing.ParsedCommand!
+Signal.Application.Commands.CommandSucceeded.Parsed.init -> void
+Signal.Application.Commands.FlagAttribute
+Signal.Application.Commands.FlagAttribute.FlagAttribute(string? name = null) -> void
+Signal.Application.Commands.FlagAttribute.Name.get -> string?
+Signal.Application.Commands.HelpModule
+Signal.Application.Commands.HelpModule.HelpAsync(string? command = null) -> System.Threading.Tasks.Task!
+Signal.Application.Commands.HelpModule.HelpModule(Signal.Application.Commands.ICommandRegistry! registry) -> void
+Signal.Application.Commands.ICommand
+Signal.Application.Commands.ICommand.Aliases.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Signal.Application.Commands.ICommand.Description.get -> string?
+Signal.Application.Commands.ICommand.ExecuteAsync(Signal.Application.Commands.CommandContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+Signal.Application.Commands.ICommand.Hidden.get -> bool
+Signal.Application.Commands.ICommand.Name.get -> string!
+Signal.Application.Commands.ICommand.Usage.get -> string?
+Signal.Application.Commands.ICommandExecutor
+Signal.Application.Commands.ICommandExecutor.ExecuteAsync(Signal.Application.Pipeline.MessageContext! message, Signal.Application.Commands.Parsing.ParsedCommand! parsed) -> System.Threading.Tasks.Task<Signal.Application.Commands.CommandResult>!
+Signal.Application.Commands.ICommandRegistry
+Signal.Application.Commands.ICommandRegistry.Commands.get -> System.Collections.Generic.IReadOnlyList<Signal.Application.Commands.CommandDescriptor!>!
+Signal.Application.Commands.ICommandRegistry.TryGetCommand(string! nameOrAlias, out Signal.Application.Commands.CommandDescriptor? command) -> bool
+Signal.Application.Commands.ICommandResultHandler
+Signal.Application.Commands.ICommandResultHandler.HandleAsync(Signal.Application.Pipeline.MessageContext! context, Signal.Application.Commands.CommandResult result) -> System.Threading.Tasks.Task!
+Signal.Application.Commands.Parsing.CommandArguments
+Signal.Application.Commands.Parsing.CommandArguments.<Clone>$() -> Signal.Application.Commands.Parsing.CommandArguments!
+Signal.Application.Commands.Parsing.CommandArguments.CommandArguments(System.Collections.Generic.IReadOnlyList<Signal.Application.Commands.Parsing.CommandToken>! Positional, System.Collections.Generic.IReadOnlyDictionary<string!, string?>! Flags, int LastFlagStart) -> void
+Signal.Application.Commands.Parsing.CommandArguments.Deconstruct(out System.Collections.Generic.IReadOnlyList<Signal.Application.Commands.Parsing.CommandToken>! Positional, out System.Collections.Generic.IReadOnlyDictionary<string!, string?>! Flags, out int LastFlagStart) -> void
+Signal.Application.Commands.Parsing.CommandArguments.Equals(Signal.Application.Commands.Parsing.CommandArguments? other) -> bool
+Signal.Application.Commands.Parsing.CommandArguments.Flags.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string?>!
+Signal.Application.Commands.Parsing.CommandArguments.Flags.init -> void
+Signal.Application.Commands.Parsing.CommandArguments.LastFlagStart.get -> int
+Signal.Application.Commands.Parsing.CommandArguments.LastFlagStart.init -> void
+Signal.Application.Commands.Parsing.CommandArguments.Positional.get -> System.Collections.Generic.IReadOnlyList<Signal.Application.Commands.Parsing.CommandToken>!
+Signal.Application.Commands.Parsing.CommandArguments.Positional.init -> void
+Signal.Application.Commands.Parsing.CommandToken
+Signal.Application.Commands.Parsing.CommandToken.CommandToken() -> void
+Signal.Application.Commands.Parsing.CommandToken.CommandToken(string! Value, bool IsQuoted, int Start) -> void
+Signal.Application.Commands.Parsing.CommandToken.Deconstruct(out string! Value, out bool IsQuoted, out int Start) -> void
+Signal.Application.Commands.Parsing.CommandToken.Equals(Signal.Application.Commands.Parsing.CommandToken other) -> bool
+Signal.Application.Commands.Parsing.CommandToken.IsEndOfFlags.get -> bool
+Signal.Application.Commands.Parsing.CommandToken.IsFlag.get -> bool
+Signal.Application.Commands.Parsing.CommandToken.IsQuoted.get -> bool
+Signal.Application.Commands.Parsing.CommandToken.IsQuoted.init -> void
+Signal.Application.Commands.Parsing.CommandToken.Start.get -> int
+Signal.Application.Commands.Parsing.CommandToken.Start.init -> void
+Signal.Application.Commands.Parsing.CommandToken.Value.get -> string!
+Signal.Application.Commands.Parsing.CommandToken.Value.init -> void
+Signal.Application.Commands.Parsing.CommandTokenizer
+Signal.Application.Commands.Parsing.ICommandParser
+Signal.Application.Commands.Parsing.ICommandParser.TryParse(string? text, out Signal.Application.Commands.Parsing.ParsedCommand? command) -> bool
+Signal.Application.Commands.Parsing.ParsedCommand
+Signal.Application.Commands.Parsing.ParsedCommand.Arguments.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Signal.Application.Commands.Parsing.ParsedCommand.Flags.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string?>!
+Signal.Application.Commands.Parsing.ParsedCommand.Name.get -> string!
+Signal.Application.Commands.Parsing.ParsedCommand.ParsedCommand(string! prefix, string! name, string! rawArguments) -> void
+Signal.Application.Commands.Parsing.ParsedCommand.Prefix.get -> string!
+Signal.Application.Commands.Parsing.ParsedCommand.RawArguments.get -> string!
+Signal.Application.Commands.Parsing.ParsedCommand.Split(System.Collections.Generic.IReadOnlySet<string!>? switches) -> Signal.Application.Commands.Parsing.CommandArguments!
+Signal.Application.Commands.Parsing.ParsedCommand.Tokens.get -> System.Collections.Generic.IReadOnlyList<Signal.Application.Commands.Parsing.CommandToken>!
+Signal.Application.Commands.Preconditions.CooldownAttribute
+Signal.Application.Commands.Preconditions.CooldownAttribute.CooldownAttribute(double seconds) -> void
+Signal.Application.Commands.Preconditions.CooldownAttribute.Period.get -> System.TimeSpan
+Signal.Application.Commands.Preconditions.CooldownAttribute.Scope.get -> Signal.Application.Commands.Preconditions.CooldownScope
+Signal.Application.Commands.Preconditions.CooldownAttribute.Scope.set -> void
+Signal.Application.Commands.Preconditions.CooldownScope
+Signal.Application.Commands.Preconditions.CooldownScope.Global = 2 -> Signal.Application.Commands.Preconditions.CooldownScope
+Signal.Application.Commands.Preconditions.CooldownScope.PerConversation = 1 -> Signal.Application.Commands.Preconditions.CooldownScope
+Signal.Application.Commands.Preconditions.CooldownScope.PerSender = 0 -> Signal.Application.Commands.Preconditions.CooldownScope
+Signal.Application.Commands.Preconditions.ICooldownTracker
+Signal.Application.Commands.Preconditions.ICooldownTracker.TryEnter(string! key, System.TimeSpan period, out System.TimeSpan remaining) -> bool
+Signal.Application.Commands.Preconditions.PreconditionAttribute
+Signal.Application.Commands.Preconditions.PreconditionAttribute.ErrorMessage.get -> string?
+Signal.Application.Commands.Preconditions.PreconditionAttribute.ErrorMessage.set -> void
+Signal.Application.Commands.Preconditions.PreconditionAttribute.Fail(string! defaultMessage) -> Signal.Application.Commands.Preconditions.PreconditionResult
+Signal.Application.Commands.Preconditions.PreconditionAttribute.PreconditionAttribute() -> void
+Signal.Application.Commands.Preconditions.PreconditionResult
+Signal.Application.Commands.Preconditions.PreconditionResult.Deconstruct(out bool IsSuccess, out string? Reason) -> void
+Signal.Application.Commands.Preconditions.PreconditionResult.Equals(Signal.Application.Commands.Preconditions.PreconditionResult other) -> bool
+Signal.Application.Commands.Preconditions.PreconditionResult.IsSuccess.get -> bool
+Signal.Application.Commands.Preconditions.PreconditionResult.IsSuccess.init -> void
+Signal.Application.Commands.Preconditions.PreconditionResult.PreconditionResult() -> void
+Signal.Application.Commands.Preconditions.PreconditionResult.PreconditionResult(bool IsSuccess, string? Reason) -> void
+Signal.Application.Commands.Preconditions.PreconditionResult.Reason.get -> string?
+Signal.Application.Commands.Preconditions.PreconditionResult.Reason.init -> void
+Signal.Application.Commands.Preconditions.RequireAdminAttribute
+Signal.Application.Commands.Preconditions.RequireAdminAttribute.RequireAdminAttribute() -> void
+Signal.Application.Commands.Preconditions.RequireDirectMessageAttribute
+Signal.Application.Commands.Preconditions.RequireDirectMessageAttribute.RequireDirectMessageAttribute() -> void
+Signal.Application.Commands.Preconditions.RequireGroupAdminAttribute
+Signal.Application.Commands.Preconditions.RequireGroupAdminAttribute.RequireGroupAdminAttribute() -> void
+Signal.Application.Commands.Preconditions.RequireGroupAttribute
+Signal.Application.Commands.Preconditions.RequireGroupAttribute.RequireGroupAttribute() -> void
+Signal.Application.Commands.RemainderAttribute
+Signal.Application.Commands.RemainderAttribute.RemainderAttribute() -> void
+Signal.Application.Commands.SummaryAttribute
+Signal.Application.Commands.SummaryAttribute.SummaryAttribute(string! text) -> void
+Signal.Application.Commands.SummaryAttribute.Text.get -> string!
+Signal.Application.Configuration.AccessControlOptions
+Signal.Application.Configuration.AccessControlOptions.AccessControlOptions() -> void
+Signal.Application.Configuration.AccessControlOptions.AllowedSenders.get -> System.Collections.Generic.List<string!>!
+Signal.Application.Configuration.AccessControlOptions.AllowedSenders.set -> void
+Signal.Application.Configuration.AccessControlOptions.BlockedSenders.get -> System.Collections.Generic.List<string!>!
+Signal.Application.Configuration.AccessControlOptions.BlockedSenders.set -> void
+Signal.Application.Configuration.AccessControlOptions.IgnoreOwnMessages.get -> bool
+Signal.Application.Configuration.AccessControlOptions.IgnoreOwnMessages.set -> void
+Signal.Application.Configuration.CommandOptions
+Signal.Application.Configuration.CommandOptions.Admins.get -> System.Collections.Generic.List<string!>!
+Signal.Application.Configuration.CommandOptions.Admins.set -> void
+Signal.Application.Configuration.CommandOptions.CaseSensitive.get -> bool
+Signal.Application.Configuration.CommandOptions.CaseSensitive.set -> void
+Signal.Application.Configuration.CommandOptions.CommandOptions() -> void
+Signal.Application.Configuration.CommandOptions.EffectivePrefixes.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Signal.Application.Configuration.CommandOptions.EnableHelp.get -> bool
+Signal.Application.Configuration.CommandOptions.EnableHelp.set -> void
+Signal.Application.Configuration.CommandOptions.ErrorMessage.get -> string!
+Signal.Application.Configuration.CommandOptions.ErrorMessage.set -> void
+Signal.Application.Configuration.CommandOptions.Prefixes.get -> System.Collections.Generic.List<string!>!
+Signal.Application.Configuration.CommandOptions.Prefixes.set -> void
+Signal.Application.Configuration.CommandOptions.QuoteReplies.get -> bool
+Signal.Application.Configuration.CommandOptions.QuoteReplies.set -> void
+Signal.Application.Configuration.CommandOptions.RespondToUnknown.get -> bool
+Signal.Application.Configuration.CommandOptions.RespondToUnknown.set -> void
+Signal.Application.Configuration.CommandOptions.UnknownCommandMessage.get -> string!
+Signal.Application.Configuration.CommandOptions.UnknownCommandMessage.set -> void
+Signal.Application.Configuration.HttpOptions
+Signal.Application.Configuration.HttpOptions.HttpOptions() -> void
+Signal.Application.Configuration.HttpOptions.RetryCount.get -> int
+Signal.Application.Configuration.HttpOptions.RetryCount.set -> void
+Signal.Application.Configuration.HttpOptions.Timeout.get -> System.TimeSpan
+Signal.Application.Configuration.HttpOptions.Timeout.set -> void
+Signal.Application.Configuration.RateLimitOptions
+Signal.Application.Configuration.RateLimitOptions.PermitsPerWindow.get -> int
+Signal.Application.Configuration.RateLimitOptions.PermitsPerWindow.set -> void
+Signal.Application.Configuration.RateLimitOptions.RateLimitOptions() -> void
+Signal.Application.Configuration.RateLimitOptions.Window.get -> System.TimeSpan
+Signal.Application.Configuration.RateLimitOptions.Window.set -> void
+Signal.Application.Configuration.ReceiveOptions
+Signal.Application.Configuration.ReceiveOptions.IgnoreAttachments.get -> bool
+Signal.Application.Configuration.ReceiveOptions.IgnoreAttachments.set -> void
+Signal.Application.Configuration.ReceiveOptions.IgnoreStories.get -> bool
+Signal.Application.Configuration.ReceiveOptions.IgnoreStories.set -> void
+Signal.Application.Configuration.ReceiveOptions.MaxErrorBackoff.get -> System.TimeSpan
+Signal.Application.Configuration.ReceiveOptions.MaxErrorBackoff.set -> void
+Signal.Application.Configuration.ReceiveOptions.MaxMessages.get -> int?
+Signal.Application.Configuration.ReceiveOptions.MaxMessages.set -> void
+Signal.Application.Configuration.ReceiveOptions.PollingInterval.get -> System.TimeSpan
+Signal.Application.Configuration.ReceiveOptions.PollingInterval.set -> void
+Signal.Application.Configuration.ReceiveOptions.ReceiveOptions() -> void
+Signal.Application.Configuration.ReceiveOptions.SendReadReceipts.get -> bool
+Signal.Application.Configuration.ReceiveOptions.SendReadReceipts.set -> void
+Signal.Application.Configuration.ReceiveOptions.TimeoutSeconds.get -> int
+Signal.Application.Configuration.ReceiveOptions.TimeoutSeconds.set -> void
+Signal.Application.Configuration.SignalOptions
+Signal.Application.Configuration.SignalOptions.AccessControl.get -> Signal.Application.Configuration.AccessControlOptions!
+Signal.Application.Configuration.SignalOptions.AccessControl.set -> void
+Signal.Application.Configuration.SignalOptions.Accounts.get -> System.Collections.Generic.List<string!>!
+Signal.Application.Configuration.SignalOptions.Accounts.set -> void
+Signal.Application.Configuration.SignalOptions.BaseUrl.get -> System.Uri!
+Signal.Application.Configuration.SignalOptions.BaseUrl.set -> void
+Signal.Application.Configuration.SignalOptions.Commands.get -> Signal.Application.Configuration.CommandOptions!
+Signal.Application.Configuration.SignalOptions.Commands.set -> void
+Signal.Application.Configuration.SignalOptions.FailOnModeMismatch.get -> bool
+Signal.Application.Configuration.SignalOptions.FailOnModeMismatch.set -> void
+Signal.Application.Configuration.SignalOptions.Http.get -> Signal.Application.Configuration.HttpOptions!
+Signal.Application.Configuration.SignalOptions.Http.set -> void
+Signal.Application.Configuration.SignalOptions.MaxConcurrency.get -> int
+Signal.Application.Configuration.SignalOptions.MaxConcurrency.set -> void
+Signal.Application.Configuration.SignalOptions.Mode.get -> Signal.Domain.ExecutionMode
+Signal.Application.Configuration.SignalOptions.Mode.set -> void
+Signal.Application.Configuration.SignalOptions.RateLimit.get -> Signal.Application.Configuration.RateLimitOptions!
+Signal.Application.Configuration.SignalOptions.RateLimit.set -> void
+Signal.Application.Configuration.SignalOptions.Receive.get -> Signal.Application.Configuration.ReceiveOptions!
+Signal.Application.Configuration.SignalOptions.Receive.set -> void
+Signal.Application.Configuration.SignalOptions.SignalOptions() -> void
+Signal.Application.Configuration.SignalOptions.VerifyModeOnStartup.get -> bool
+Signal.Application.Configuration.SignalOptions.VerifyModeOnStartup.set -> void
+Signal.Application.Configuration.SignalOptions.WebSocket.get -> Signal.Application.Configuration.WebSocketOptions!
+Signal.Application.Configuration.SignalOptions.WebSocket.set -> void
+Signal.Application.Configuration.SignalOptionsValidator
+Signal.Application.Configuration.SignalOptionsValidator.SignalOptionsValidator() -> void
+Signal.Application.Configuration.SignalOptionsValidator.Validate(string? name, Signal.Application.Configuration.SignalOptions! options) -> Microsoft.Extensions.Options.ValidateOptionsResult!
+Signal.Application.Configuration.WebSocketOptions
+Signal.Application.Configuration.WebSocketOptions.KeepAlive.get -> System.TimeSpan
+Signal.Application.Configuration.WebSocketOptions.KeepAlive.set -> void
+Signal.Application.Configuration.WebSocketOptions.ReceiveBufferSize.get -> int
+Signal.Application.Configuration.WebSocketOptions.ReceiveBufferSize.set -> void
+Signal.Application.Configuration.WebSocketOptions.ReconnectMaxDelay.get -> System.TimeSpan
+Signal.Application.Configuration.WebSocketOptions.ReconnectMaxDelay.set -> void
+Signal.Application.Configuration.WebSocketOptions.ReconnectMinDelay.get -> System.TimeSpan
+Signal.Application.Configuration.WebSocketOptions.ReconnectMinDelay.set -> void
+Signal.Application.Configuration.WebSocketOptions.WebSocketOptions() -> void
+Signal.Application.Events.IDomainEventDispatcher
+Signal.Application.Events.IDomainEventDispatcher.DispatchAsync(Signal.Domain.Events.IDomainEvent! domainEvent, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Events.IEventHandler<TEvent>
+Signal.Application.Events.IEventHandler<TEvent>.HandleAsync(TEvent domainEvent, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+Signal.Application.Pipeline.AccessControlMiddleware
+Signal.Application.Pipeline.AccessControlMiddleware.AccessControlMiddleware(Microsoft.Extensions.Options.IOptionsMonitor<Signal.Application.Configuration.SignalOptions!>! options, Microsoft.Extensions.Logging.ILogger<Signal.Application.Pipeline.AccessControlMiddleware!>! logger) -> void
+Signal.Application.Pipeline.AccessControlMiddleware.InvokeAsync(Signal.Application.Pipeline.MessageContext! context, Signal.Application.Pipeline.MessageDelegate! next) -> System.Threading.Tasks.Task!
+Signal.Application.Pipeline.DomainEventMiddleware
+Signal.Application.Pipeline.DomainEventMiddleware.DomainEventMiddleware(Signal.Application.Events.IDomainEventDispatcher! dispatcher) -> void
+Signal.Application.Pipeline.DomainEventMiddleware.InvokeAsync(Signal.Application.Pipeline.MessageContext! context, Signal.Application.Pipeline.MessageDelegate! next) -> System.Threading.Tasks.Task!
+Signal.Application.Pipeline.ExceptionHandlingMiddleware
+Signal.Application.Pipeline.ExceptionHandlingMiddleware.ExceptionHandlingMiddleware(Microsoft.Extensions.Logging.ILogger<Signal.Application.Pipeline.ExceptionHandlingMiddleware!>! logger) -> void
+Signal.Application.Pipeline.ExceptionHandlingMiddleware.InvokeAsync(Signal.Application.Pipeline.MessageContext! context, Signal.Application.Pipeline.MessageDelegate! next) -> System.Threading.Tasks.Task!
+Signal.Application.Pipeline.IMessageMiddleware
+Signal.Application.Pipeline.IMessageMiddleware.InvokeAsync(Signal.Application.Pipeline.MessageContext! context, Signal.Application.Pipeline.MessageDelegate! next) -> System.Threading.Tasks.Task!
+Signal.Application.Pipeline.IMessagePipeline
+Signal.Application.Pipeline.IMessagePipeline.ExecuteAsync(Signal.Application.Pipeline.MessageContext! context) -> System.Threading.Tasks.Task!
+Signal.Application.Pipeline.ISenderRateLimiter
+Signal.Application.Pipeline.ISenderRateLimiter.TryAcquire(string! senderKey) -> bool
+Signal.Application.Pipeline.LoggingMiddleware
+Signal.Application.Pipeline.LoggingMiddleware.InvokeAsync(Signal.Application.Pipeline.MessageContext! context, Signal.Application.Pipeline.MessageDelegate! next) -> System.Threading.Tasks.Task!
+Signal.Application.Pipeline.LoggingMiddleware.LoggingMiddleware(Microsoft.Extensions.Logging.ILogger<Signal.Application.Pipeline.LoggingMiddleware!>! logger) -> void
+Signal.Application.Pipeline.MessageContext
+Signal.Application.Pipeline.MessageContext.Account.get -> Signal.Domain.ValueObjects.PhoneNumber
+Signal.Application.Pipeline.MessageContext.CancellationToken.get -> System.Threading.CancellationToken
+Signal.Application.Pipeline.MessageContext.Conversation.get -> Signal.Domain.ValueObjects.Recipient
+Signal.Application.Pipeline.MessageContext.Envelope.get -> Signal.Domain.Messaging.IncomingEnvelope!
+Signal.Application.Pipeline.MessageContext.IsHandled.get -> bool
+Signal.Application.Pipeline.MessageContext.IsHandled.set -> void
+Signal.Application.Pipeline.MessageContext.Items.get -> System.Collections.Generic.IDictionary<object!, object?>!
+Signal.Application.Pipeline.MessageContext.MessageContext(Signal.Domain.Messaging.IncomingEnvelope! envelope, System.IServiceProvider! services, System.Threading.CancellationToken cancellationToken) -> void
+Signal.Application.Pipeline.MessageContext.ReplyAsync(Signal.Domain.Messaging.OutgoingMessage! message, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
+Signal.Application.Pipeline.MessageContext.ReplyAsync(string! text, bool quote = false, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
+Signal.Application.Pipeline.MessageContext.Sender.get -> Signal.Domain.Messaging.Sender!
+Signal.Application.Pipeline.MessageContext.Services.get -> System.IServiceProvider!
+Signal.Application.Pipeline.MessageDelegate
+Signal.Application.Pipeline.MiddlewareRegistry
+Signal.Application.Pipeline.MiddlewareRegistry.Add(System.Type! middlewareType) -> void
+Signal.Application.Pipeline.MiddlewareRegistry.MiddlewareRegistry() -> void
+Signal.Application.Pipeline.MiddlewareRegistry.Middlewares.get -> System.Collections.Generic.IReadOnlyList<System.Type!>!
+Signal.Application.Pipeline.RateLimitingMiddleware
+Signal.Application.Pipeline.RateLimitingMiddleware.InvokeAsync(Signal.Application.Pipeline.MessageContext! context, Signal.Application.Pipeline.MessageDelegate! next) -> System.Threading.Tasks.Task!
+Signal.Application.Pipeline.RateLimitingMiddleware.RateLimitingMiddleware(Signal.Application.Pipeline.ISenderRateLimiter! limiter, Microsoft.Extensions.Logging.ILogger<Signal.Application.Pipeline.RateLimitingMiddleware!>! logger) -> void
+static Signal.Application.Abstractions.ProfileUpdate.operator !=(Signal.Application.Abstractions.ProfileUpdate? left, Signal.Application.Abstractions.ProfileUpdate? right) -> bool
+static Signal.Application.Abstractions.ProfileUpdate.operator ==(Signal.Application.Abstractions.ProfileUpdate? left, Signal.Application.Abstractions.ProfileUpdate? right) -> bool
+static Signal.Application.Abstractions.SendResult.operator !=(Signal.Application.Abstractions.SendResult left, Signal.Application.Abstractions.SendResult right) -> bool
+static Signal.Application.Abstractions.SendResult.operator ==(Signal.Application.Abstractions.SendResult left, Signal.Application.Abstractions.SendResult right) -> bool
+static Signal.Application.Abstractions.SignalApiInfo.operator !=(Signal.Application.Abstractions.SignalApiInfo? left, Signal.Application.Abstractions.SignalApiInfo? right) -> bool
+static Signal.Application.Abstractions.SignalApiInfo.operator ==(Signal.Application.Abstractions.SignalApiInfo? left, Signal.Application.Abstractions.SignalApiInfo? right) -> bool
+static Signal.Application.ApplicationServiceCollectionExtensions.AddSignalApplication(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Signal.Application.ApplicationServiceCollectionExtensions.GetOrAddSingletonInstance<T>(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> T!
+static Signal.Application.Commands.Binding.ArgumentBindingError.operator !=(Signal.Application.Commands.Binding.ArgumentBindingError? left, Signal.Application.Commands.Binding.ArgumentBindingError? right) -> bool
+static Signal.Application.Commands.Binding.ArgumentBindingError.operator ==(Signal.Application.Commands.Binding.ArgumentBindingError? left, Signal.Application.Commands.Binding.ArgumentBindingError? right) -> bool
+static Signal.Application.Commands.Binding.BoundArguments.operator !=(Signal.Application.Commands.Binding.BoundArguments? left, Signal.Application.Commands.Binding.BoundArguments? right) -> bool
+static Signal.Application.Commands.Binding.BoundArguments.operator ==(Signal.Application.Commands.Binding.BoundArguments? left, Signal.Application.Commands.Binding.BoundArguments? right) -> bool
+static Signal.Application.Commands.CommandBindingFailed.operator !=(Signal.Application.Commands.CommandBindingFailed? left, Signal.Application.Commands.CommandBindingFailed? right) -> bool
+static Signal.Application.Commands.CommandBindingFailed.operator ==(Signal.Application.Commands.CommandBindingFailed? left, Signal.Application.Commands.CommandBindingFailed? right) -> bool
+static Signal.Application.Commands.CommandFaulted.operator !=(Signal.Application.Commands.CommandFaulted? left, Signal.Application.Commands.CommandFaulted? right) -> bool
+static Signal.Application.Commands.CommandFaulted.operator ==(Signal.Application.Commands.CommandFaulted? left, Signal.Application.Commands.CommandFaulted? right) -> bool
+static Signal.Application.Commands.CommandNotFound.operator !=(Signal.Application.Commands.CommandNotFound? left, Signal.Application.Commands.CommandNotFound? right) -> bool
+static Signal.Application.Commands.CommandNotFound.operator ==(Signal.Application.Commands.CommandNotFound? left, Signal.Application.Commands.CommandNotFound? right) -> bool
+static Signal.Application.Commands.CommandParameter.operator !=(Signal.Application.Commands.CommandParameter? left, Signal.Application.Commands.CommandParameter? right) -> bool
+static Signal.Application.Commands.CommandParameter.operator ==(Signal.Application.Commands.CommandParameter? left, Signal.Application.Commands.CommandParameter? right) -> bool
+static Signal.Application.Commands.CommandPreconditionFailed.operator !=(Signal.Application.Commands.CommandPreconditionFailed? left, Signal.Application.Commands.CommandPreconditionFailed? right) -> bool
+static Signal.Application.Commands.CommandPreconditionFailed.operator ==(Signal.Application.Commands.CommandPreconditionFailed? left, Signal.Application.Commands.CommandPreconditionFailed? right) -> bool
+static Signal.Application.Commands.CommandSucceeded.operator !=(Signal.Application.Commands.CommandSucceeded? left, Signal.Application.Commands.CommandSucceeded? right) -> bool
+static Signal.Application.Commands.CommandSucceeded.operator ==(Signal.Application.Commands.CommandSucceeded? left, Signal.Application.Commands.CommandSucceeded? right) -> bool
+static Signal.Application.Commands.Parsing.CommandArguments.operator !=(Signal.Application.Commands.Parsing.CommandArguments? left, Signal.Application.Commands.Parsing.CommandArguments? right) -> bool
+static Signal.Application.Commands.Parsing.CommandArguments.operator ==(Signal.Application.Commands.Parsing.CommandArguments? left, Signal.Application.Commands.Parsing.CommandArguments? right) -> bool
+static Signal.Application.Commands.Parsing.CommandToken.operator !=(Signal.Application.Commands.Parsing.CommandToken left, Signal.Application.Commands.Parsing.CommandToken right) -> bool
+static Signal.Application.Commands.Parsing.CommandToken.operator ==(Signal.Application.Commands.Parsing.CommandToken left, Signal.Application.Commands.Parsing.CommandToken right) -> bool
+static Signal.Application.Commands.Parsing.CommandTokenizer.Tokenize(string! input) -> System.Collections.Generic.IReadOnlyList<Signal.Application.Commands.Parsing.CommandToken>!
+static Signal.Application.Commands.Preconditions.PreconditionResult.Fail(string? reason) -> Signal.Application.Commands.Preconditions.PreconditionResult
+static Signal.Application.Commands.Preconditions.PreconditionResult.operator !=(Signal.Application.Commands.Preconditions.PreconditionResult left, Signal.Application.Commands.Preconditions.PreconditionResult right) -> bool
+static Signal.Application.Commands.Preconditions.PreconditionResult.operator ==(Signal.Application.Commands.Preconditions.PreconditionResult left, Signal.Application.Commands.Preconditions.PreconditionResult right) -> bool
+static Signal.Application.Commands.Preconditions.PreconditionResult.Success.get -> Signal.Application.Commands.Preconditions.PreconditionResult
+virtual Signal.Application.Commands.Binding.ArgumentConverter<T>.DisplayName.get -> string!
+virtual Signal.Application.Commands.CommandBase.Aliases.get -> System.Collections.Generic.IReadOnlyList<string!>!
+virtual Signal.Application.Commands.CommandBase.Description.get -> string?
+virtual Signal.Application.Commands.CommandBase.Hidden.get -> bool
+virtual Signal.Application.Commands.CommandBase.Name.get -> string!
+virtual Signal.Application.Commands.CommandBase.Usage.get -> string?
+virtual Signal.Application.Commands.Preconditions.PreconditionAttribute.Order.get -> int
+virtual Signal.Application.Pipeline.MessageDelegate.Invoke(Signal.Application.Pipeline.MessageContext! context) -> System.Threading.Tasks.Task!
+~override Signal.Application.Abstractions.SendResult.Equals(object obj) -> bool
+~override Signal.Application.Abstractions.SendResult.ToString() -> string
+~override Signal.Application.Commands.Parsing.CommandToken.Equals(object obj) -> bool
+~override Signal.Application.Commands.Parsing.CommandToken.ToString() -> string
+~override Signal.Application.Commands.Preconditions.PreconditionResult.Equals(object obj) -> bool
+~override Signal.Application.Commands.Preconditions.PreconditionResult.ToString() -> string

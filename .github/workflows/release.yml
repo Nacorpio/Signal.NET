@@ -68,11 +68,13 @@ jobs:
         shell: bash
         run: |
           version="${GITHUB_REF_NAME#v}"
-          # Section between "## [version]" and the next "## [" heading (literal match: versions contain dots).
+          # Section between "## [version]" and the next "## [" heading or the link definitions at the end
+          # of the file (literal heading match: versions contain dots).
           awk -v heading="## [$version]" '
-            index($0, heading) == 1 { found = 1; next }
-            found && /^## \[/       { exit }
-            found                   { print }
+            index($0, heading) == 1          { found = 1; next }
+            found && /^## \[/                { exit }
+            found && /^\[[^]]+\]: https?:\/\// { exit }
+            found                            { print }
           ' CHANGELOG.md > release-notes.md
           if [ ! -s release-notes.md ]; then
             echo "::warning::No CHANGELOG.md section for $version; using generated notes only."
