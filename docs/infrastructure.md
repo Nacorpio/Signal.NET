@@ -29,6 +29,7 @@ detail of the wire protocol:
 translates errors.
 
 - **`GetAsync`, `GetBytesAsync`, `SendAsync`:** JSON or binary requests to relative paths such as `v2/send`.
+- **`GetStreamAsync`:** reads only the response headers and returns the body unbuffered. The returned stream (`ResponseStream`) owns the `HttpResponseMessage`, so the connection stays open until the caller disposes it.
 - **Error translation:** a non-success response becomes a `SignalApiException` carrying the API's `error` text.
 - **`Escape`:** escapes path segments. Phone numbers become `%2B49…`, and a `/` inside a base64 group id is escaped as well.
 
@@ -91,7 +92,7 @@ the response back.
 | `RestGroupService` | `IGroupService` | `GetAsync` returns `null` for 404 or 400 (unknown group) |
 | `RestAccountService` | `IAccountService` | Invalid numbers in the list are skipped |
 | `RestContactService` | `IContactService` | The contact id is its UUID, falling back to the number |
-| `RestAttachmentService` | `IAttachmentService` | Returns the raw bytes |
+| `RestAttachmentService` | `IAttachmentService` | `DownloadAsync` returns the raw bytes; `OpenReadAsync` streams them via `GetStreamAsync` |
 | `RestProfileService` | `IProfileService` | |
 | `RestIdentityService` | `IIdentityService` | |
 | `RestSystemService` | `ISystemService` | `IsHealthyAsync` never throws for connection errors |

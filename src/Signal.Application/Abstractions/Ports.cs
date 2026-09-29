@@ -236,17 +236,54 @@ public interface IAttachmentService
     /// <returns>The attachment ids.</returns>
     Task<IReadOnlyList<string>> ListAsync(CancellationToken cancellationToken = default);
 
-    /// <summary>Downloads an attachment.</summary>
+    /// <summary>Downloads an attachment completely into memory. Prefer <see cref="OpenReadAsync"/> for large files.</summary>
     /// <param name="attachmentId">The id from <see cref="Attachment.Id"/>.</param>
     /// <param name="cancellationToken">Cancels the request.</param>
     /// <returns>The attachment content.</returns>
     Task<byte[]> DownloadAsync(string attachmentId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Opens an attachment as a stream that reads directly from the HTTP response (<c>GET /v1/attachments/{id}</c>),
+    /// so large files never have to fit in memory. Dispose the result to release the connection.
+    /// </summary>
+    /// <remarks>
+    /// The default implementation falls back to <see cref="DownloadAsync"/> and wraps the bytes in a
+    /// <see cref="MemoryStream"/>, so existing <see cref="IAttachmentService"/> implementations keep working.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// await using var download = await attachments.OpenReadAsync(attachment.Id, ct);
+    /// await using var file = File.Create(attachment.Filename ?? attachment.Id);
+    /// await download.Content.CopyToAsync(file, ct);
+    /// </code>
+    /// </example>
+    /// <param name="attachmentId">The id from <see cref="Attachment.Id"/>.</param>
+    /// <param name="cancellationToken">Cancels opening the stream (reads take their own token).</param>
+    /// <returns>The open download. The caller owns and must dispose it.</returns>
+    /// <exception cref="SignalApiException">The attachment does not exist (404) or the API rejected the request.</exception>
+    async Task<AttachmentDownload> OpenReadAsync(string attachmentId, CancellationToken cancellationToken = default) =>
+        new(new MemoryStream(await DownloadAsync(attachmentId, cancellationToken), writable: false), ContentType: null, Length: null);
 
     /// <summary>Deletes a stored attachment to free disk space in the container.</summary>
     /// <param name="attachmentId">The attachment id.</param>
     /// <param name="cancellationToken">Cancels the request.</param>
     /// <returns>A task that completes when the attachment was deleted.</returns>
     Task DeleteAsync(string attachmentId, CancellationToken cancellationToken = default);
+}
+
+/// <summary>An attachment opened for streaming by <see cref="IAttachmentService.OpenReadAsync"/>.</summary>
+/// <remarks>Disposing it disposes <see cref="Content"/>, which releases the underlying HTTP response.</remarks>
+/// <param name="Content">The attachment bytes as a forward-only, read-only stream.</param>
+/// <param name="ContentType">The MIME type reported by the API, if any.</param>
+/// <param name="Length">The size in bytes reported by the API, if known.</param>
+public sealed record AttachmentDownload(Stream Content, string? ContentType, long? Length) : IAsyncDisposable, IDisposable
+{
+    /// <summary>Disposes <see cref="Content"/>.</summary>
+    /// <returns>A task that completes when the stream is disposed.</returns>
+    public ValueTask DisposeAsync() => Content.DisposeAsync();
+
+    /// <summary>Disposes <see cref="Content"/>.</summary>
+    public void Dispose() => Content.Dispose();
 }
 
 /// <summary>New profile values for an account.</summary>

@@ -207,6 +207,9 @@ var message = OutgoingMessage.To(recipientA, recipientB)
 | `WithText` / `WithStyledText` | Sets the text. Styled mode enables `**bold**`, `*italic*`, `~strike~`, `` `mono` `` and `\|\|spoiler\|\|`. |
 | `WithAttachment(bytes, contentType, fileName?)` | Encodes the content as `data:<mime>;filename=<name>;base64,<data>` |
 | `WithBase64Attachment(string)` | Adds content that is already base64 or a data URI |
+
+Outgoing attachments can't be streamed: `POST /v2/send` expects them as base64 inside the JSON body, so the
+whole file is encoded in memory. Downloads, in contrast, can stream (`IAttachmentService.OpenReadAsync`).
 | `WithMention(author, start, length)` | Mentions a user at the given position in the text |
 | `Quoting(timestamp, author, text?)` | Replies to (quotes) a message |
 | `Editing(timestamp)` | Turns the send into an edit of a message sent earlier |

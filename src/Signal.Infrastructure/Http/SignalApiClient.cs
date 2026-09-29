@@ -41,6 +41,30 @@ internal sealed class SignalApiClient(HttpClient http)
         return await response.Content.ReadAsByteArrayAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// Sends a GET request and returns the body as an unbuffered stream (headers are read, the body is not).
+    /// The returned download owns the HTTP response; disposing it releases the connection.
+    /// </summary>
+    /// <exception cref="SignalApiException">Non-success status code.</exception>
+    public async Task<AttachmentDownload> GetStreamAsync(string path, CancellationToken cancellationToken)
+    {
+        var response = await http.GetAsync(path, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        try
+        {
+            await EnsureSuccessAsync(response, path, cancellationToken);
+            var body = await response.Content.ReadAsStreamAsync(cancellationToken);
+            return new AttachmentDownload(
+                new ResponseStream(body, response),
+                response.Content.Headers.ContentType?.MediaType,
+                response.Content.Headers.ContentLength);
+        }
+        catch
+        {
+            response.Dispose();
+            throw;
+        }
+    }
+
     /// <summary>Sends a GET request and reports whether it succeeded (health checks); never throws for status codes.</summary>
     public async Task<bool> IsSuccessAsync(string path, CancellationToken cancellationToken)
     {

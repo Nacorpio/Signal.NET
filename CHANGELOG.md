@@ -8,6 +8,8 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Streaming attachment downloads (roadmap 0.3.12):** `IAttachmentService.OpenReadAsync` returns an `AttachmentDownload` whose stream reads directly from the HTTP response, with content type and length. It's a default interface member, so existing `IAttachmentService` implementations keep compiling.
+
 - **Release workflow:** waits until every package is listed on nuget.org before creating the GitHub Release (roadmap 0.2.8).
 - **Package validation:** compares against the published `0.2.0-preview.2` baseline, so breaking API changes fail `dotnet pack`.
 
