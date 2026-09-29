@@ -12,6 +12,8 @@ name: Release
 # One-time configuration:
 #   - nuget.org → your username → Trusted Publishing → add a policy:
 #       Repository Owner: Nacorpio   Repository: Signal.NET   Workflow File: release.yml   Environment: nuget
+#       Scopes: "Push new packages" + "Push new package versions", Glob pattern: Signal.*
+#       (the first release creates the package IDs; the glob keeps the policy away from your other packages)
 #   - GitHub → Settings → Environments → create "nuget" (optionally with required reviewers to approve releases)
 #     and add the environment secret NUGET_USER = your nuget.org username (profile name, not your email).
 
