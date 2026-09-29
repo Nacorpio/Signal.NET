@@ -4,7 +4,7 @@
     The generated project references the Signal.NET packages of the same version as this template package.
   -->
   <PropertyGroup>
-    <PackageId>Signal.NET.Templates</PackageId>
+    <PackageId>Nacorpio.Signal.Templates</PackageId>
     <PackageType>Template</PackageType>
     <Title>Signal.NET templates</Title>
     <Description>dotnet new templates for Signal.NET: a ready-to-run Signal bot project (signalbot).</Description>

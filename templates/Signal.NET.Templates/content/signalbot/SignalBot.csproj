@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
-    <PackageReference Include="Signal.Hosting" Version="SIGNALNET_VERSION" />
+    <PackageReference Include="Nacorpio.Signal.Hosting" Version="SIGNALNET_VERSION" />
   </ItemGroup>
 
 </Project>

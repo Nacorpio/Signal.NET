@@ -6,9 +6,18 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- **NuGet package IDs are now owner-prefixed:**
+  - `Nacorpio.Signal.Domain`, `Nacorpio.Signal.Application`, `Nacorpio.Signal.Infrastructure` and `Nacorpio.Signal.Hosting`.
+  - The template package is now `Nacorpio.Signal.Templates`.
+  - The `Signal.` ID prefix is reserved by another owner on nuget.org, so the 0.2.0-preview.1 packages were never published.
+  - Assembly names and namespaces are unchanged.
+- **Release workflow:** a rejected nuget.org push now fails the release instead of being skipped as a duplicate.
+
 ## [0.2.0-preview.1] - 2026-09-29
 
-First preview release.
+First preview release. Available as a [GitHub Release](https://github.com/Nacorpio/Signal.NET/releases/tag/v0.2.0-preview.1) only: publishing to nuget.org failed because the `Signal.` package ID prefix is reserved.
 
 ### Added
 
