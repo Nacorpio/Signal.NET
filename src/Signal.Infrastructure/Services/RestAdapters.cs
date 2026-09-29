@@ -155,6 +155,72 @@ internal sealed class RestGroupService(SignalApiClient api) : IGroupService
     public Task DeleteAsync(PhoneNumber account, GroupId group, CancellationToken cancellationToken = default) =>
         api.SendAsync(HttpMethod.Delete, GroupPath(account, group), cancellationToken);
 
+    public Task JoinAsync(PhoneNumber account, GroupId group, CancellationToken cancellationToken = default) =>
+        api.SendAsync(HttpMethod.Post, $"{GroupPath(account, group)}/join", cancellationToken);
+
+    public Task BlockAsync(PhoneNumber account, GroupId group, CancellationToken cancellationToken = default) =>
+        api.SendAsync(HttpMethod.Post, $"{GroupPath(account, group)}/block", cancellationToken);
+
+    public Task UpdateSettingsAsync(PhoneNumber account, GroupId group, GroupSettings settings, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        if (settings.MessageExpiration is { } expiration)
+        {
+            ArgumentOutOfRangeException.ThrowIfLessThan(expiration, TimeSpan.Zero, nameof(settings));
+        }
+
+        if (settings is { Permissions: null, Link: null, MessageExpiration: null })
+        {
+            return Task.CompletedTask;
+        }
+
+        return api.SendAsync(HttpMethod.Put, GroupPath(account, group),
+            new UpdateGroupRequestDto
+            {
+                Permissions = settings.Permissions is { } p
+                    ? new GroupPermissionsDto { AddMembers = ToApi(p.AddMembers), EditGroup = ToApi(p.EditGroup), SendMessages = ToApi(p.SendMessages) }
+                    : null,
+                GroupLink = settings.Link switch
+                {
+                    null => null,
+                    GroupLinkMode.Disabled => "disabled",
+                    GroupLinkMode.Enabled => "enabled",
+                    GroupLinkMode.EnabledWithApproval => "enabled-with-approval",
+                    _ => throw new ArgumentOutOfRangeException(nameof(settings), settings.Link, "Unknown group link mode."),
+                },
+                ExpirationTime = settings.MessageExpiration is { } timer ? checked((int)timer.TotalSeconds) : null,
+            },
+            SignalRestJsonContext.Default.UpdateGroupRequestDto, cancellationToken);
+    }
+
+    public Task PinMessageAsync(PhoneNumber account, GroupId group, string targetAuthor, long targetTimestamp, TimeSpan? duration = null, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetAuthor);
+        if (duration is { } d)
+        {
+            ArgumentOutOfRangeException.ThrowIfLessThan(d, TimeSpan.FromSeconds(1), nameof(duration));
+        }
+
+        return api.SendAsync(HttpMethod.Post, $"{GroupPath(account, group)}/pin-message",
+            new PinMessageRequestDto { TargetAuthor = targetAuthor.Trim(), Timestamp = targetTimestamp, Duration = duration is { } span ? checked((int)span.TotalSeconds) : null },
+            SignalRestJsonContext.Default.PinMessageRequestDto, cancellationToken);
+    }
+
+    public Task UnpinMessageAsync(PhoneNumber account, GroupId group, string targetAuthor, long targetTimestamp, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(targetAuthor);
+        return api.SendAsync(HttpMethod.Delete, $"{GroupPath(account, group)}/pin-message",
+            new PinMessageRequestDto { TargetAuthor = targetAuthor.Trim(), Timestamp = targetTimestamp },
+            SignalRestJsonContext.Default.PinMessageRequestDto, cancellationToken);
+    }
+
+    private static string ToApi(GroupPermission permission) => permission switch
+    {
+        GroupPermission.EveryMember => "every-member",
+        GroupPermission.OnlyAdmins => "only-admins",
+        _ => throw new ArgumentOutOfRangeException(nameof(permission), permission, "Unknown group permission."),
+    };
+
     private Task Members(HttpMethod method, PhoneNumber account, GroupId group, IEnumerable<string> members, CancellationToken cancellationToken) =>
         api.SendAsync(method, $"{GroupPath(account, group)}/members", new GroupMembersRequestDto { Members = [.. members] },
             SignalRestJsonContext.Default.GroupMembersRequestDto, cancellationToken);
@@ -357,6 +423,27 @@ internal sealed class RestContactService(SignalApiClient api) : IContactService
         api.SendAsync(HttpMethod.Put, $"v1/contacts/{SignalApiClient.Escape(account.Value)}",
             new UpdateContactRequestDto { Recipient = contact.Address, Name = name, ExpirationInSeconds = expirationInSeconds },
             SignalRestJsonContext.Default.UpdateContactRequestDto, cancellationToken);
+
+    public Task SyncAsync(PhoneNumber account, CancellationToken cancellationToken = default) =>
+        api.SendAsync(HttpMethod.Post, $"v1/contacts/{SignalApiClient.Escape(account.Value)}/sync", cancellationToken);
+
+    public async Task<IReadOnlyList<NumberRegistration>> CheckRegisteredAsync(PhoneNumber account, IEnumerable<PhoneNumber> numbers, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(numbers);
+        var distinct = numbers.Distinct().ToList();
+        if (distinct.Count == 0)
+        {
+            return [];
+        }
+
+        // The API takes the numbers as a repeated query parameter: ?numbers=a&numbers=b.
+        var query = string.Join('&', distinct.Select(n => $"numbers={Uri.EscapeDataString(n.Value)}"));
+        var results = await api.GetAsync($"v1/search/{SignalApiClient.Escape(account.Value)}?{query}",
+            SignalRestJsonContext.Default.ListSearchResponseDto, cancellationToken);
+        return [.. results
+            .Select(r => PhoneNumber.TryParse(r.Number, out var number) ? new NumberRegistration(number, r.Registered) : null)
+            .OfType<NumberRegistration>()];
+    }
 }
 
 /// <summary>Implements <see cref="IAttachmentService"/> with the <c>/v1/attachments</c> endpoints.</summary>

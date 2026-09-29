@@ -240,6 +240,38 @@ internal sealed class UpdateGroupRequestDto
     public string? Name { get; set; }
     public string? Description { get; set; }
     public string? Base64Avatar { get; set; }
+    public GroupPermissionsDto? Permissions { get; set; }
+
+    /// <summary><c>disabled</c>, <c>enabled</c> or <c>enabled-with-approval</c>.</summary>
+    public string? GroupLink { get; set; }
+
+    /// <summary>Disappearing-messages timer in seconds.</summary>
+    public int? ExpirationTime { get; set; }
+}
+
+/// <summary>Group permissions; each value is <c>only-admins</c> or <c>every-member</c>.</summary>
+internal sealed class GroupPermissionsDto
+{
+    public required string AddMembers { get; set; }
+    public required string EditGroup { get; set; }
+    public required string SendMessages { get; set; }
+}
+
+/// <summary>Body of <c>POST /v1/groups/{number}/{groupid}/pin-message</c> (and, without duration, of <c>DELETE</c>).</summary>
+internal sealed class PinMessageRequestDto
+{
+    public required string TargetAuthor { get; set; }
+    public long Timestamp { get; set; }
+
+    /// <summary>Pin duration in seconds.</summary>
+    public int? Duration { get; set; }
+}
+
+/// <summary>An entry of <c>GET /v1/search/{number}</c>.</summary>
+internal sealed class SearchResponseDto
+{
+    public string? Number { get; set; }
+    public bool Registered { get; set; }
 }
 
 /// <summary>Body of <c>POST</c>/<c>DELETE /v1/groups/{number}/{groupid}/members</c>.</summary>

@@ -89,12 +89,12 @@ the response back.
 | `RestReactionService` | `IReactionService` | Same body for add (POST) and remove (DELETE) |
 | `RestReceiptService` | `IReceiptService` | Rejects `Delivery`, because Signal sends delivery receipts automatically |
 | `RestTypingIndicatorService` | `ITypingIndicatorService` | PUT to start, DELETE to stop |
-| `RestGroupService` | `IGroupService` | `GetAsync` returns `null` for 404 or 400 (unknown group) |
+| `RestGroupService` | `IGroupService` | `GetAsync` returns `null` for 404 or 400 (unknown group). `UpdateSettingsAsync` sends nothing when no setting changes; timers and pin durations are sent in whole seconds. |
 | `RestAccountService` | `IAccountService` | Invalid numbers in the list are skipped. `SetUsernameAsync` accepts both documented answers: 201 with `{username, username_link}`, or 204 without a body (via `SendForOptionalResultAsync`). |
 | `RestRegistrationService` | `IRegistrationService` | All POSTs, so never retried (a retry would request a second code). Removes separators from verification codes (`123-456` → `123456`). |
 | `RestStickerService` | `IStickerService` | Skips packs without an id; pack ids are lower-cased so they match `Sticker.PackId` |
 | `RestDeviceService` | `IDeviceService` | Timestamps of `0` (unknown) become `null`. `RemoveAsync` rejects the primary device (id 1) before calling the API. |
-| `RestContactService` | `IContactService` | The contact id is its UUID, falling back to the number |
+| `RestContactService` | `IContactService` | The contact id is its UUID, falling back to the number. `CheckRegisteredAsync` de-duplicates the numbers, repeats the `numbers` query parameter per number and makes no request for an empty list. |
 | `RestAttachmentService` | `IAttachmentService` | `DownloadAsync` returns the raw bytes; `OpenReadAsync` streams them via `GetStreamAsync` |
 | `RestProfileService` | `IProfileService` | |
 | `RestIdentityService` | `IIdentityService` | |

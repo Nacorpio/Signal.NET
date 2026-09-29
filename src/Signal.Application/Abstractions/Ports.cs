@@ -214,7 +214,97 @@ public interface IGroupService
     /// <param name="cancellationToken">Cancels the request.</param>
     /// <returns>A task that completes when the group was deleted.</returns>
     Task DeleteAsync(PhoneNumber account, GroupId group, CancellationToken cancellationToken = default);
+
+    // The members below were added after 0.2.0-preview.2. Their default implementations throw
+    // NotSupportedException, so IGroupService implementations written earlier keep compiling.
+
+    /// <summary>Accepts an invitation to a group (<c>POST /v1/groups/{number}/{groupid}/join</c>).</summary>
+    /// <param name="account">The invited account.</param>
+    /// <param name="group">The group id.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>A task that completes when the account joined.</returns>
+    Task JoinAsync(PhoneNumber account, GroupId group, CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException($"{GetType().Name} does not support joining groups.");
+
+    /// <summary>Blocks a group, so its messages are no longer received (<c>POST /v1/groups/{number}/{groupid}/block</c>).</summary>
+    /// <param name="account">The account.</param>
+    /// <param name="group">The group id.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>A task that completes when the group was blocked.</returns>
+    Task BlockAsync(PhoneNumber account, GroupId group, CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException($"{GetType().Name} does not support blocking groups.");
+
+    /// <summary>
+    /// Changes permissions, the invite link mode and/or the disappearing-messages timer
+    /// (<c>PUT /v1/groups/{number}/{groupid}</c>). <see langword="null"/> values are left unchanged.
+    /// </summary>
+    /// <param name="account">The account (usually must be a group admin).</param>
+    /// <param name="group">The group id.</param>
+    /// <param name="settings">The settings to change.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>A task that completes when the group was updated.</returns>
+    Task UpdateSettingsAsync(PhoneNumber account, GroupId group, GroupSettings settings, CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException($"{GetType().Name} does not support group settings.");
+
+    /// <summary>Pins a message in a group (<c>POST /v1/groups/{number}/{groupid}/pin-message</c>).</summary>
+    /// <param name="account">The account.</param>
+    /// <param name="group">The group id.</param>
+    /// <param name="targetAuthor">Phone number or UUID of the pinned message's author.</param>
+    /// <param name="targetTimestamp">Timestamp of the pinned message.</param>
+    /// <param name="duration">How long the message stays pinned (whole seconds), or <see langword="null"/> for the API default.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>A task that completes when the message was pinned.</returns>
+    /// <exception cref="ArgumentException"><paramref name="targetAuthor"/> is empty.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="duration"/> is shorter than one second.</exception>
+    Task PinMessageAsync(PhoneNumber account, GroupId group, string targetAuthor, long targetTimestamp, TimeSpan? duration = null, CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException($"{GetType().Name} does not support pinned messages.");
+
+    /// <summary>Unpins a message in a group (<c>DELETE /v1/groups/{number}/{groupid}/pin-message</c>).</summary>
+    /// <param name="account">The account.</param>
+    /// <param name="group">The group id.</param>
+    /// <param name="targetAuthor">Phone number or UUID of the pinned message's author.</param>
+    /// <param name="targetTimestamp">Timestamp of the pinned message.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>A task that completes when the message was unpinned.</returns>
+    /// <exception cref="ArgumentException"><paramref name="targetAuthor"/> is empty.</exception>
+    Task UnpinMessageAsync(PhoneNumber account, GroupId group, string targetAuthor, long targetTimestamp, CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException($"{GetType().Name} does not support pinned messages.");
 }
+
+/// <summary>Who may perform an action in a group.</summary>
+public enum GroupPermission
+{
+    /// <summary>Every member (<c>every-member</c>).</summary>
+    EveryMember,
+
+    /// <summary>Only admins (<c>only-admins</c>).</summary>
+    OnlyAdmins,
+}
+
+/// <summary>Whether and how people can join a group through its invite link.</summary>
+public enum GroupLinkMode
+{
+    /// <summary>The invite link is disabled.</summary>
+    Disabled,
+
+    /// <summary>Anyone with the link can join.</summary>
+    Enabled,
+
+    /// <summary>Anyone with the link can request to join; an admin must approve.</summary>
+    EnabledWithApproval,
+}
+
+/// <summary>The permissions of a group. The API requires all three to be set together.</summary>
+/// <param name="AddMembers">Who may add members.</param>
+/// <param name="EditGroup">Who may edit name, description, avatar and timer.</param>
+/// <param name="SendMessages">Who may send messages (<see cref="GroupPermission.OnlyAdmins"/> makes an announcement group).</param>
+public sealed record GroupPermissions(GroupPermission AddMembers, GroupPermission EditGroup, GroupPermission SendMessages);
+
+/// <summary>Group settings for <see cref="IGroupService.UpdateSettingsAsync"/>. <see langword="null"/> leaves a setting unchanged.</summary>
+/// <param name="Permissions">The permissions.</param>
+/// <param name="Link">The invite link mode.</param>
+/// <param name="MessageExpiration">The disappearing-messages timer (whole seconds); <see cref="TimeSpan.Zero"/> turns it off.</param>
+public sealed record GroupSettings(GroupPermissions? Permissions = null, GroupLinkMode? Link = null, TimeSpan? MessageExpiration = null);
 
 /// <summary>Lists accounts and links new devices.</summary>
 public interface IAccountService
@@ -497,7 +587,32 @@ public interface IContactService
     /// <param name="cancellationToken">Cancels the request.</param>
     /// <returns>A task that completes when the contact was updated.</returns>
     Task UpdateAsync(PhoneNumber account, Recipient contact, string? name, int? expirationInSeconds = null, CancellationToken cancellationToken = default);
+
+    // The members below were added after 0.2.0-preview.2. Their default implementations throw
+    // NotSupportedException, so IContactService implementations written earlier keep compiling.
+
+    /// <summary>
+    /// Sends the account's contact list to its linked devices (<c>POST /v1/contacts/{number}/sync</c>).
+    /// </summary>
+    /// <param name="account">The account.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>A task that completes when the sync message was sent.</returns>
+    Task SyncAsync(PhoneNumber account, CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException($"{GetType().Name} does not support contact sync.");
+
+    /// <summary>Checks which phone numbers are registered with Signal (<c>GET /v1/search/{number}</c>).</summary>
+    /// <param name="account">The account performing the lookup.</param>
+    /// <param name="numbers">The numbers to check. Duplicates are checked once; an empty list makes no request.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>One entry per number the API reported on.</returns>
+    Task<IReadOnlyList<NumberRegistration>> CheckRegisteredAsync(PhoneNumber account, IEnumerable<PhoneNumber> numbers, CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException($"{GetType().Name} does not support number search.");
 }
+
+/// <summary>Whether a phone number is registered with Signal, from <see cref="IContactService.CheckRegisteredAsync"/>.</summary>
+/// <param name="Number">The checked number.</param>
+/// <param name="IsRegistered">Whether the number can receive Signal messages.</param>
+public sealed record NumberRegistration(PhoneNumber Number, bool IsRegistered);
 
 /// <summary>Accesses attachments stored by the container (<c>/v1/attachments</c>).</summary>
 public interface IAttachmentService
