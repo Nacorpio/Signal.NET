@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/Nacorpio/Signal.NET/actions/workflows/ci.yml/badge.svg)](https://github.com/Nacorpio/Signal.NET/actions/workflows/ci.yml)
 [![Docs](https://github.com/Nacorpio/Signal.NET/actions/workflows/docs.yml/badge.svg)](https://nacorpio.github.io/Signal.NET/)
-[![NuGet](https://img.shields.io/nuget/vpre/Signal.Hosting?label=nuget)](https://www.nuget.org/packages/Signal.Hosting)
+[![NuGet](https://img.shields.io/nuget/vpre/Nacorpio.Signal.Hosting?label=nuget)](https://www.nuget.org/packages/Nacorpio.Signal.Hosting)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 A .NET 11 / C# 15 framework for building Signal bots and integrations on top of
@@ -20,17 +20,17 @@ A .NET 11 / C# 15 framework for building Signal bots and integrations on top of
 Start a new bot from the template:
 
 ```bash
-dotnet new install Signal.NET.Templates
+dotnet new install Nacorpio.Signal.Templates
 dotnet new signalbot -n MyBot --mode JsonRpc --account +4915112345678
 ```
 
 Or add Signal.NET to an existing project. Signal.NET uses C# 15 unions, so set `<LangVersion>preview</LangVersion>`.
 
 ```bash
-dotnet add package Signal.Hosting --prerelease
+dotnet add package Nacorpio.Signal.Hosting --prerelease
 ```
 
-`Signal.Hosting` pulls in `Signal.Infrastructure`, `Signal.Application` and `Signal.Domain`.
+`Nacorpio.Signal.Hosting` pulls in `Nacorpio.Signal.Infrastructure`, `Nacorpio.Signal.Application` and `Nacorpio.Signal.Domain`. The packages are owner-prefixed because the `Signal.` ID prefix is reserved on nuget.org; the assemblies and namespaces are still `Signal.*`.
 
 ## Documentation
 

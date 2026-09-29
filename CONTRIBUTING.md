@@ -65,7 +65,7 @@ Test changes to `templates/Signal.NET.Templates` against locally packed librarie
 
 ```bash
 dotnet pack -c Release -o ./feed
-dotnet new install ./feed/Signal.NET.Templates.<version>.nupkg
+dotnet new install ./feed/Nacorpio.Signal.Templates.<version>.nupkg
 dotnet new signalbot -n TestBot -o ../TestBot   # outside the repo, then add ./feed as a NuGet source
 ```
 
@@ -88,7 +88,7 @@ stored. One-time setup:
 
 1. **nuget.org** → your username → **Trusted Publishing** → add a policy: Repository Owner `Nacorpio`,
    Repository `Signal.NET`, Workflow File `release.yml`, Environment `nuget`. Under **Select Scopes**, allow
-   *Push new packages* and *Push new package versions* with the glob pattern `Signal.*`. The first release
+   *Push new packages* and *Push new package versions* with the glob pattern `Nacorpio.Signal.*`. The first release
    creates the package IDs, and the glob stops the policy from applying to your other packages.
 2. **GitHub** → Settings → **Environments** → create `nuget`. Add the environment secret `NUGET_USER`
    (your nuget.org profile name, not your email). Optionally add yourself as a required reviewer, so every

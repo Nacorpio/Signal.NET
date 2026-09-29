@@ -3,7 +3,7 @@
 `dotnet new` templates for [Signal.NET](https://github.com/Nacorpio/Signal.NET).
 
 ```bash
-dotnet new install Signal.NET.Templates
+dotnet new install Nacorpio.Signal.Templates
 dotnet new signalbot -n MyBot --mode JsonRpc --account +4915112345678
 ```
 

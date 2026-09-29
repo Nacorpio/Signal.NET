@@ -7,6 +7,12 @@
     <IsPackable>true</IsPackable>
 
     <!--
+      nuget.org package IDs are owner-prefixed (Nacorpio.Signal.Domain, …): the "Signal." ID prefix is reserved by
+      another owner. Assembly names and namespaces stay Signal.*.
+    -->
+    <PackageId>Nacorpio.$(MSBuildProjectName)</PackageId>
+
+    <!--
       Package validation (dotnet pack): checks the package for inconsistencies and, once a baseline exists,
       for breaking changes against the last published version. Set the baseline after the first release:
       <PackageValidationBaselineVersion>0.2.0</PackageValidationBaselineVersion>

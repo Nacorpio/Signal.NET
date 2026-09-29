@@ -12,7 +12,7 @@ name: Release
 # One-time configuration:
 #   - nuget.org → your username → Trusted Publishing → add a policy:
 #       Repository Owner: Nacorpio   Repository: Signal.NET   Workflow File: release.yml   Environment: nuget
-#       Scopes: "Push new packages" + "Push new package versions", Glob pattern: Signal.*
+#       Scopes: "Push new packages" + "Push new package versions", Glob pattern: Nacorpio.Signal.*
 #       (the first release creates the package IDs; the glob keeps the policy away from your other packages)
 #   - GitHub → Settings → Environments → create "nuget" (optionally with required reviewers to approve releases)
 #     and add the environment secret NUGET_USER = your nuget.org username (profile name, not your email).
@@ -87,12 +87,14 @@ jobs:
         with:
           user: ${{ secrets.NUGET_USER }}
 
+      # No --skip-duplicate: it reports every 409 as "already exists", which also hides a rejection such as a
+      # reserved package ID prefix (this is how the 0.2.0-preview.1 run "succeeded" without publishing anything).
+      # A tag's version is published exactly once, so any rejected push must fail the release.
       - name: Publish to nuget.org
         run: >
           dotnet nuget push "artifacts/*.nupkg"
           --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}"
           --source https://api.nuget.org/v3/index.json
-          --skip-duplicate
 
       - name: Create GitHub Release
         env:
