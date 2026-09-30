@@ -93,8 +93,8 @@ it are exhaustive, the compiler points at every place that needs updating.*
 | 0.4.4 | **Stickers received** | D/I | S | ✅ `DataMessage.Sticker` (the `Sticker` value object from 0.3.6); sticker-only messages now raise `MessageReceived` |
 | 0.4.5 | **Story messages** | D/I | M | Opt-in via `Receive:IgnoreStories = false`; `StoryReceived` event |
 | 0.4.6 | **Call messages** | D/I | S | `CallReceived` event (offer, hangup) for "sorry, I'm a bot" replies |
-| 0.4.7 | **Mention-aware binding** | A | S | `Recipient` and `PhoneNumber` parameters accept `@mentions` (resolving the U+FFFC placeholder through `DataMessage.Mentions`) |
-| 0.4.8 | **Text styles received** | D/I | S | Bold, italic and spoiler ranges on `DataMessage` |
+| 0.4.7 | **Mention-aware binding** | A | S | ✅ Positional arguments that are `@mentions` bind as the mentioned user (phone number, else UUID), for `Recipient`, `PhoneNumber` and `AccountId`. Unresolvable placeholders are a binding error. |
+| 0.4.8 | **Text styles received** | D/I | S | ✅ `DataMessage.TextStyles` (`StyledRange`: bold, italic, spoiler, strikethrough, monospace) |
 | 0.4.9 | **Group change details** | D/I | M | `GroupUpdated` carries what changed (members added or removed, rename) |
 
 ## Milestone 0.5: Command system 2.0

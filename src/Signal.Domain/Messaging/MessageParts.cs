@@ -100,6 +100,31 @@ public sealed record Attachment(string Id, string? ContentType, string? Filename
 /// <param name="Name">Display name of the mentioned user (received mentions only).</param>
 public sealed record Mention(string Author, int Start, int Length, string? Name = null);
 
+/// <summary>A formatting style applied to a range of a received message's text.</summary>
+public enum TextStyle
+{
+    /// <summary>Bold text.</summary>
+    Bold,
+
+    /// <summary>Italic text.</summary>
+    Italic,
+
+    /// <summary>Hidden until tapped.</summary>
+    Spoiler,
+
+    /// <summary>Struck-through text.</summary>
+    Strikethrough,
+
+    /// <summary>Monospaced text.</summary>
+    Monospace,
+}
+
+/// <summary>A styled range of a received message's text.</summary>
+/// <param name="Style">The style.</param>
+/// <param name="Start">Start position in the text (UTF-16 code units).</param>
+/// <param name="Length">Length of the range (UTF-16 code units).</param>
+public sealed record StyledRange(TextStyle Style, int Start, int Length);
+
 /// <summary>A quoted (replied-to) message.</summary>
 /// <param name="Timestamp">Timestamp of the quoted message; identifies it together with <paramref name="Author"/>.</param>
 /// <param name="Author">Phone number or UUID of the quoted message's author.</param>

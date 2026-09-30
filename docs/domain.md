@@ -173,7 +173,8 @@ way in 0.4, so exhaustive switches written against 0.3 now warn until they handl
 
 **Purpose:** a regular message.
 
-- **Content:** `Timestamp` and `Text`, plus `Group`, `Attachments`, `Mentions`, `Quote`, `Reaction`, `Sticker`, `RemoteDelete`, `IsGroupUpdate` and `ViewOnce`.
+- **Content:** `Timestamp` and `Text`, plus `Group`, `Attachments`, `Mentions`, `TextStyles`, `Quote`, `Reaction`, `Sticker`, `RemoteDelete`, `IsGroupUpdate` and `ViewOnce`.
+- **`TextStyles`:** the sender's formatting as `StyledRange(Style, Start, Length)` entries, with `TextStyle` being `Bold`, `Italic`, `Spoiler`, `Strikethrough` or `Monospace`. Positions are UTF-16 offsets into `Text`, like mentions.
 - **`HasContent`:** true when there is text, at least one attachment, or a sticker.
 - **`Sticker`:** a received sticker as the same `Sticker` value object used for sending, so a bot can send it back with `WithSticker`.
 - **`RemoteDelete`:** set when the message deletes an earlier one for everyone. `TargetTimestamp` together with the envelope's sender identifies the deleted message, because Signal only lets authors delete their own messages.
@@ -263,6 +264,7 @@ an argument like `f3a9…:4`.
 |---|---|
 | `Attachment(Id, ContentType, Filename, Size)` | Metadata of a received attachment. Download it through `IAttachmentService` by `Id`. |
 | `Mention(Author, Start, Length, Name)` | A mention inside a text. `Author` is a phone number or UUID. |
+| `StyledRange(Style, Start, Length)`, `TextStyle` | A formatted range of a received text |
 | `Quote(Timestamp, Author, Text)` | A quoted message |
 | `Reaction(Emoji, TargetAuthor, TargetTimestamp, IsRemove)` | An emoji reaction, or its removal |
 | `LinkPreview(Url, Title, Description, Base64Thumbnail)` | A link preview card of an outgoing message |

@@ -23,6 +23,9 @@ override Signal.Domain.Messaging.RemoteDelete.ToString() -> string!
 override Signal.Domain.Messaging.SentTranscript.Equals(object? obj) -> bool
 override Signal.Domain.Messaging.SentTranscript.GetHashCode() -> int
 override Signal.Domain.Messaging.SentTranscript.ToString() -> string!
+override Signal.Domain.Messaging.StyledRange.Equals(object? obj) -> bool
+override Signal.Domain.Messaging.StyledRange.GetHashCode() -> int
+override Signal.Domain.Messaging.StyledRange.ToString() -> string!
 Signal.Domain.Events.MessageDeleted
 Signal.Domain.Events.MessageDeleted.Deconstruct(out Signal.Domain.Messaging.IncomingEnvelope! Envelope, out Signal.Domain.Messaging.RemoteDelete! Delete) -> void
 Signal.Domain.Events.MessageDeleted.Delete.get -> Signal.Domain.Messaging.RemoteDelete!
@@ -45,6 +48,8 @@ Signal.Domain.Messaging.DataMessage.RemoteDelete.get -> Signal.Domain.Messaging.
 Signal.Domain.Messaging.DataMessage.RemoteDelete.init -> void
 Signal.Domain.Messaging.DataMessage.Sticker.get -> Signal.Domain.Messaging.Sticker?
 Signal.Domain.Messaging.DataMessage.Sticker.init -> void
+Signal.Domain.Messaging.DataMessage.TextStyles.get -> System.Collections.Generic.IReadOnlyList<Signal.Domain.Messaging.StyledRange!>!
+Signal.Domain.Messaging.DataMessage.TextStyles.init -> void
 Signal.Domain.Messaging.EditMessage
 Signal.Domain.Messaging.EditMessage.<Clone>$() -> Signal.Domain.Messaging.EditMessage!
 Signal.Domain.Messaging.EditMessage.Deconstruct(out long TargetTimestamp, out Signal.Domain.Messaging.DataMessage! Message) -> void
@@ -76,6 +81,23 @@ Signal.Domain.Messaging.SentTranscript.Equals(Signal.Domain.Messaging.SentTransc
 Signal.Domain.Messaging.SentTranscript.Message.get -> Signal.Domain.Messaging.DataMessage!
 Signal.Domain.Messaging.SentTranscript.Message.init -> void
 Signal.Domain.Messaging.SentTranscript.SentTranscript(Signal.Domain.ValueObjects.Recipient Conversation, Signal.Domain.Messaging.DataMessage! Message) -> void
+Signal.Domain.Messaging.StyledRange
+Signal.Domain.Messaging.StyledRange.<Clone>$() -> Signal.Domain.Messaging.StyledRange!
+Signal.Domain.Messaging.StyledRange.Deconstruct(out Signal.Domain.Messaging.TextStyle Style, out int Start, out int Length) -> void
+Signal.Domain.Messaging.StyledRange.Equals(Signal.Domain.Messaging.StyledRange? other) -> bool
+Signal.Domain.Messaging.StyledRange.Length.get -> int
+Signal.Domain.Messaging.StyledRange.Length.init -> void
+Signal.Domain.Messaging.StyledRange.Start.get -> int
+Signal.Domain.Messaging.StyledRange.Start.init -> void
+Signal.Domain.Messaging.StyledRange.Style.get -> Signal.Domain.Messaging.TextStyle
+Signal.Domain.Messaging.StyledRange.Style.init -> void
+Signal.Domain.Messaging.StyledRange.StyledRange(Signal.Domain.Messaging.TextStyle Style, int Start, int Length) -> void
+Signal.Domain.Messaging.TextStyle
+Signal.Domain.Messaging.TextStyle.Bold = 0 -> Signal.Domain.Messaging.TextStyle
+Signal.Domain.Messaging.TextStyle.Italic = 1 -> Signal.Domain.Messaging.TextStyle
+Signal.Domain.Messaging.TextStyle.Monospace = 4 -> Signal.Domain.Messaging.TextStyle
+Signal.Domain.Messaging.TextStyle.Spoiler = 2 -> Signal.Domain.Messaging.TextStyle
+Signal.Domain.Messaging.TextStyle.Strikethrough = 3 -> Signal.Domain.Messaging.TextStyle
 static Signal.Domain.Events.MessageDeleted.operator !=(Signal.Domain.Events.MessageDeleted? left, Signal.Domain.Events.MessageDeleted? right) -> bool
 static Signal.Domain.Events.MessageDeleted.operator ==(Signal.Domain.Events.MessageDeleted? left, Signal.Domain.Events.MessageDeleted? right) -> bool
 static Signal.Domain.Events.MessageEdited.operator !=(Signal.Domain.Events.MessageEdited? left, Signal.Domain.Events.MessageEdited? right) -> bool
@@ -88,3 +110,5 @@ static Signal.Domain.Messaging.RemoteDelete.operator !=(Signal.Domain.Messaging.
 static Signal.Domain.Messaging.RemoteDelete.operator ==(Signal.Domain.Messaging.RemoteDelete? left, Signal.Domain.Messaging.RemoteDelete? right) -> bool
 static Signal.Domain.Messaging.SentTranscript.operator !=(Signal.Domain.Messaging.SentTranscript? left, Signal.Domain.Messaging.SentTranscript? right) -> bool
 static Signal.Domain.Messaging.SentTranscript.operator ==(Signal.Domain.Messaging.SentTranscript? left, Signal.Domain.Messaging.SentTranscript? right) -> bool
+static Signal.Domain.Messaging.StyledRange.operator !=(Signal.Domain.Messaging.StyledRange? left, Signal.Domain.Messaging.StyledRange? right) -> bool
+static Signal.Domain.Messaging.StyledRange.operator ==(Signal.Domain.Messaging.StyledRange? left, Signal.Domain.Messaging.StyledRange? right) -> bool

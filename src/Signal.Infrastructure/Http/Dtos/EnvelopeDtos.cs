@@ -45,6 +45,18 @@ internal class DataMessageDto
     public ReactionDto? Reaction { get; set; }
     public StickerDto? Sticker { get; set; }
     public RemoteDeleteDto? RemoteDelete { get; set; }
+    public List<TextStyleDto>? TextStyles { get; set; }
+}
+
+/// <summary>
+/// A styled range (signal-cli <c>JsonTextStyle</c>); <see cref="Style"/> is <c>BOLD</c>, <c>ITALIC</c>, <c>SPOILER</c>,
+/// <c>STRIKETHROUGH</c>, <c>MONOSPACE</c> or <c>NONE</c>.
+/// </summary>
+internal sealed class TextStyleDto
+{
+    public string? Style { get; set; }
+    public int Start { get; set; }
+    public int Length { get; set; }
 }
 
 /// <summary>

@@ -20,6 +20,9 @@ public sealed record DataMessage(long Timestamp, string? Text)
     /// <summary>Users mentioned in <see cref="DataMessage.Text"/>.</summary>
     public IReadOnlyList<Mention> Mentions { get; init; } = [];
 
+    /// <summary>Styled ranges of <see cref="DataMessage.Text"/> (bold, italic, spoiler, …), as the sender formatted them.</summary>
+    public IReadOnlyList<StyledRange> TextStyles { get; init; } = [];
+
     /// <summary>The message this message replies to, if any.</summary>
     public Quote? Quote { get; init; }
 

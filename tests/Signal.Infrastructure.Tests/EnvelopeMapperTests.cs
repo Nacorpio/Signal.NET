@@ -139,6 +139,20 @@ public class EnvelopeMapperTests
     public void Drops_unsupported_or_incomplete_sync_messages(string json) => Assert.Null(MapOne(json));
 
     [Fact]
+    public void Maps_text_styles_and_skips_none_unknown_and_empty_ranges()
+    {
+        var envelope = MapOne("""
+            "dataMessage":{"timestamp":1,"message":"bold and secret","textStyles":[
+              {"style":"BOLD","start":0,"length":4},{"style":"SPOILER","start":9,"length":6},
+              {"style":"NONE","start":0,"length":4},{"style":"SPARKLY","start":0,"length":1},{"style":"ITALIC","start":0,"length":0}]}
+            """)!;
+
+        Assert.Equal(
+            [new StyledRange(TextStyle.Bold, 0, 4), new StyledRange(TextStyle.Spoiler, 9, 6)],
+            envelope.Data!.TextStyles);
+    }
+
+    [Fact]
     public void Ignores_malformed_stickers_but_keeps_the_message()
     {
         var envelope = MapOne(""" "dataMessage":{"timestamp":1,"message":"hi","sticker":{"packId":"not hex","stickerId":1}} """)!;
