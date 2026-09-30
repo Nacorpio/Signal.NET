@@ -10,6 +10,7 @@ using Signal.Application.Commands.Preconditions;
 using Signal.Application.Configuration;
 using Signal.Application.Events;
 using Signal.Application.Pipeline;
+using Signal.Application.Roles;
 using Signal.Application.Scheduling;
 
 namespace Signal.Application;
@@ -54,6 +55,11 @@ public static class ApplicationServiceCollectionExtensions
         services.TryAddSingleton<IBackgroundWorkQueue>(sp => sp.GetRequiredService<ChannelBackgroundWorkQueue>());
         services.TryAddSingleton<IBackgroundWorkProcessor, BackgroundWorkProcessor>();
         services.TryAddSingleton<IPromptRegistry, PromptRegistry>();
+
+        // Roles: configuration and Signal group admins; AddRoleProvider<T>() adds more.
+        services.TryAddScoped<IRoleService, RoleService>();
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IRoleProvider, ConfigurationRoleProvider>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IRoleProvider, GroupAdminRoleProvider>());
 
         // Scheduled messages: in-memory by default; register an IScheduledMessageStore first to persist them.
         services.TryAddSingleton<IScheduledMessageStore, InMemoryScheduledMessageStore>();

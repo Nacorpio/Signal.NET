@@ -87,7 +87,8 @@ Durations use the `TimeSpan` format `hh:mm:ss`. Enum values are case-insensitive
 | `QuoteReplies` | false | Replies quote the triggering message |
 | `EnableHelp` | true | Enables the built-in `help` command |
 | `HelpPageSize` | 20 | Commands per `/help` page (`/help 2` for the next). 0 disables paging. |
-| `Admins` | [] | Phone numbers or UUIDs allowed to use `[RequireAdmin]` commands |
+| `Admins` | [] | Phone numbers or UUIDs allowed to use `[RequireAdmin]` commands. They also have the `admin` role. |
+| `Roles` | {} | Role name → phone numbers or UUIDs for `[RequireRole]`, e.g. `{ "moderator": ["+4915112345678"] }`. Role names are case-insensitive; changes apply without restart. |
 
 ## `AccessControl`
 

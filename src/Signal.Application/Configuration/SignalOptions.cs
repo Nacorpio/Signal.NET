@@ -184,6 +184,12 @@ public sealed class CommandOptions
     /// <summary>Phone numbers or UUIDs allowed to run <c>[RequireAdmin]</c> commands.</summary>
     public List<string> Admins { get; set; } = [];
 
+    /// <summary>
+    /// Role members for <c>[RequireRole]</c>: role name → phone numbers or UUIDs, e.g.
+    /// <c>{ "moderator": ["+4915112345678"] }</c>. Role names are case-insensitive.
+    /// </summary>
+    public Dictionary<string, List<string>> Roles { get; set; } = [];
+
     /// <summary><see cref="Prefixes"/>, or <see cref="DefaultPrefix"/> when none are configured.</summary>
     public IReadOnlyList<string> EffectivePrefixes => Prefixes.Count == 0 ? [DefaultPrefix] : Prefixes;
 }

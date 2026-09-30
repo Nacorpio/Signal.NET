@@ -167,6 +167,7 @@ Binding rules:
 | `RequireAdminAttribute` | The sender is in `Signal:Commands:Admins` (phone number or UUID) |
 | `RequireGroupAttribute` / `RequireDirectMessageAttribute` | Restricts where the command can be used |
 | `RequireGroupAdminAttribute` | The sender is an admin **of the Signal group** (looked up live via `IGroupService`) |
+| `RequireRoleAttribute(roles…)` | The sender has **at least one** of the roles, per the registered `IRoleProvider`s. Built in: `Commands:Roles` (role → numbers/UUIDs), `Role.Admin` (also `Commands:Admins`), `Role.GroupAdmin` (Signal group admins). `AddRoleProvider<T>()` adds your own, e.g. database-backed. |
 | `CooldownAttribute(seconds)` | Rate-limits one command, per `Scope` (`PerSender`, `PerConversation`, `Global`). `Order = 1000`, so it runs last and failed permission checks don't consume the cooldown. |
 | `ICooldownTracker` | Stores cooldown expirations. The default is in memory and uses `TimeProvider`; replace it for multi-instance deployments. |
 

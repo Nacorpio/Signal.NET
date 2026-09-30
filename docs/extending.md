@@ -7,6 +7,7 @@ The builder methods below cover the common extension points.
 | I want to… | Extension point | Lifetime |
 |---|---|---|
 | Add a command | `CommandModule`, `ICommand`/`CommandBase`, `MapCommand` | per execution / scoped |
+| Grant roles from your own data (e.g. a database) | Implement `IRoleProvider` and call `AddRoleProvider<T>()` | scoped (default) |
 | Keep scheduled messages across restarts | Implement `IScheduledMessageStore` and register it before `AddSignal` | singleton |
 | Support a custom argument type | Implement `IParsable<T>` on the type, or `ArgumentConverter<T>` + `AddArgumentConverter<T>()` | singleton |
 | Add a permission check | Derive from `PreconditionAttribute` | attribute |
