@@ -209,6 +209,17 @@ public interface ICommandParser
     /// <param name="command">The parsed invocation when the method returns <see langword="true"/>.</param>
     /// <returns><see langword="true"/> if the text is a command invocation.</returns>
     bool TryParse(string? text, [NotNullWhen(true)] out ParsedCommand? command);
+
+    /// <summary>
+    /// Parses <paramref name="text"/> using <paramref name="prefixes"/> instead of the configured ones (per-conversation
+    /// prefixes). Added after 0.4; the default ignores <paramref name="prefixes"/> and uses the configured prefixes.
+    /// </summary>
+    /// <param name="text">The message text.</param>
+    /// <param name="prefixes">The prefixes to accept (longest match wins).</param>
+    /// <param name="command">The parsed invocation when the method returns <see langword="true"/>.</param>
+    /// <returns><see langword="true"/> if the text is a command invocation.</returns>
+    bool TryParse(string? text, IReadOnlyList<string> prefixes, [NotNullWhen(true)] out ParsedCommand? command) =>
+        TryParse(text, out command);
 }
 
 /// <summary>
@@ -217,7 +228,10 @@ public interface ICommandParser
 /// </summary>
 internal sealed class CommandParser(IOptionsMonitor<SignalOptions> options) : ICommandParser
 {
-    public bool TryParse(string? text, [NotNullWhen(true)] out ParsedCommand? command)
+    public bool TryParse(string? text, [NotNullWhen(true)] out ParsedCommand? command) =>
+        TryParse(text, options.CurrentValue.Commands.EffectivePrefixes, out command);
+
+    public bool TryParse(string? text, IReadOnlyList<string> prefixes, [NotNullWhen(true)] out ParsedCommand? command)
     {
         command = null;
         if (string.IsNullOrWhiteSpace(text))
@@ -226,8 +240,8 @@ internal sealed class CommandParser(IOptionsMonitor<SignalOptions> options) : IC
         }
 
         text = text.TrimStart();
-        var prefix = options.CurrentValue.Commands.EffectivePrefixes
-            .Where(p => text.StartsWith(p, StringComparison.Ordinal))
+        var prefix = prefixes
+            .Where(p => !string.IsNullOrEmpty(p) && text.StartsWith(p, StringComparison.Ordinal))
             .MaxBy(p => p.Length);
         if (prefix is null)
         {

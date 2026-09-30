@@ -83,6 +83,31 @@ public sealed class PlaylistModule : CommandModule
 - **Conflicts** are rejected at startup: a group can't have the same name or alias as a top-level command.
   Several modules may share a group name; their commands are merged.
 
+## Per-conversation settings
+
+A group (or direct chat) can have its own prefixes and disabled commands, stored in `IConversationSettingsStore`:
+
+```csharp
+[Command("prefix"), RequireGroup, RequireRole(Role.GroupAdmin)]
+public async Task PrefixAsync(string prefix)
+{
+    var store = Context.Services.GetRequiredService<IConversationSettingsStore>();
+    var current = await Context.Message.GetConversationSettingsAsync() ?? new ConversationSettings();
+    await store.SetAsync(Context.Account, Context.Conversation, current with { Prefixes = [prefix] });
+    await ReplyAsync($"This group now uses {prefix} as prefix.");
+}
+```
+
+- **`Prefixes`** replace `Commands:Prefixes` in that conversation only.
+- **`DisabledCommands`** lists full names (`ban`, `playlist add`) or group names (`playlist`), case-insensitive.
+  Using one replies with `Commands:DisabledCommandMessage` (empty for no reply), and help and "Did you mean"
+  treat them as hidden there.
+- **`Culture`** is stored for localised replies.
+- **Storage:** settings are loaded **once per text message** and cached in `MessageContext.Items`
+  (`GetConversationSettingsAsync()`). The default store is in memory; implement `IConversationSettingsStore` to persist them.
+- **Known limitation:** prompts recognise commands by the global prefixes only. In a conversation with its own
+  prefix, an answer like `!help` is taken as the answer.
+
 ## Components
 
 ### Attributes (`Attributes.cs`)
