@@ -24,10 +24,22 @@ public abstract record DomainEvent(IncomingEnvelope Envelope) : IDomainEvent
     public DateTimeOffset OccurredAt => Envelope.ReceivedAt;
 }
 
-/// <summary>A text and/or attachment message was received.</summary>
+/// <summary>A message with text, attachments and/or a sticker was received.</summary>
 /// <param name="Envelope">The envelope that produced the event.</param>
 /// <param name="Message">The received message.</param>
 public sealed record MessageReceived(IncomingEnvelope Envelope, DataMessage Message) : DomainEvent(Envelope);
+
+/// <summary>
+/// The sender edited one of their earlier messages. Edits never run commands; handle this event to react to them.
+/// </summary>
+/// <param name="Envelope">The envelope that produced the event.</param>
+/// <param name="Edit">The edit: the original message's timestamp and the new version.</param>
+public sealed record MessageEdited(IncomingEnvelope Envelope, EditMessage Edit) : DomainEvent(Envelope);
+
+/// <summary>The sender deleted one of their earlier messages for everyone.</summary>
+/// <param name="Envelope">The envelope that produced the event.</param>
+/// <param name="Delete">The deletion, naming the deleted message's timestamp.</param>
+public sealed record MessageDeleted(IncomingEnvelope Envelope, RemoteDelete Delete) : DomainEvent(Envelope);
 
 /// <summary>A reaction was added to or removed from a message.</summary>
 /// <param name="Envelope">The envelope that produced the event.</param>

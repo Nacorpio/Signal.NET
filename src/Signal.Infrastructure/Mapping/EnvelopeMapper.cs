@@ -46,6 +46,10 @@ internal static class EnvelopeMapper
         {
             content = data;
         }
+        else if (envelope.EditMessage is { TargetSentTimestamp: > 0 } edit && Map(edit.DataMessage) is { } edited)
+        {
+            content = new EditMessage(edit.TargetSentTimestamp, edited);
+        }
         else if (Map(envelope.ReceiptMessage) is { } receipt)
         {
             content = receipt;
@@ -85,6 +89,12 @@ internal static class EnvelopeMapper
             Reaction = dto.Reaction is { Emoji: { } emoji } r && (r.TargetAuthorNumber ?? r.TargetAuthorUuid ?? r.TargetAuthor) is { } target
                 ? new Reaction(emoji, target, r.TargetSentTimestamp, r.IsRemove)
                 : null,
+
+            // A malformed sticker is dropped rather than failing the whole message.
+            Sticker = dto.Sticker is { PackId: { } packId, StickerId: >= 0 } s && Sticker.TryParse($"{packId}:{s.StickerId}", out var sticker)
+                ? sticker
+                : null,
+            RemoteDelete = dto.RemoteDelete is { Timestamp: > 0 } d ? new RemoteDelete(d.Timestamp) : null,
         };
     }
 

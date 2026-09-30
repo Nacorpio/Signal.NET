@@ -48,4 +48,55 @@ public class EnvelopeMapperTests
         Assert.Equal(TypingAction.Started, sample[3].Typing!.Action);
         Assert.Null(sample[3].Source.Number);
     }
+
+    // Shapes follow signal-cli's JsonMessageEnvelope / JsonEditMessage / JsonDataMessage records.
+    private static IncomingEnvelope? MapOne(string envelopeJson) =>
+        EnvelopeMapper.Map(
+            JsonSerializer.Deserialize(
+                $$$"""{"account":"+15550000000","envelope":{"sourceNumber":"+15550001111","sourceDevice":1,"timestamp":1700000000500,{{{envelopeJson}}}}}""",
+                SignalEnvelopeJsonContext.Default.ReceivedMessageDto)!,
+            Account);
+
+    [Fact]
+    public void Maps_edits_with_their_target_and_group()
+    {
+        var envelope = MapOne("""
+            "editMessage":{"targetSentTimestamp":1700000000000,
+              "dataMessage":{"timestamp":1700000000400,"message":"fixed typo","groupInfo":{"groupId":"abc123==","type":"DELIVER"}}}
+            """)!;
+
+        var edit = Assert.IsType<EditMessage>(envelope.Content.Value);
+        Assert.Equal(1700000000000, edit.TargetTimestamp);
+        Assert.Equal("fixed typo", edit.Message.Text);
+        Assert.Equal(1700000000400, edit.Message.Timestamp);
+        Assert.Same(edit, envelope.Edit);
+        Assert.Null(envelope.Data);
+        Assert.Equal(GroupId.FromInternalId("abc123=="), envelope.Group);
+    }
+
+    [Theory]
+    [InlineData(""" "editMessage":{"targetSentTimestamp":0,"dataMessage":{"timestamp":1,"message":"x"}} """)]
+    [InlineData(""" "editMessage":{"targetSentTimestamp":1700000000000} """)]
+    public void Drops_malformed_edits(string json) => Assert.Null(MapOne(json));
+
+    [Fact]
+    public void Maps_remote_deletes_and_stickers()
+    {
+        var delete = MapOne(""" "dataMessage":{"timestamp":1700000000400,"message":null,"remoteDelete":{"timestamp":1700000000000}} """)!;
+        var sticker = MapOne(""" "dataMessage":{"timestamp":1700000000400,"message":null,"sticker":{"packId":"ABCDEF","stickerId":7}} """)!;
+
+        Assert.Equal(new RemoteDelete(1700000000000), delete.Data!.RemoteDelete);
+        Assert.False(delete.Data.HasContent);
+        Assert.Equal(new Sticker("abcdef", 7), sticker.Data!.Sticker);
+        Assert.True(sticker.Data.HasContent);
+    }
+
+    [Fact]
+    public void Ignores_malformed_stickers_but_keeps_the_message()
+    {
+        var envelope = MapOne(""" "dataMessage":{"timestamp":1,"message":"hi","sticker":{"packId":"not hex","stickerId":1}} """)!;
+
+        Assert.Null(envelope.Data!.Sticker);
+        Assert.Equal("hi", envelope.Data.Text);
+    }
 }

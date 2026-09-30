@@ -26,7 +26,7 @@ These known limitations shape the plan below:
 
 1. **Long-running commands block their conversation partition.** The docs currently only advise against them.
 2. **Reflection and `Expression.Compile`** in `CommandDescriptorFactory`, `ArgumentConverters` and `DomainEventDispatcher` rule out trimming and Native AOT.
-3. **Unmodelled envelope content.** Sync, story, edit, remote-delete, sticker and call messages are dropped by `EnvelopeMapper`.
+3. **Unmodelled envelope content.** Sync, story and call messages are dropped by `EnvelopeMapper` (edits, remote deletes and stickers are handled since 0.4).
 4. **State is in memory only.** Cooldowns and rate limits don't survive restarts and aren't shared between instances.
 5. **Partial API coverage.** Registration, devices, stickers, username, account settings, remote delete and search are missing.
 6. **Pre-release SDK dependency.** The project builds with the .NET 11 RC1 SDK and `LangVersion=preview`. It cannot declare a stable 1.0 before .NET 11 and C# 15 are generally available.
@@ -88,9 +88,9 @@ it are exhaustive, the compiler points at every place that needs updating.*
 | # | Feature | Layer | Size | Notes |
 |---|---|---|---|---|
 | 0.4.1 | **Sync messages** | D/I | M | Messages sent from the account's own devices (`SentTranscript`); enables "note to self" bots and multi-device awareness |
-| 0.4.2 | **Edited messages** | D/I | S | `MessageEdited` event with the original timestamp |
-| 0.4.3 | **Remote deletes** | D/I | S | `MessageDeleted` event |
-| 0.4.4 | **Stickers received** | D/I | S | Sticker metadata on `DataMessage` |
+| 0.4.2 | **Edited messages** | D/I | S | ✅ New `EnvelopeContent` case `EditMessage` (signal-cli reports edits at envelope level) and `MessageEdited` event. Edits never run commands. |
+| 0.4.3 | **Remote deletes** | D/I | S | ✅ `DataMessage.RemoteDelete` and `MessageDeleted` event (takes precedence over the other data-message events) |
+| 0.4.4 | **Stickers received** | D/I | S | ✅ `DataMessage.Sticker` (the `Sticker` value object from 0.3.6); sticker-only messages now raise `MessageReceived` |
 | 0.4.5 | **Story messages** | D/I | M | Opt-in via `Receive:IgnoreStories = false`; `StoryReceived` event |
 | 0.4.6 | **Call messages** | D/I | S | `CallReceived` event (offer, hangup) for "sorry, I'm a bot" replies |
 | 0.4.7 | **Mention-aware binding** | A | S | `Recipient` and `PhoneNumber` parameters accept `@mentions` (resolving the U+FFFC placeholder through `DataMessage.Mentions`) |

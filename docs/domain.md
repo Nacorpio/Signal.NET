@@ -7,9 +7,9 @@ speaks this language. The project has no dependencies, performs no I/O, and neve
 |---|---|
 | `/` | `ExecutionMode`, `ExecutionModeExtensions` |
 | `ValueObjects/` | `PhoneNumber`, `AccountId`, `Username`, `GroupId`, `Recipient` (union) |
-| `Messaging/` | `IncomingEnvelope`, `EnvelopeContent` (union), `DataMessage`, `ReceiptMessage`, `TypingMessage`, `Sender`, `OutgoingMessage`, `OutgoingMessageBuilder`, `Attachment`, `Mention`, `Quote`, `Reaction`, `TextMode`, `ReceiptType`, `TypingAction` |
+| `Messaging/` | `IncomingEnvelope`, `EnvelopeContent` (union), `DataMessage`, `EditMessage`, `RemoteDelete`, `ReceiptMessage`, `TypingMessage`, `Sender`, `OutgoingMessage`, `OutgoingMessageBuilder`, `Attachment`, `Mention`, `Quote`, `Reaction`, `TextMode`, `ReceiptType`, `TypingAction` |
 | `Entities/` | `Entity<TId>`, `Group`, `Contact`, `Identity` |
-| `Events/` | `IDomainEvent`, `DomainEvent`, `MessageReceived`, `ReactionReceived`, `ReceiptReceived`, `TypingIndicatorChanged`, `GroupUpdated` |
+| `Events/` | `IDomainEvent`, `DomainEvent`, `MessageReceived`, `MessageEdited`, `MessageDeleted`, `ReactionReceived`, `ReceiptReceived`, `TypingIndicatorChanged`, `GroupUpdated` |
 | `Exceptions/` | `SignalDomainException`, `InvalidPhoneNumberException`, `InvalidRecipientException` |
 
 ---
@@ -138,9 +138,9 @@ it with an `ArgumentException`.
 | `Account` | The receiving account |
 | `Source` | The `Sender` |
 | `Timestamp` / `ReceivedAt` | Server timestamp (ms) / as a `DateTimeOffset` |
-| `Content` | The `EnvelopeContent` union: **exactly one** of `DataMessage`, `ReceiptMessage`, `TypingMessage` |
-| `Data` / `Receipt` / `Typing` | Convenience accessors. Each returns the content if it has that type, otherwise `null`. |
-| `Group`, `IsGroup` | Group context, from the data or typing message |
+| `Content` | The `EnvelopeContent` union: **exactly one** of `DataMessage`, `EditMessage`, `ReceiptMessage`, `TypingMessage` |
+| `Data` / `Edit` / `Receipt` / `Typing` | Convenience accessors. Each returns the content if it has that type, otherwise `null`. |
+| `Group`, `IsGroup` | Group context, from the data message, the edited message or the typing message |
 | `Conversation` | **Where replies go:** the group recipient for group messages, otherwise the sender (by phone number, or by `AccountId` if the number is hidden) |
 | `ToDomainEvent()` | Converts the envelope into its domain event (see below) |
 
@@ -148,30 +148,42 @@ it with an `ArgumentException`.
 
 | Content | Event |
 |---|---|
+| `DataMessage` with a `RemoteDelete` | `MessageDeleted` |
 | `DataMessage` with a `Reaction` | `ReactionReceived` |
 | `DataMessage` with `IsGroupUpdate` and a group | `GroupUpdated` |
-| `DataMessage` with text or attachments | `MessageReceived` |
+| `DataMessage` with text, attachments or a sticker | `MessageReceived` |
 | `DataMessage` without content | none (`null`) |
+| `EditMessage` | `MessageEdited` |
 | `ReceiptMessage` | `ReceiptReceived` |
 | `TypingMessage` | `TypingIndicatorChanged` |
 
 ### `EnvelopeContent` (union)
 
 ```csharp
-public union EnvelopeContent(DataMessage, ReceiptMessage, TypingMessage);
+public union EnvelopeContent(DataMessage, EditMessage, ReceiptMessage, TypingMessage);
 ```
 
 **Purpose:** a Signal envelope carries exactly one kind of content. Modelling that as a union makes it
 impossible to build an envelope with no content or with two kinds at once. Adding a new content kind
-later would produce a compiler warning at every `switch` that doesn't handle it yet.
+produces a compiler warning at every `switch` that doesn't handle it yet. `EditMessage` was added this way in
+0.4, so exhaustive switches written against 0.3 now warn until they handle edits.
 
 ### `DataMessage`
 
 **Purpose:** a regular message.
 
-- **Content:** `Timestamp` and `Text`, plus `Group`, `Attachments`, `Mentions`, `Quote`, `Reaction`, `IsGroupUpdate` and `ViewOnce`.
-- **`HasContent`:** true when there is text or at least one attachment.
+- **Content:** `Timestamp` and `Text`, plus `Group`, `Attachments`, `Mentions`, `Quote`, `Reaction`, `Sticker`, `RemoteDelete`, `IsGroupUpdate` and `ViewOnce`.
+- **`HasContent`:** true when there is text, at least one attachment, or a sticker.
+- **`Sticker`:** a received sticker as the same `Sticker` value object used for sending, so a bot can send it back with `WithSticker`.
+- **`RemoteDelete`:** set when the message deletes an earlier one for everyone. `TargetTimestamp` together with the envelope's sender identifies the deleted message, because Signal only lets authors delete their own messages.
 - **Why the timestamp matters:** it identifies the message for reactions, quotes and receipts.
+
+### `EditMessage`
+
+**Purpose:** an edit of an earlier message. signal-cli reports edits at envelope level rather than inside a
+data message, so `EditMessage` is its own union case: `TargetTimestamp` names the edited message and `Message`
+is the new version (a full `DataMessage`, with its own timestamp). **Edits never run commands**, so editing a
+message into `/something` doesn't execute it; handle `MessageEdited` to react to edits.
 
 ### `ReceiptMessage`, `TypingMessage`
 
@@ -277,6 +289,8 @@ receives messages. Events are raised by `IncomingEnvelope.ToDomainEvent()` and d
 | Event | Payload | Typical use |
 |---|---|---|
 | `MessageReceived` | `Message` (`DataMessage`) | Logging, auto-replies, moderation, non-command bots |
+| `MessageEdited` | `Edit` (`EditMessage`) | Keeping stored copies or moderation up to date |
+| `MessageDeleted` | `Delete` (`RemoteDelete`) | Removing stored copies (e.g. logs, archives) |
 | `ReactionReceived` | `Reaction` | Polls, acknowledgements |
 | `ReceiptReceived` | `Receipt` | Delivery tracking |
 | `TypingIndicatorChanged` | `Typing` | Presence features |

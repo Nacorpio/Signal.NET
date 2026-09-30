@@ -4,6 +4,7 @@ using Signal.Application.Commands;
 using Signal.Application.Commands.Preconditions;
 using Signal.Application.Events;
 using Signal.Domain.Events;
+using Signal.Domain.Messaging;
 using Signal.Domain.ValueObjects;
 
 namespace Signal.Application.Tests;
@@ -181,6 +182,27 @@ public class CommandTests
         var context = await harness.ReceiveAsync("just chatting");
 
         Assert.False(context.IsHandled);
+        Assert.Empty(harness.Signal.Sent);
+    }
+
+    [Fact]
+    public async Task Edits_deletes_and_stickers_never_run_commands()
+    {
+        await using var harness = Harness();
+        var account = PhoneNumber.Parse(TestHarness.Account);
+        var alice = new Sender(PhoneNumber.Parse(TestHarness.Alice), null, "Alice");
+
+        // Editing a message into a command must not execute it.
+        var edit = await harness.ReceiveAsync(new IncomingEnvelope(account, alice, 2,
+            new EditMessage(1, new DataMessage(2, "/add 1 2"))));
+        var delete = await harness.ReceiveAsync(new IncomingEnvelope(account, alice, 3,
+            new DataMessage(3, null) { RemoteDelete = new RemoteDelete(1) }));
+        var sticker = await harness.ReceiveAsync(new IncomingEnvelope(account, alice, 4,
+            new DataMessage(4, null) { Sticker = new Sticker("abc", 1) }));
+
+        Assert.False(edit.IsHandled);
+        Assert.False(delete.IsHandled);
+        Assert.False(sticker.IsHandled);
         Assert.Empty(harness.Signal.Sent);
     }
 
