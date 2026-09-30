@@ -1,0 +1,11 @@
+#nullable enable
+abstract Signal.Infrastructure.Receiving.ChannelMessageReceiver.ProduceAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.Channels.ChannelWriter<Signal.Domain.Messaging.IncomingEnvelope!>! writer, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task!
+Signal.Infrastructure.InfrastructureServiceCollectionExtensions
+Signal.Infrastructure.Receiving.ChannelMessageReceiver
+Signal.Infrastructure.Receiving.ChannelMessageReceiver.ChannelMessageReceiver() -> void
+Signal.Infrastructure.Receiving.ChannelMessageReceiver.ReceiveAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Collections.Generic.IAsyncEnumerable<Signal.Domain.Messaging.IncomingEnvelope!>!
+Signal.Infrastructure.Receiving.IWebSocketConnector
+Signal.Infrastructure.Receiving.IWebSocketConnector.ConnectAsync(System.Uri! uri, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<System.Net.WebSockets.WebSocket!>!
+static Signal.Infrastructure.InfrastructureServiceCollectionExtensions.AddSignalInfrastructure(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services) -> Microsoft.Extensions.DependencyInjection.IServiceCollection!
+static Signal.Infrastructure.Receiving.ChannelMessageReceiver.Backoff(int attempt, System.TimeSpan min, System.TimeSpan max) -> System.TimeSpan
+virtual Signal.Infrastructure.Receiving.ChannelMessageReceiver.Capacity.get -> int
