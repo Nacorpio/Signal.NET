@@ -58,6 +58,13 @@ Calling `AddSignal` more than once is safe, because the framework services use `
 **Ordering guarantee:** all messages of one conversation land in the same partition and are therefore
 processed strictly in order. Different conversations are processed in parallel.
 
+### `ScheduledMessageService`
+
+**Purpose:** runs the `IScheduledMessageDispatcher`. Every `Scheduler:PollInterval` it asks the
+`IScheduledMessageStore` for due messages and sends each in its own DI scope. One-off messages are then removed;
+recurring ones move to their next future time. A failed send is retried after `Scheduler:RetryDelay`, and a
+store failure is logged and retried on the next tick.
+
 ### `BackgroundWorkService`
 
 **Purpose:** runs the `IBackgroundWorkProcessor`, so work queued with `RunInBackgroundAsync` /

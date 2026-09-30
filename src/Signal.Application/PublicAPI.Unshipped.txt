@@ -8,6 +8,9 @@ override Signal.Application.Background.PromptResult<T>.ToString() -> string!
 override Signal.Application.Commands.CommandGroupInfo.Equals(object? obj) -> bool
 override Signal.Application.Commands.CommandGroupInfo.GetHashCode() -> int
 override Signal.Application.Commands.CommandGroupInfo.ToString() -> string!
+override Signal.Application.Scheduling.ScheduledMessage.Equals(object? obj) -> bool
+override Signal.Application.Scheduling.ScheduledMessage.GetHashCode() -> int
+override Signal.Application.Scheduling.ScheduledMessage.ToString() -> string!
 Signal.Application.Background.BackgroundWork
 Signal.Application.Background.BackgroundWork.Account.get -> Signal.Domain.ValueObjects.PhoneNumber
 Signal.Application.Background.BackgroundWork.BackgroundWork(System.IServiceProvider! services, Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient conversation, System.Threading.CancellationToken cancellationToken, Signal.Domain.Messaging.Sender? sender = null) -> void
@@ -85,6 +88,7 @@ Signal.Application.Commands.CommandGroupInfo.Equals(Signal.Application.Commands.
 Signal.Application.Commands.CommandGroupInfo.Name.get -> string!
 Signal.Application.Commands.CommandGroupInfo.Name.init -> void
 Signal.Application.Commands.CommandModule.RunInBackgroundAsync(System.Func<Signal.Application.Background.BackgroundWork!, System.Threading.Tasks.Task!>! work) -> System.Threading.Tasks.ValueTask
+Signal.Application.Commands.CommandModule.ScheduleReplyAsync(string! text, System.DateTimeOffset dueAt, System.TimeSpan? repeatEvery = null) -> System.Threading.Tasks.Task<Signal.Application.Scheduling.ScheduledMessage!>!
 Signal.Application.Commands.CommandParameter.ElementType.get -> System.Type?
 Signal.Application.Commands.CommandParameter.ElementType.init -> void
 Signal.Application.Commands.CommandParameter.IsCollection.get -> bool
@@ -104,8 +108,48 @@ Signal.Application.Configuration.CommandOptions.HelpPageSize.get -> int
 Signal.Application.Configuration.CommandOptions.HelpPageSize.set -> void
 Signal.Application.Configuration.CommandOptions.SuggestSimilarCommands.get -> bool
 Signal.Application.Configuration.CommandOptions.SuggestSimilarCommands.set -> void
+Signal.Application.Configuration.SchedulerOptions
+Signal.Application.Configuration.SchedulerOptions.PollInterval.get -> System.TimeSpan
+Signal.Application.Configuration.SchedulerOptions.PollInterval.set -> void
+Signal.Application.Configuration.SchedulerOptions.RetryDelay.get -> System.TimeSpan
+Signal.Application.Configuration.SchedulerOptions.RetryDelay.set -> void
+Signal.Application.Configuration.SchedulerOptions.SchedulerOptions() -> void
 Signal.Application.Configuration.SignalOptions.Background.get -> Signal.Application.Configuration.BackgroundOptions!
 Signal.Application.Configuration.SignalOptions.Background.set -> void
+Signal.Application.Configuration.SignalOptions.Scheduler.get -> Signal.Application.Configuration.SchedulerOptions!
+Signal.Application.Configuration.SignalOptions.Scheduler.set -> void
+Signal.Application.Scheduling.IMessageScheduler
+Signal.Application.Scheduling.IMessageScheduler.CancelAsync(System.Guid id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
+Signal.Application.Scheduling.IMessageScheduler.ListAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Signal.Application.Scheduling.ScheduledMessage!>!>!
+Signal.Application.Scheduling.IMessageScheduler.ScheduleAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient recipient, string! text, System.DateTimeOffset dueAt, System.TimeSpan? repeatEvery = null, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Scheduling.ScheduledMessage!>!
+Signal.Application.Scheduling.IScheduledMessageDispatcher
+Signal.Application.Scheduling.IScheduledMessageDispatcher.RunAsync(System.Threading.CancellationToken stoppingToken) -> System.Threading.Tasks.Task!
+Signal.Application.Scheduling.IScheduledMessageStore
+Signal.Application.Scheduling.IScheduledMessageStore.AddAsync(Signal.Application.Scheduling.ScheduledMessage! message, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Scheduling.IScheduledMessageStore.GetDueAsync(System.DateTimeOffset now, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Signal.Application.Scheduling.ScheduledMessage!>!>!
+Signal.Application.Scheduling.IScheduledMessageStore.ListAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Signal.Application.Scheduling.ScheduledMessage!>!>!
+Signal.Application.Scheduling.IScheduledMessageStore.RemoveAsync(System.Guid id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
+Signal.Application.Scheduling.IScheduledMessageStore.UpdateAsync(Signal.Application.Scheduling.ScheduledMessage! message, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Scheduling.ScheduledMessage
+Signal.Application.Scheduling.ScheduledMessage.<Clone>$() -> Signal.Application.Scheduling.ScheduledMessage!
+Signal.Application.Scheduling.ScheduledMessage.Account.get -> Signal.Domain.ValueObjects.PhoneNumber
+Signal.Application.Scheduling.ScheduledMessage.Account.init -> void
+Signal.Application.Scheduling.ScheduledMessage.Deconstruct(out System.Guid Id, out Signal.Domain.ValueObjects.PhoneNumber Account, out Signal.Domain.ValueObjects.Recipient Recipient, out string! Text, out System.DateTimeOffset DueAt) -> void
+Signal.Application.Scheduling.ScheduledMessage.DueAt.get -> System.DateTimeOffset
+Signal.Application.Scheduling.ScheduledMessage.DueAt.init -> void
+Signal.Application.Scheduling.ScheduledMessage.Equals(Signal.Application.Scheduling.ScheduledMessage? other) -> bool
+Signal.Application.Scheduling.ScheduledMessage.Id.get -> System.Guid
+Signal.Application.Scheduling.ScheduledMessage.Id.init -> void
+Signal.Application.Scheduling.ScheduledMessage.Recipient.get -> Signal.Domain.ValueObjects.Recipient
+Signal.Application.Scheduling.ScheduledMessage.Recipient.init -> void
+Signal.Application.Scheduling.ScheduledMessage.RepeatEvery.get -> System.TimeSpan?
+Signal.Application.Scheduling.ScheduledMessage.RepeatEvery.init -> void
+Signal.Application.Scheduling.ScheduledMessage.ScheduledMessage(System.Guid Id, Signal.Domain.ValueObjects.PhoneNumber Account, Signal.Domain.ValueObjects.Recipient Recipient, string! Text, System.DateTimeOffset DueAt) -> void
+Signal.Application.Scheduling.ScheduledMessage.Text.get -> string!
+Signal.Application.Scheduling.ScheduledMessage.Text.init -> void
+Signal.Application.Scheduling.ScheduledMessage.TextMode.get -> Signal.Domain.Messaging.TextMode
+Signal.Application.Scheduling.ScheduledMessage.TextMode.init -> void
+Signal.Application.Scheduling.SchedulingExtensions
 static Signal.Application.Background.BackgroundWorkExtensions.QueueBackgroundWorkAsync(this Signal.Application.Pipeline.MessageContext! context, System.Func<Signal.Application.Background.BackgroundWork!, System.Threading.Tasks.Task!>! work) -> System.Threading.Tasks.ValueTask
 static Signal.Application.Background.BackgroundWorkItem.operator !=(Signal.Application.Background.BackgroundWorkItem? left, Signal.Application.Background.BackgroundWorkItem? right) -> bool
 static Signal.Application.Background.BackgroundWorkItem.operator ==(Signal.Application.Background.BackgroundWorkItem? left, Signal.Application.Background.BackgroundWorkItem? right) -> bool
@@ -114,3 +158,6 @@ static Signal.Application.Background.PromptResult<T>.operator ==(Signal.Applicat
 static Signal.Application.Commands.CommandGroupInfo.From(Signal.Application.Commands.CommandGroupAttribute! attribute) -> Signal.Application.Commands.CommandGroupInfo!
 static Signal.Application.Commands.CommandGroupInfo.operator !=(Signal.Application.Commands.CommandGroupInfo? left, Signal.Application.Commands.CommandGroupInfo? right) -> bool
 static Signal.Application.Commands.CommandGroupInfo.operator ==(Signal.Application.Commands.CommandGroupInfo? left, Signal.Application.Commands.CommandGroupInfo? right) -> bool
+static Signal.Application.Scheduling.ScheduledMessage.operator !=(Signal.Application.Scheduling.ScheduledMessage? left, Signal.Application.Scheduling.ScheduledMessage? right) -> bool
+static Signal.Application.Scheduling.ScheduledMessage.operator ==(Signal.Application.Scheduling.ScheduledMessage? left, Signal.Application.Scheduling.ScheduledMessage? right) -> bool
+static Signal.Application.Scheduling.SchedulingExtensions.ScheduleReplyAsync(this Signal.Application.Pipeline.MessageContext! context, string! text, System.DateTimeOffset dueAt, System.TimeSpan? repeatEvery = null) -> System.Threading.Tasks.Task<Signal.Application.Scheduling.ScheduledMessage!>!

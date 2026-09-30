@@ -10,6 +10,7 @@ using Signal.Application.Commands.Preconditions;
 using Signal.Application.Configuration;
 using Signal.Application.Events;
 using Signal.Application.Pipeline;
+using Signal.Application.Scheduling;
 
 namespace Signal.Application;
 
@@ -53,6 +54,11 @@ public static class ApplicationServiceCollectionExtensions
         services.TryAddSingleton<IBackgroundWorkQueue>(sp => sp.GetRequiredService<ChannelBackgroundWorkQueue>());
         services.TryAddSingleton<IBackgroundWorkProcessor, BackgroundWorkProcessor>();
         services.TryAddSingleton<IPromptRegistry, PromptRegistry>();
+
+        // Scheduled messages: in-memory by default; register an IScheduledMessageStore first to persist them.
+        services.TryAddSingleton<IScheduledMessageStore, InMemoryScheduledMessageStore>();
+        services.TryAddSingleton<IMessageScheduler, MessageScheduler>();
+        services.TryAddSingleton<IScheduledMessageDispatcher, ScheduledMessageDispatcher>();
         services.TryAddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
 
         // Commands

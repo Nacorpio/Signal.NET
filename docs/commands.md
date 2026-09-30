@@ -273,4 +273,19 @@ var reply = result switch
     a newer prompt to the same sender replaces it) or `Invalid` (after `attempts` unparsable answers).
   - Prompts live in background work, not in commands, on purpose: a command waiting for an answer would hold
     its conversation partition, and every conversation sharing it, until the answer or the timeout.
+- **Reminders and digests:** `ScheduleReplyAsync` sends a message into the conversation later, once or repeatedly:
+
+  ```csharp
+  [Command("remind")]
+  public async Task RemindAsync(TimeSpan delay, [Remainder] string text)
+  {
+      var reminder = await ScheduleReplyAsync(text, DateTimeOffset.UtcNow + delay);
+      await ReplyAsync($"OK, reminder {reminder.Id} set.");
+  }
+  ```
+
+  Use `IMessageScheduler` to schedule to any recipient, list (`ListAsync`) or cancel (`CancelAsync`). A
+  `repeatEvery` of at least one minute makes it recurring. Scheduled messages are **kept in memory** by default
+  and lost on restart; register your own `IScheduledMessageStore` (e.g. backed by a database) before `AddSignal`
+  to keep them.
 - **Ignoring commands in event handlers:** check `MessageContext.Items[typeof(CommandResult)]` in later middleware, or compare `MessageReceived.Message.Text` against your prefixes.
