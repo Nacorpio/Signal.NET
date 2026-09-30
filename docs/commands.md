@@ -76,6 +76,8 @@ public sealed class PlaylistModule : CommandModule
   full name (`CommandDescriptor.FullName`, e.g. `playlist add`).
 - **Shared preconditions:** preconditions on the module apply to every command in the group.
 - **Separate state:** cooldowns are keyed by the full name, so `/playlist add` and `/queue add` don't share one.
+- **Typos** get a suggestion: `/hlep` → "… Did you mean /help?", and `/playlist remvoe` → "… Did you mean
+  /playlist remove?". Hidden commands are never suggested (`Commands:SuggestSimilarCommands`).
 - **Missing or unknown subcommands** get a reply listing the group's commands (`/playlist needs a subcommand: add,
   remove.`) instead of "Unknown command". `/help playlist` describes the group, `/help playlist add` the command.
 - **Conflicts** are rejected at startup: a group can't have the same name or alias as a top-level command.

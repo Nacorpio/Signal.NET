@@ -162,7 +162,8 @@ public interface ICommandResultHandler
 /// <summary>
 /// Default result handler: replies with the unknown-command message (if enabled), binding errors plus the usage
 /// line, precondition reasons, or the generic error message for faulted commands. Exception details are never sent.
-/// For a command group typed without a known subcommand it lists the group's commands instead.
+/// For a command group typed without a known subcommand it lists the group's commands instead. With
+/// <see cref="CommandOptions.SuggestSimilarCommands"/> it appends the closest command or subcommand name.
 /// </summary>
 internal sealed class DefaultCommandResultHandler(IOptionsMonitor<SignalOptions> options, ICommandRegistry registry) : ICommandResultHandler
 {
@@ -173,8 +174,9 @@ internal sealed class DefaultCommandResultHandler(IOptionsMonitor<SignalOptions>
         {
             CommandSucceeded => null,
             CommandNotFound notFound => !commands.RespondToUnknown ? null
-                : GroupHint(notFound.Parsed)
-                    ?? string.Format(CultureInfo.InvariantCulture, commands.UnknownCommandMessage, notFound.Parsed.Name, notFound.Parsed.Prefix),
+                : (GroupHint(notFound.Parsed)
+                    ?? string.Format(CultureInfo.InvariantCulture, commands.UnknownCommandMessage, notFound.Parsed.Name, notFound.Parsed.Prefix))
+                    + (commands.SuggestSimilarCommands ? Suggestion(notFound.Parsed) : null),
             CommandBindingFailed failed => $"{failed.Error}\nUsage: {failed.Command.FormatUsage(failed.Parsed.Prefix)}",
             CommandPreconditionFailed failed => failed.Reason,
             CommandFaulted => commands.ErrorMessage,
@@ -200,6 +202,27 @@ internal sealed class DefaultCommandResultHandler(IOptionsMonitor<SignalOptions>
         return parsed.Tokens is [var sub, ..]
             ? $"Unknown subcommand '{sub.Value}' for {group}. Available: {available}."
             : $"{group} needs a subcommand: {available}. Send {parsed.Prefix}help {parsed.Name} for details.";
+    }
+
+    /// <summary>
+    /// <c> Did you mean /x?</c> for the closest visible name: a subcommand of the group for <c>/group typo</c>,
+    /// otherwise a top-level command, alias or group name. Empty when nothing is close enough.
+    /// </summary>
+    private string? Suggestion(ParsedCommand parsed)
+    {
+        var group = registry.GetGroup(parsed.Name).Where(c => !c.Hidden).ToList();
+        if (group.Count > 0)
+        {
+            return parsed.Tokens is [var sub, ..]
+                && CommandSuggestions.Closest(sub.Value, group.SelectMany(c => c.Aliases.Prepend(c.Name))) is { } closestSub
+                    ? $" Did you mean {parsed.Prefix}{parsed.Name} {closestSub}?"
+                    : null;
+        }
+
+        var candidates = registry.Commands
+            .Where(c => !c.Hidden)
+            .SelectMany(c => c.Group is { } g ? g.Aliases.Prepend(g.Name) : c.Aliases.Prepend(c.Name));
+        return CommandSuggestions.Closest(parsed.Name, candidates) is { } closest ? $" Did you mean {parsed.Prefix}{closest}?" : null;
     }
 }
 
