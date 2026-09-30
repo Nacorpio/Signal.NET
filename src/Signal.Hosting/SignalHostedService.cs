@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Signal.Application.Abstractions;
+using Signal.Application.Background;
 using Signal.Application.Configuration;
 using Signal.Application.Pipeline;
 using Signal.Domain;
@@ -26,11 +27,15 @@ namespace Signal.Hosting;
 /// On startup the container mode is verified (<see cref="SignalOptions.VerifyModeOnStartup"/>). Receivers restart
 /// after unexpected failures; on shutdown the receive loops stop and the workers drain their channels.
 /// </para>
+/// <para>
+/// Envelopes that answer a pending prompt (<see cref="IPromptRegistry"/>) are delivered to it directly and not processed.
+/// </para>
 /// </remarks>
 internal sealed partial class SignalHostedService(
     IServiceScopeFactory scopes,
     IMessageReceiverFactory receivers,
     IMessagePipeline pipeline,
+    IPromptRegistry prompts,
     IOptions<SignalOptions> options,
     ILogger<SignalHostedService> logger) : BackgroundService
 {
@@ -74,6 +79,12 @@ internal sealed partial class SignalHostedService(
             {
                 await foreach (var envelope in receiver.ReceiveAsync(account, stoppingToken))
                 {
+                    // Answers to pending prompts skip the partitions: the work waiting for them may be queued behind it.
+                    if (prompts.TryDeliver(envelope))
+                    {
+                        continue;
+                    }
+
                     var partition = (int)((uint)StringComparer.Ordinal.GetHashCode(envelope.Conversation.Address) % (uint)partitions.Length);
                     await partitions[partition].Writer.WriteAsync(envelope, stoppingToken);
                 }

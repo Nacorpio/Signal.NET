@@ -52,6 +52,7 @@ public static class ApplicationServiceCollectionExtensions
         services.TryAddSingleton<ChannelBackgroundWorkQueue>();
         services.TryAddSingleton<IBackgroundWorkQueue>(sp => sp.GetRequiredService<ChannelBackgroundWorkQueue>());
         services.TryAddSingleton<IBackgroundWorkProcessor, BackgroundWorkProcessor>();
+        services.TryAddSingleton<IPromptRegistry, PromptRegistry>();
         services.TryAddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
 
         // Commands

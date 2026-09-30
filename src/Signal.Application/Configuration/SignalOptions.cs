@@ -71,6 +71,9 @@ public sealed class BackgroundOptions
 
     /// <summary>How many items may wait in the queue; queuing waits while it is full. Default 100.</summary>
     public int Capacity { get; set; } = 100;
+
+    /// <summary>How long <c>BackgroundWork.PromptAsync</c> waits for an answer by default. Default 2 minutes.</summary>
+    public TimeSpan PromptTimeout { get; set; } = TimeSpan.FromMinutes(2);
 }
 
 /// <summary>HTTP polling of <c>GET /v1/receive/{number}</c> (<c>normal</c> / <c>native</c> modes).</summary>

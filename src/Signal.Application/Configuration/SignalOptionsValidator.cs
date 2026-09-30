@@ -94,6 +94,11 @@ public sealed class SignalOptionsValidator : IValidateOptions<SignalOptions>
             errors.Add("Signal:Background:MaxConcurrency and Capacity must be at least 1.");
         }
 
+        if (options.Background.PromptTimeout <= TimeSpan.Zero)
+        {
+            errors.Add("Signal:Background:PromptTimeout must be positive.");
+        }
+
         if (options.Commands.HelpPageSize < 0)
         {
             errors.Add("Signal:Commands:HelpPageSize must not be negative (0 disables paging).");

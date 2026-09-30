@@ -253,4 +253,24 @@ var reply = result switch
   The work runs in **its own DI scope**, because the message's scope is disposed as soon as the command returns.
   Don't capture the module's scoped services in the lambda. `work.ReplyAsync` answers in the original
   conversation. Outside commands, use `messageContext.QueueBackgroundWorkAsync(...)` or `IBackgroundWorkQueue`.
+- **Asking follow-up questions:** background work can wait for the sender's next message:
+
+  ```csharp
+  [Command("order")]
+  public Task OrderAsync() => RunInBackgroundAsync(async work =>
+  {
+      var count = await work.PromptAsync<int>("How many?");         // any IParsable<T>; asks again on invalid input
+      if (!count.IsAnswered) { await work.ReplyAsync("Never mind."); return; }
+      var name = await work.PromptAsync("Name for the order?");
+      await work.ReplyAsync($"Ordered {count.Value} for {name.Value}.");
+  }).AsTask();
+  ```
+
+  - Only the sender who triggered the work can answer; in groups, other members' messages are ignored.
+  - Messages that parse as a command are never taken as answers, so `/help` still works while a prompt waits.
+  - The answer is consumed: it raises no events and runs no commands.
+  - `PromptResult.Status` is `Answered`, `TimedOut` (after `Background:PromptTimeout`, default 2 minutes, or when
+    a newer prompt to the same sender replaces it) or `Invalid` (after `attempts` unparsable answers).
+  - Prompts live in background work, not in commands, on purpose: a command waiting for an answer would hold
+    its conversation partition, and every conversation sharing it, until the answer or the timeout.
 - **Ignoring commands in event handlers:** check `MessageContext.Items[typeof(CommandResult)]` in later middleware, or compare `MessageReceived.Message.Text` against your prefixes.

@@ -49,7 +49,9 @@ Calling `AddSignal` more than once is safe, because the framework services use `
    - on a mismatch it logs a warning, or throws if `FailOnModeMismatch` is set, which stops the host;
    - if the API is unreachable it logs a warning and continues, because the receivers retry anyway.
 2. **Create partitions:** `MaxConcurrency` bounded channels (64 slots each), each with a single worker.
-3. **Receive:** one loop per account. Each envelope goes to partition `hash(conversation) % MaxConcurrency`. If a receiver fails unexpectedly, the loop logs it and restarts after 5 s.
+3. **Receive:** one loop per account. An envelope that answers a pending prompt (`IPromptRegistry.TryDeliver`) goes
+   straight to the waiting work and is not processed further. That has to happen here, because the answer must not
+   queue behind the work waiting for it. Every other envelope goes to partition `hash(conversation) % MaxConcurrency`. If a receiver fails unexpectedly, the loop logs it and restarts after 5 s.
 4. **Process:** each worker takes envelopes one at a time. For each it creates a new async DI scope, builds a `MessageContext`, and runs the `IMessagePipeline`. Exceptions are logged and never stop the worker.
 5. **Shut down:** when the host stops, the receive loops end, the channels are completed, and the workers drain.
 
