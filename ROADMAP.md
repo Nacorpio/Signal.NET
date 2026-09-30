@@ -24,7 +24,7 @@ The layer column shows where the work mainly lands (**D**omain, **A**pplication,
 
 These known limitations shape the plan below:
 
-1. **Long-running commands block their conversation partition.** The docs currently only advise against them.
+1. ~~**Long-running commands block their conversation partition.**~~ Resolved in 0.5.3: `RunInBackgroundAsync` / `IBackgroundWorkQueue` run slow work outside the partition.
 2. **Reflection and `Expression.Compile`** in `CommandDescriptorFactory`, `ArgumentConverters` and `DomainEventDispatcher` rule out trimming and Native AOT.
 3. **Unmodelled envelope content.** Sync messages other than sent transcripts (read, blocked, contacts), call ICE updates, payments and polls are dropped by `EnvelopeMapper`. Edits, remote deletes, stickers, sent transcripts, stories and calls are handled since 0.4.
 4. **State is in memory only.** Cooldowns and rate limits don't survive restarts and aren't shared between instances.
@@ -107,7 +107,7 @@ it are exhaustive, the compiler points at every place that needs updating.*
 |---|---|---|---|---|
 | 0.5.1 | **Command groups and subcommands** | A | M | ✅ `[CommandGroup("group", Aliases, Description)]` on a module or command class; module preconditions shared; subcommand hints; group help; cooldowns keyed by full name |
 | 0.5.2 | **Conversations and prompts** | A | L | `await Context.PromptAsync<int>("How many?", timeout)` waits for the sender's next message in the conversation. Needs a pending-reply registry checked by the pipeline before command parsing. |
-| 0.5.3 | **Background work from commands** | A/H | M | `IBackgroundWorkQueue` so commands can reply later without blocking their partition. Fixes limitation 1. |
+| 0.5.3 | **Background work from commands** | A/H | M | ✅ `RunInBackgroundAsync` / `IBackgroundWorkQueue`: bounded in-memory queue, `Background:MaxConcurrency` workers, own DI scope per item, replies to the original conversation. Fixes limitation 1. |
 | 0.5.4 | **Scheduled messages** | A/H | M | `IMessageScheduler` (in-memory plus a persistence port) for reminders and digests |
 | 0.5.5 | **Localisation** | A | M | Resource-based texts for framework replies (unknown command, binding errors, help), with culture per conversation |
 | 0.5.6 | **Role-based permissions** | A | M | `[RequireRole("moderator")]` backed by an `IRoleProvider` (config, database or group admins) |

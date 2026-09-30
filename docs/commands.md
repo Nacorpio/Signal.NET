@@ -234,5 +234,23 @@ var reply = result switch
 
 ## Tips
 
-- **Long-running work:** avoid awaiting it inside a command, because it blocks its conversation partition. Enqueue the work instead, and reply when it is done.
+- **Long-running work:** don't await it inside a command, because it blocks its conversation partition. Use
+  `RunInBackgroundAsync` instead; it returns as soon as the work is queued:
+
+  ```csharp
+  [Command("report")]
+  public async Task ReportAsync()
+  {
+      await ReplyAsync("Working on it...");
+      await RunInBackgroundAsync(async work =>
+      {
+          var reports = work.Services.GetRequiredService<IReportService>();   // resolve from the work's own scope
+          await work.ReplyAsync(await reports.BuildAsync(work.CancellationToken));
+      });
+  }
+  ```
+
+  The work runs in **its own DI scope**, because the message's scope is disposed as soon as the command returns.
+  Don't capture the module's scoped services in the lambda. `work.ReplyAsync` answers in the original
+  conversation. Outside commands, use `messageContext.QueueBackgroundWorkAsync(...)` or `IBackgroundWorkQueue`.
 - **Ignoring commands in event handlers:** check `MessageContext.Items[typeof(CommandResult)]` in later middleware, or compare `MessageReceived.Message.Text` against your prefixes.

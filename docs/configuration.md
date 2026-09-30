@@ -28,7 +28,8 @@ Durations use the `TimeSpan` format `hh:mm:ss`. Enum values are case-insensitive
                    "ErrorMessage": "Sorry, something went wrong while executing this command.",
                    "QuoteReplies": false, "EnableHelp": true, "HelpPageSize": 20, "Admins": [ "+4915112345678" ] },
     "AccessControl": { "AllowedSenders": [], "BlockedSenders": [], "IgnoreOwnMessages": true },
-    "RateLimit": { "PermitsPerWindow": 0, "Window": "00:01:00" }
+    "RateLimit": { "PermitsPerWindow": 0, "Window": "00:01:00" },
+    "Background": { "MaxConcurrency": 4, "Capacity": 100 }
   }
 }
 ```
@@ -101,6 +102,17 @@ Durations use the `TimeSpan` format `hh:mm:ss`. Enum values are case-insensitive
 |---|---|---|
 | `PermitsPerWindow` | 0 (off) | Data messages per sender per window |
 | `Window` | 1 min | > 0 |
+
+## `Background`
+
+Work queued with `RunInBackgroundAsync` / `IBackgroundWorkQueue`.
+
+| Key | Default | Notes |
+|---|---|---|
+| `MaxConcurrency` | 4 | Work items running at the same time; at least 1 |
+| `Capacity` | 100 | Items that may wait; queuing waits while the queue is full. At least 1. |
+
+Items still queued at shutdown are dropped (logged as a warning), so don't use the queue for work that must survive restarts.
 
 ## Hot reload
 

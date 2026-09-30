@@ -1,7 +1,34 @@
 #nullable enable
+override Signal.Application.Background.BackgroundWorkItem.Equals(object? obj) -> bool
+override Signal.Application.Background.BackgroundWorkItem.GetHashCode() -> int
+override Signal.Application.Background.BackgroundWorkItem.ToString() -> string!
 override Signal.Application.Commands.CommandGroupInfo.Equals(object? obj) -> bool
 override Signal.Application.Commands.CommandGroupInfo.GetHashCode() -> int
 override Signal.Application.Commands.CommandGroupInfo.ToString() -> string!
+Signal.Application.Background.BackgroundWork
+Signal.Application.Background.BackgroundWork.Account.get -> Signal.Domain.ValueObjects.PhoneNumber
+Signal.Application.Background.BackgroundWork.BackgroundWork(System.IServiceProvider! services, Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient conversation, System.Threading.CancellationToken cancellationToken) -> void
+Signal.Application.Background.BackgroundWork.CancellationToken.get -> System.Threading.CancellationToken
+Signal.Application.Background.BackgroundWork.Conversation.get -> Signal.Domain.ValueObjects.Recipient
+Signal.Application.Background.BackgroundWork.ReplyAsync(Signal.Domain.Messaging.OutgoingMessage! message) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
+Signal.Application.Background.BackgroundWork.ReplyAsync(string! text) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
+Signal.Application.Background.BackgroundWork.Services.get -> System.IServiceProvider!
+Signal.Application.Background.BackgroundWorkExtensions
+Signal.Application.Background.BackgroundWorkItem
+Signal.Application.Background.BackgroundWorkItem.<Clone>$() -> Signal.Application.Background.BackgroundWorkItem!
+Signal.Application.Background.BackgroundWorkItem.Account.get -> Signal.Domain.ValueObjects.PhoneNumber
+Signal.Application.Background.BackgroundWorkItem.Account.init -> void
+Signal.Application.Background.BackgroundWorkItem.BackgroundWorkItem(Signal.Domain.ValueObjects.PhoneNumber Account, Signal.Domain.ValueObjects.Recipient Conversation, System.Func<Signal.Application.Background.BackgroundWork!, System.Threading.Tasks.Task!>! Work) -> void
+Signal.Application.Background.BackgroundWorkItem.Conversation.get -> Signal.Domain.ValueObjects.Recipient
+Signal.Application.Background.BackgroundWorkItem.Conversation.init -> void
+Signal.Application.Background.BackgroundWorkItem.Deconstruct(out Signal.Domain.ValueObjects.PhoneNumber Account, out Signal.Domain.ValueObjects.Recipient Conversation, out System.Func<Signal.Application.Background.BackgroundWork!, System.Threading.Tasks.Task!>! Work) -> void
+Signal.Application.Background.BackgroundWorkItem.Equals(Signal.Application.Background.BackgroundWorkItem? other) -> bool
+Signal.Application.Background.BackgroundWorkItem.Work.get -> System.Func<Signal.Application.Background.BackgroundWork!, System.Threading.Tasks.Task!>!
+Signal.Application.Background.BackgroundWorkItem.Work.init -> void
+Signal.Application.Background.IBackgroundWorkProcessor
+Signal.Application.Background.IBackgroundWorkProcessor.RunAsync(System.Threading.CancellationToken stoppingToken) -> System.Threading.Tasks.Task!
+Signal.Application.Background.IBackgroundWorkQueue
+Signal.Application.Background.IBackgroundWorkQueue.QueueAsync(Signal.Application.Background.BackgroundWorkItem! item, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
 Signal.Application.Commands.CategoryAttribute
 Signal.Application.Commands.CategoryAttribute.CategoryAttribute(string! name) -> void
 Signal.Application.Commands.CategoryAttribute.Name.get -> string!
@@ -30,6 +57,7 @@ Signal.Application.Commands.CommandGroupInfo.Description.init -> void
 Signal.Application.Commands.CommandGroupInfo.Equals(Signal.Application.Commands.CommandGroupInfo? other) -> bool
 Signal.Application.Commands.CommandGroupInfo.Name.get -> string!
 Signal.Application.Commands.CommandGroupInfo.Name.init -> void
+Signal.Application.Commands.CommandModule.RunInBackgroundAsync(System.Func<Signal.Application.Background.BackgroundWork!, System.Threading.Tasks.Task!>! work) -> System.Threading.Tasks.ValueTask
 Signal.Application.Commands.CommandParameter.ElementType.get -> System.Type?
 Signal.Application.Commands.CommandParameter.ElementType.init -> void
 Signal.Application.Commands.CommandParameter.IsCollection.get -> bool
@@ -37,10 +65,21 @@ Signal.Application.Commands.ExampleAttribute
 Signal.Application.Commands.ExampleAttribute.ExampleAttribute(string! text) -> void
 Signal.Application.Commands.ExampleAttribute.Text.get -> string!
 Signal.Application.Commands.ICommandRegistry.GetGroup(string! groupNameOrAlias) -> System.Collections.Generic.IReadOnlyList<Signal.Application.Commands.CommandDescriptor!>!
+Signal.Application.Configuration.BackgroundOptions
+Signal.Application.Configuration.BackgroundOptions.BackgroundOptions() -> void
+Signal.Application.Configuration.BackgroundOptions.Capacity.get -> int
+Signal.Application.Configuration.BackgroundOptions.Capacity.set -> void
+Signal.Application.Configuration.BackgroundOptions.MaxConcurrency.get -> int
+Signal.Application.Configuration.BackgroundOptions.MaxConcurrency.set -> void
 Signal.Application.Configuration.CommandOptions.HelpPageSize.get -> int
 Signal.Application.Configuration.CommandOptions.HelpPageSize.set -> void
 Signal.Application.Configuration.CommandOptions.SuggestSimilarCommands.get -> bool
 Signal.Application.Configuration.CommandOptions.SuggestSimilarCommands.set -> void
+Signal.Application.Configuration.SignalOptions.Background.get -> Signal.Application.Configuration.BackgroundOptions!
+Signal.Application.Configuration.SignalOptions.Background.set -> void
+static Signal.Application.Background.BackgroundWorkExtensions.QueueBackgroundWorkAsync(this Signal.Application.Pipeline.MessageContext! context, System.Func<Signal.Application.Background.BackgroundWork!, System.Threading.Tasks.Task!>! work) -> System.Threading.Tasks.ValueTask
+static Signal.Application.Background.BackgroundWorkItem.operator !=(Signal.Application.Background.BackgroundWorkItem? left, Signal.Application.Background.BackgroundWorkItem? right) -> bool
+static Signal.Application.Background.BackgroundWorkItem.operator ==(Signal.Application.Background.BackgroundWorkItem? left, Signal.Application.Background.BackgroundWorkItem? right) -> bool
 static Signal.Application.Commands.CommandGroupInfo.From(Signal.Application.Commands.CommandGroupAttribute! attribute) -> Signal.Application.Commands.CommandGroupInfo!
 static Signal.Application.Commands.CommandGroupInfo.operator !=(Signal.Application.Commands.CommandGroupInfo? left, Signal.Application.Commands.CommandGroupInfo? right) -> bool
 static Signal.Application.Commands.CommandGroupInfo.operator ==(Signal.Application.Commands.CommandGroupInfo? left, Signal.Application.Commands.CommandGroupInfo? right) -> bool
