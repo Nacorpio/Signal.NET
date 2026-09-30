@@ -17,6 +17,7 @@ It has no knowledge of HTTP, JSON or WebSockets.
 | `Configuration/` | `SignalOptions` and its sub-options, `SignalOptionsValidator` |
 | `Background/` | `IBackgroundWorkQueue`, `BackgroundWorkItem`, `BackgroundWork` (the work's scope, conversation, sender, `ReplyAsync` and `PromptAsync`), `IBackgroundWorkProcessor`, `QueueBackgroundWorkAsync`, `IPromptRegistry`, `PromptResult<T>`, `PromptStatus` |
 | `Conversations/` | `ConversationSettings` (prefixes, culture, disabled commands), `IConversationSettingsStore` (in memory by default), `GetConversationSettingsAsync` |
+| `Reactions/` | `ReactionModule`, `OnReactionAttribute`, `ReactionContext`, the reaction middleware |
 | `Roles/` | `IRoleProvider`, `IRoleService`, `RequireRoleAttribute`, `Role` (built-in role names `admin`, `group-admin`) |
 | `Scheduling/` | `IMessageScheduler`, `ScheduledMessage`, `IScheduledMessageStore` (persistence port; in-memory by default), `IScheduledMessageDispatcher`, `ScheduleReplyAsync` |
 | `Localization/` | `ISignalTexts`, `TextKey` (all text keys with their arguments), `GetCultureAsync` |

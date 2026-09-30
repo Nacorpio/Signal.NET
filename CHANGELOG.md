@@ -8,6 +8,9 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Reaction commands (roadmap 0.5.11):** `ReactionModule` methods with `[OnReaction("👍")]` run when someone reacts to the bot's messages (or any message with `AnyMessage`, removals with `IncludeRemovals`).
+  - Emojis match regardless of skin tone and variation selector.
+  - Registered with `AddReactionModule<T>()` or `AddCommands(assembly)`; invalid handler signatures fail at registration.
 - **Localisation (roadmap 0.5.5):** every text the framework sends (errors, usage, help, precondition failures, prompt re-asks) goes through the new `ISignalTexts`, with keys in `TextKey`.
   - Translations go under `Signal:Localization:Texts:{culture}:{key}`. Lookup falls back `de-AT` → `de` → English.
   - The culture is the conversation's `ConversationSettings.Culture`, otherwise `Localization:DefaultCulture`. Cultures are plain names, so this works in invariant-globalization mode too.

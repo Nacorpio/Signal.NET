@@ -1,3 +1,4 @@
 #nullable enable
 Signal.Hosting.SignalBuilderExtensions
+static Signal.Hosting.SignalBuilderExtensions.AddReactionModule<TModule>(this Signal.Hosting.ISignalBuilder! builder) -> Signal.Hosting.ISignalBuilder!
 static Signal.Hosting.SignalBuilderExtensions.AddRoleProvider<TProvider>(this Signal.Hosting.ISignalBuilder! builder, Microsoft.Extensions.DependencyInjection.ServiceLifetime lifetime = Microsoft.Extensions.DependencyInjection.ServiceLifetime.Scoped) -> Signal.Hosting.ISignalBuilder!

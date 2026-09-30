@@ -119,6 +119,10 @@ internal sealed class SignalBuilder(IServiceCollection services) : ISignalBuilde
             {
                 Catalog.AddModule(type);
             }
+            else if (typeof(Application.Reactions.ReactionModule).IsAssignableFrom(type))
+            {
+                Catalog.AddReactionModule(type);
+            }
         }
 
         return this;

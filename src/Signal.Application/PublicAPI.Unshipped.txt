@@ -102,6 +102,8 @@ Signal.Application.Background.PromptStatus.TimedOut = 1 -> Signal.Application.Ba
 Signal.Application.Commands.CategoryAttribute
 Signal.Application.Commands.CategoryAttribute.CategoryAttribute(string! name) -> void
 Signal.Application.Commands.CategoryAttribute.Name.get -> string!
+Signal.Application.Commands.CommandCatalog.AddReactionModule(System.Type! moduleType) -> void
+Signal.Application.Commands.CommandCatalog.ReactionModuleTypes.get -> System.Collections.Generic.IReadOnlyList<System.Type!>!
 Signal.Application.Commands.CommandDescriptor.Category.get -> string?
 Signal.Application.Commands.CommandDescriptor.Category.init -> void
 Signal.Application.Commands.CommandDescriptor.Examples.get -> System.Collections.Generic.IReadOnlyList<string!>!
@@ -192,6 +194,27 @@ Signal.Application.Localization.ISignalTexts
 Signal.Application.Localization.ISignalTexts.Get(string! key, string! culture, params object?[]! args) -> string!
 Signal.Application.Localization.LocalizationExtensions
 Signal.Application.Localization.TextKey
+Signal.Application.Reactions.OnReactionAttribute
+Signal.Application.Reactions.OnReactionAttribute.AnyMessage.get -> bool
+Signal.Application.Reactions.OnReactionAttribute.AnyMessage.set -> void
+Signal.Application.Reactions.OnReactionAttribute.Emojis.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Signal.Application.Reactions.OnReactionAttribute.IncludeRemovals.get -> bool
+Signal.Application.Reactions.OnReactionAttribute.IncludeRemovals.set -> void
+Signal.Application.Reactions.OnReactionAttribute.OnReactionAttribute(params string![]! emojis) -> void
+Signal.Application.Reactions.ReactionContext
+Signal.Application.Reactions.ReactionContext.Account.get -> Signal.Domain.ValueObjects.PhoneNumber
+Signal.Application.Reactions.ReactionContext.CancellationToken.get -> System.Threading.CancellationToken
+Signal.Application.Reactions.ReactionContext.Conversation.get -> Signal.Domain.ValueObjects.Recipient
+Signal.Application.Reactions.ReactionContext.Message.get -> Signal.Application.Pipeline.MessageContext!
+Signal.Application.Reactions.ReactionContext.Reaction.get -> Signal.Domain.Messaging.Reaction!
+Signal.Application.Reactions.ReactionContext.ReactionContext(Signal.Application.Pipeline.MessageContext! message, Signal.Domain.Messaging.Reaction! reaction) -> void
+Signal.Application.Reactions.ReactionContext.ReplyAsync(string! text) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
+Signal.Application.Reactions.ReactionContext.Sender.get -> Signal.Domain.Messaging.Sender!
+Signal.Application.Reactions.ReactionContext.Services.get -> System.IServiceProvider!
+Signal.Application.Reactions.ReactionModule
+Signal.Application.Reactions.ReactionModule.Context.get -> Signal.Application.Reactions.ReactionContext!
+Signal.Application.Reactions.ReactionModule.ReactionModule() -> void
+Signal.Application.Reactions.ReactionModule.ReplyAsync(string! text) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
 Signal.Application.Roles.IRoleProvider
 Signal.Application.Roles.IRoleProvider.HasRoleAsync(Signal.Application.Pipeline.MessageContext! message, string! role, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<bool>
 Signal.Application.Roles.IRoleService

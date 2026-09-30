@@ -101,6 +101,8 @@ it are exhaustive, the compiler points at every place that needs updating.*
 
 ## Milestone 0.5: Command system 2.0
 
+**Status:** all items are merged into `main` and not yet released (see the [changelog](CHANGELOG.md)).
+
 *Goal: make complex bots pleasant to write.*
 
 | # | Feature | Layer | Size | Notes |
@@ -115,7 +117,7 @@ it are exhaustive, the compiler points at every place that needs updating.*
 | 0.5.8 | **Better help** | A | S | ✅ Headings per command group and `[Category]` (flat list when there's only one section), paging via `HelpPageSize` and `/help 2`, examples via `[Example("…")]` |
 | 0.5.9 | **"Did you mean …?"** | A | S | ✅ Closest visible command, alias, group or subcommand by optimal-string-alignment distance (≤1, or ≤2 for 6+ characters); `Commands:SuggestSimilarCommands` |
 | 0.5.10 | **Variadic and collection parameters** | A | S | ✅ `params T[]`, `T[]`, `List<T>` and the read-only/list interfaces take the remaining positional arguments; per-element conversion and mention resolution |
-| 0.5.11 | **Reaction commands** | A | S | Trigger handlers by reacting with an emoji (`[OnReaction("👍")]`), e.g. for polls and approvals |
+| 0.5.11 | **Reaction commands** | A | S | ✅ `ReactionModule` + `[OnReaction("👍")]` (own messages by default, `AnyMessage`, `IncludeRemovals`); skin-tone and variation-selector-insensitive matching; signatures checked at registration |
 
 ## Milestone 0.6: Scale, persistence and operations
 
