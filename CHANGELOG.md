@@ -10,7 +10,7 @@ All notable changes to this project are documented here. The format follows
 
 - **Localisation (roadmap 0.5.5):** every text the framework sends (errors, usage, help, precondition failures, prompt re-asks) goes through the new `ISignalTexts`, with keys in `TextKey`.
   - Translations go under `Signal:Localization:Texts:{culture}:{key}`. Lookup falls back `de-AT` → `de` → English.
-  - The culture is the conversation's `ConversationSettings.Culture`, otherwise `Localization:DefaultCulture`.
+  - The culture is the conversation's `ConversationSettings.Culture`, otherwise `Localization:DefaultCulture`. Cultures are plain names, so this works in invariant-globalization mode too.
   - Argument type names are translated via `Type.{English name}`. Custom preconditions can use `Fail(context, key, args)`, and `MessageContext.GetCultureAsync()` exposes the culture.
   - English output is unchanged.
 

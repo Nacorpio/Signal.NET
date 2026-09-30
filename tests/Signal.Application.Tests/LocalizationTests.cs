@@ -94,15 +94,18 @@ public class LocalizationTests
             })
             .BuildServiceProvider();
 
-        var text = provider.GetRequiredService<ISignalTexts>().Get(TextKey.MissingArgument, System.Globalization.CultureInfo.GetCultureInfo("de"), "b");
+        var text = provider.GetRequiredService<ISignalTexts>().Get(TextKey.MissingArgument, "de", "b");
 
         Assert.Equal("Missing argument <b>.", text);
     }
 
-    [Fact]
-    public void Unknown_default_cultures_fail_validation()
+    [Theory]
+    [InlineData("")]
+    [InlineData("de_AT")]
+    [InlineData("de-")]
+    public void Malformed_default_cultures_fail_validation(string culture)
     {
-        var harness = TestHarness.Create(o => o.Localization.DefaultCulture = "xx-nonsense-culture");
+        var harness = TestHarness.Create(o => o.Localization.DefaultCulture = culture);
 
         var error = Assert.Throws<OptionsValidationException>(() => harness.Services.GetRequiredService<IOptions<SignalOptions>>().Value);
         Assert.Contains("DefaultCulture", error.Message);

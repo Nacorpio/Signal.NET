@@ -233,7 +233,7 @@ public sealed partial class BackgroundWork
     }
 
     /// <summary>The culture and command prefixes of <see cref="Conversation"/>, from its settings.</summary>
-    private async ValueTask<(CultureInfo Culture, IReadOnlyList<string>? Prefixes)> ConversationAsync()
+    private async ValueTask<(string Culture, IReadOnlyList<string>? Prefixes)> ConversationAsync()
     {
         var settings = await Services.GetRequiredService<IConversationSettingsStore>().GetAsync(Account, Conversation, CancellationToken);
         return (LocalizationExtensions.Resolve(settings?.Culture, Services), settings?.Prefixes);

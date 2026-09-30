@@ -189,7 +189,7 @@ Signal.Application.Conversations.IConversationSettingsStore.GetAsync(Signal.Doma
 Signal.Application.Conversations.IConversationSettingsStore.RemoveAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient conversation, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
 Signal.Application.Conversations.IConversationSettingsStore.SetAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient conversation, Signal.Application.Conversations.ConversationSettings! settings, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Signal.Application.Localization.ISignalTexts
-Signal.Application.Localization.ISignalTexts.Get(string! key, System.Globalization.CultureInfo! culture, params object?[]! args) -> string!
+Signal.Application.Localization.ISignalTexts.Get(string! key, string! culture, params object?[]! args) -> string!
 Signal.Application.Localization.LocalizationExtensions
 Signal.Application.Localization.TextKey
 Signal.Application.Roles.IRoleProvider
@@ -243,7 +243,7 @@ static Signal.Application.Commands.CommandGroupInfo.operator ==(Signal.Applicati
 static Signal.Application.Conversations.ConversationSettings.operator !=(Signal.Application.Conversations.ConversationSettings? left, Signal.Application.Conversations.ConversationSettings? right) -> bool
 static Signal.Application.Conversations.ConversationSettings.operator ==(Signal.Application.Conversations.ConversationSettings? left, Signal.Application.Conversations.ConversationSettings? right) -> bool
 static Signal.Application.Conversations.ConversationSettingsExtensions.GetConversationSettingsAsync(this Signal.Application.Pipeline.MessageContext! context) -> System.Threading.Tasks.ValueTask<Signal.Application.Conversations.ConversationSettings?>
-static Signal.Application.Localization.LocalizationExtensions.GetCultureAsync(this Signal.Application.Pipeline.MessageContext! context) -> System.Threading.Tasks.ValueTask<System.Globalization.CultureInfo!>
+static Signal.Application.Localization.LocalizationExtensions.GetCultureAsync(this Signal.Application.Pipeline.MessageContext! context) -> System.Threading.Tasks.ValueTask<string!>
 static Signal.Application.Scheduling.ScheduledMessage.operator !=(Signal.Application.Scheduling.ScheduledMessage? left, Signal.Application.Scheduling.ScheduledMessage? right) -> bool
 static Signal.Application.Scheduling.ScheduledMessage.operator ==(Signal.Application.Scheduling.ScheduledMessage? left, Signal.Application.Scheduling.ScheduledMessage? right) -> bool
 static Signal.Application.Scheduling.SchedulingExtensions.ScheduleReplyAsync(this Signal.Application.Pipeline.MessageContext! context, string! text, System.DateTimeOffset dueAt, System.TimeSpan? repeatEvery = null) -> System.Threading.Tasks.Task<Signal.Application.Scheduling.ScheduledMessage!>!

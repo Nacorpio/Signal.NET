@@ -154,31 +154,36 @@ public static class TextKey
     };
 }
 
+
 /// <summary>
 /// The texts the framework sends, per culture. The default reads translations from <c>Signal:Localization:Texts</c>
-/// and falls back from a specific culture to its neutral culture (<c>de-AT</c> → <c>de</c>) and then to English.
+/// and falls back from a specific culture name to its parents (<c>de-AT</c> → <c>de</c>) and then to English.
 /// Replace it to load texts from elsewhere (resources, a database).
 /// </summary>
+/// <remarks>
+/// Cultures are plain names (<c>de-AT</c>), not <see cref="CultureInfo"/>s, so translations also work in
+/// invariant-globalization mode (common in small container images), where most cultures can't be created.
+/// </remarks>
 public interface ISignalTexts
 {
     /// <summary>Gets a text, formatted with <paramref name="args"/>.</summary>
     /// <param name="key">A <see cref="TextKey"/> constant, or <c>Type.{display name}</c>.</param>
-    /// <param name="culture">The culture of the conversation.</param>
-    /// <param name="args">Format arguments.</param>
+    /// <param name="culture">The culture name of the conversation, e.g. <c>de-AT</c>.</param>
+    /// <param name="args">Format arguments (formatted with the invariant culture).</param>
     /// <returns>The text; the English default (or the key itself) if there is no translation.</returns>
-    string Get(string key, CultureInfo culture, params object?[] args);
+    string Get(string key, string culture, params object?[] args);
 }
 
 /// <summary>Resolves the culture of a message's conversation.</summary>
 public static class LocalizationExtensions
 {
     /// <summary>
-    /// The conversation's culture (<see cref="ConversationSettings.Culture"/>), otherwise
-    /// <c>Signal:Localization:DefaultCulture</c>. Unknown culture names fall back to the default.
+    /// The conversation's culture name (<see cref="ConversationSettings.Culture"/>), otherwise
+    /// <c>Signal:Localization:DefaultCulture</c>.
     /// </summary>
     /// <param name="context">The message.</param>
-    /// <returns>The culture to reply in.</returns>
-    public static async ValueTask<CultureInfo> GetCultureAsync(this MessageContext context)
+    /// <returns>The culture name to reply in, e.g. <c>de-AT</c>.</returns>
+    public static async ValueTask<string> GetCultureAsync(this MessageContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         var settings = await context.GetConversationSettingsAsync();
@@ -189,42 +194,30 @@ public static class LocalizationExtensions
     /// The culture for synchronous framework code (binder, preconditions), using the settings the command middleware
     /// already loaded for this message; the default culture if none were loaded.
     /// </summary>
-    internal static CultureInfo CultureOf(MessageContext context) =>
+    internal static string CultureOf(MessageContext context) =>
         Resolve(context.Items.TryGetValue(typeof(ConversationSettings), out var settings) ? (settings as ConversationSettings)?.Culture : null, context.Services);
 
     /// <summary>Resolves a text in the culture of <paramref name="context"/>'s conversation (synchronously, see <see cref="CultureOf"/>).</summary>
     internal static string Text(this MessageContext context, string key, params object?[] args) =>
         context.Services.GetRequiredService<ISignalTexts>().Get(key, CultureOf(context), args);
 
-    internal static CultureInfo Resolve(string? cultureName, IServiceProvider services)
-    {
-        var fallback = services.GetRequiredService<IOptionsMonitor<SignalOptions>>().CurrentValue.Localization.DefaultCulture;
-        foreach (var name in new[] { cultureName, fallback })
-        {
-            if (!string.IsNullOrWhiteSpace(name))
-            {
-                try
-                {
-                    return CultureInfo.GetCultureInfo(name);
-                }
-                catch (CultureNotFoundException)
-                {
-                    // Try the next candidate.
-                }
-            }
-        }
+    /// <summary>The conversation's culture name if set, otherwise the configured default.</summary>
+    internal static string Resolve(string? cultureName, IServiceProvider services) =>
+        string.IsNullOrWhiteSpace(cultureName)
+            ? services.GetRequiredService<IOptionsMonitor<SignalOptions>>().CurrentValue.Localization.DefaultCulture
+            : cultureName.Trim();
 
-        return CultureInfo.InvariantCulture;
-    }
+    /// <summary>Whether <paramref name="name"/> is a well-formed culture name: letters or digits in hyphen-separated parts.</summary>
+    internal static bool IsWellFormed(string? name) =>
+        !string.IsNullOrWhiteSpace(name) && name.Split('-').All(part => part.Length > 0 && part.All(char.IsAsciiLetterOrDigit));
 }
 
 /// <summary>Configuration-backed <see cref="ISignalTexts"/>.</summary>
 internal sealed partial class SignalTexts(IOptionsMonitor<SignalOptions> options, ILogger<SignalTexts> logger) : ISignalTexts
 {
-    public string Get(string key, CultureInfo culture, params object?[] args)
+    public string Get(string key, string culture, params object?[] args)
     {
         ArgumentNullException.ThrowIfNull(key);
-        ArgumentNullException.ThrowIfNull(culture);
         var fallback = Default(key);
         var template = Translation(key, culture) ?? fallback;
         if (args.Length == 0)
@@ -234,23 +227,23 @@ internal sealed partial class SignalTexts(IOptionsMonitor<SignalOptions> options
 
         try
         {
-            return string.Format(culture, template, args);
+            return string.Format(CultureInfo.InvariantCulture, template, args);
         }
         catch (FormatException ex)
         {
             // A broken translation (e.g. "{3}" with two arguments) must not break the reply.
-            LogInvalidTranslation(ex, key, culture.Name);
+            LogInvalidTranslation(ex, key, culture);
             return string.Format(CultureInfo.InvariantCulture, fallback, args);
         }
     }
 
-    /// <summary>The translation for the culture or one of its parents (de-AT → de), if configured.</summary>
-    private string? Translation(string key, CultureInfo culture)
+    /// <summary>The translation for the culture name or one of its parents (zh-Hant-TW → zh-Hant → zh), if configured.</summary>
+    private string? Translation(string key, string? culture)
     {
         var texts = options.CurrentValue.Localization.Texts;
-        for (var current = culture; !Equals(current, CultureInfo.InvariantCulture); current = current.Parent)
+        for (var current = culture?.Trim(); !string.IsNullOrEmpty(current); current = Parent(current))
         {
-            var entry = texts.FirstOrDefault(t => string.Equals(t.Key, current.Name, StringComparison.OrdinalIgnoreCase)).Value;
+            var entry = texts.FirstOrDefault(t => string.Equals(t.Key, current, StringComparison.OrdinalIgnoreCase)).Value;
             if (entry?.FirstOrDefault(e => string.Equals(e.Key, key, StringComparison.OrdinalIgnoreCase)) is { Value: { } text })
             {
                 return text;
@@ -258,6 +251,8 @@ internal sealed partial class SignalTexts(IOptionsMonitor<SignalOptions> options
         }
 
         return null;
+
+        static string? Parent(string name) => name.LastIndexOf('-') is > 0 and var dash ? name[..dash] : null;
     }
 
     /// <summary>The configured or built-in English text; type names default to themselves.</summary>

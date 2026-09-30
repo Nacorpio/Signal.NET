@@ -206,7 +206,7 @@ internal sealed class DefaultCommandResultHandler(IOptionsMonitor<SignalOptions>
     }
 
     /// <summary>For <c>/group</c> or <c>/group unknown</c>: names the group's visible commands; otherwise <see langword="null"/>.</summary>
-    private string? GroupHint(ParsedCommand parsed, ConversationSettings? settings, CultureInfo culture)
+    private string? GroupHint(ParsedCommand parsed, ConversationSettings? settings, string culture)
     {
         var visible = registry.GetGroup(parsed.Name).Where(c => IsAvailable(c, settings)).Select(c => c.Name).ToList();
         if (visible.Count == 0)
@@ -225,7 +225,7 @@ internal sealed class DefaultCommandResultHandler(IOptionsMonitor<SignalOptions>
     /// <c> Did you mean /x?</c> for the closest visible name: a subcommand of the group for <c>/group typo</c>,
     /// otherwise a top-level command, alias or group name. Empty when nothing is close enough.
     /// </summary>
-    private string? Suggestion(ParsedCommand parsed, ConversationSettings? settings, CultureInfo culture)
+    private string? Suggestion(ParsedCommand parsed, ConversationSettings? settings, string culture)
     {
         var group = registry.GetGroup(parsed.Name).Where(c => IsAvailable(c, settings)).ToList();
         if (group.Count > 0)

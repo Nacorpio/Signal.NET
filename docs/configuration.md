@@ -135,7 +135,7 @@ Languages of the texts the framework sends: errors, usage lines, help, precondit
 
 | Key | Default | Notes |
 |---|---|---|
-| `DefaultCulture` | `en` | Culture of conversations without their own `ConversationSettings.Culture`; must be a known culture |
+| `DefaultCulture` | `en` | Culture of conversations without their own `ConversationSettings.Culture`; must be a well-formed culture name (`en`, `de-AT`) |
 | `Texts` | {} | Culture → text key → text. The keys are the constants of `TextKey`; `{0}`, `{1}` … are their documented arguments. |
 
 ```jsonc
@@ -152,7 +152,8 @@ Languages of the texts the framework sends: errors, usage lines, help, precondit
 ```
 
 - **Culture:** a conversation's culture comes from its settings (`ConversationSettings.Culture`), otherwise from
-  `DefaultCulture`. Lookup falls back from the specific culture to its neutral one to English (`de-AT` → `de` → English).
+  `DefaultCulture`. Cultures are plain names, so lookup falls back by name (`zh-Hant-TW` → `zh-Hant` → `zh` → English).
+  This also works in invariant-globalization mode (common in small container images), and CI tests that mode.
 - **Type names in errors** ("whole number", "yes/no", …) are translated with the key `Type.{English name}`. That
   also works for custom converters' `DisplayName`.
 - **Existing message options stay the defaults:** `Commands:UnknownCommandMessage`, `DisabledCommandMessage` and
