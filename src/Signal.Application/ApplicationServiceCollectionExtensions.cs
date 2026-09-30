@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Signal.Application.Abstractions;
+using Signal.Application.Background;
 using Signal.Application.Commands;
 using Signal.Application.Commands.Binding;
 using Signal.Application.Commands.Parsing;
@@ -46,6 +47,11 @@ public static class ApplicationServiceCollectionExtensions
 
         services.TryAddSingleton<IMessagePipeline, MessagePipeline>();
         services.TryAddSingleton<ISenderRateLimiter, FixedWindowSenderRateLimiter>();
+
+        // Background work: one in-memory queue, read by the processor that the host runs.
+        services.TryAddSingleton<ChannelBackgroundWorkQueue>();
+        services.TryAddSingleton<IBackgroundWorkQueue>(sp => sp.GetRequiredService<ChannelBackgroundWorkQueue>());
+        services.TryAddSingleton<IBackgroundWorkProcessor, BackgroundWorkProcessor>();
         services.TryAddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
 
         // Commands

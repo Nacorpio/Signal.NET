@@ -83,7 +83,7 @@ composes all of it. Each layer is a separate project, and references point inwar
 - One receive loop runs per configured account.
 - Envelopes are spread over `MaxConcurrency` bounded channels by a hash of the conversation (group id or sender).
 - Each channel has exactly one worker. **Conversations are processed in parallel. Messages within one conversation are processed strictly in order.**
-- A slow command blocks only its own conversation (and any other conversations that hash to the same partition). Move long-running work to a background queue instead of awaiting it inside a command.
+- A slow command blocks only its own conversation (and any other conversations that hash to the same partition). Move long-running work to the background queue (`RunInBackgroundAsync` in commands, `IBackgroundWorkQueue` elsewhere) instead of awaiting it inside a command.
 - All channels are bounded. When processing falls behind, back-pressure propagates to the receiver, which slows polling or reading from the socket, instead of growing memory without limit.
 
 ### Shutdown

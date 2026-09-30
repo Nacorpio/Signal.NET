@@ -1,5 +1,6 @@
 using System.Reflection;
 using Signal.Application.Abstractions;
+using Signal.Application.Background;
 
 namespace Signal.Application.Commands;
 
@@ -96,4 +97,24 @@ public abstract class CommandModule
     /// <param name="emoji">The reaction emoji.</param>
     /// <returns>A task that completes when the reaction was sent.</returns>
     protected Task ReactAsync(string emoji) => Context.ReactAsync(emoji, Context.CancellationToken);
+
+    /// <summary>
+    /// Runs slow work after the command returns, so later messages in the conversation aren't held up. The work gets
+    /// its own DI scope; resolve services from <see cref="BackgroundWork.Services"/> rather than capturing
+    /// the module's.
+    /// </summary>
+    /// <param name="work">The work; reply with <see cref="BackgroundWork.ReplyAsync(string)"/>.</param>
+    /// <returns>A task that completes when the work was queued (not when it ran).</returns>
+    /// <example>
+    /// <code>
+    /// [Command("report")]
+    /// public async Task ReportAsync()
+    /// {
+    ///     await ReplyAsync("Working on it…");
+    ///     await RunInBackgroundAsync(async work =&gt; await work.ReplyAsync(await BuildReportAsync(work.CancellationToken)));
+    /// }
+    /// </code>
+    /// </example>
+    protected ValueTask RunInBackgroundAsync(Func<BackgroundWork, Task> work) =>
+        Context.Message.QueueBackgroundWorkAsync(work);
 }

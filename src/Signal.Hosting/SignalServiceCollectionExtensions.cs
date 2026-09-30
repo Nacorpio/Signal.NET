@@ -61,6 +61,7 @@ public static class SignalServiceCollectionExtensions
         services.AddSignalApplication();
         services.AddSignalInfrastructure();
         services.AddHostedService<SignalHostedService>();
+        services.AddHostedService<BackgroundWorkService>();
         return new SignalBuilder(services);
     }
 }

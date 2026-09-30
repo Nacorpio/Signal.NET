@@ -58,6 +58,19 @@ public sealed class SignalOptions
 
     /// <summary>Per-sender rate limiting.</summary>
     public RateLimitOptions RateLimit { get; set; } = new();
+
+    /// <summary>Background work queued by commands and handlers (<c>IBackgroundWorkQueue</c>).</summary>
+    public BackgroundOptions Background { get; set; } = new();
+}
+
+/// <summary>Background work settings.</summary>
+public sealed class BackgroundOptions
+{
+    /// <summary>How many background work items run at the same time. Default 4.</summary>
+    public int MaxConcurrency { get; set; } = 4;
+
+    /// <summary>How many items may wait in the queue; queuing waits while it is full. Default 100.</summary>
+    public int Capacity { get; set; } = 100;
 }
 
 /// <summary>HTTP polling of <c>GET /v1/receive/{number}</c> (<c>normal</c> / <c>native</c> modes).</summary>

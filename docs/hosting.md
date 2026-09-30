@@ -56,6 +56,13 @@ Calling `AddSignal` more than once is safe, because the framework services use `
 **Ordering guarantee:** all messages of one conversation land in the same partition and are therefore
 processed strictly in order. Different conversations are processed in parallel.
 
+### `BackgroundWorkService`
+
+**Purpose:** runs the `IBackgroundWorkProcessor`, so work queued with `RunInBackgroundAsync` /
+`IBackgroundWorkQueue` executes **outside** the partitions. `Background:MaxConcurrency` workers each take one
+item at a time, in its own async DI scope. Failures are logged and never stop a worker. On shutdown, running
+work sees its cancellation token cancelled, and items still queued are dropped with a warning.
+
 ## Health checks
 
 ```csharp
