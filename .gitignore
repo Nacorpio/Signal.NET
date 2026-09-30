@@ -49,3 +49,6 @@ signal-cli-config/
 _site/
 api/*.yml
 api/.manifest
+
+# Temporary files from scripted edits
+*.new
