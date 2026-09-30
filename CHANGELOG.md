@@ -6,18 +6,23 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.4.0-preview.1] - 2026-09-30
+
+Milestone 0.4 (richer incoming model). Every change is binary-compatible with 0.3.0-preview.1. New
+`EnvelopeContent` cases raise compiler warnings in exhaustive switches, and a few behaviors changed (see below).
+
 ### Added
 
-- **Group update context (roadmap 0.4.9):** `GroupUpdated` has `Name` and `Revision`, and every group message exposes `DataMessage.GroupName` and `GroupRevision`. Signal doesn't report what changed; compare revisions or fetch the group to find out.
-- **Stories (roadmap 0.4.5):** `EnvelopeContent` has a new case, `StoryMessage` (file or text, optional group, `AllowsReplies`), raising the new `StoryReceived` event. Opt-in via `Receive:IgnoreStories = false`.
-- **Calls (roadmap 0.4.6):** `EnvelopeContent` has a new case, `CallMessage` (`CallEventKind` offer, answer, busy or hangup; `CallId`; `IsVideo` for offers), raising the new `CallReceived` event.
-- **Mention-aware binding (roadmap 0.4.7):** a positional command argument that is an `@mention` binds as the mentioned user's phone number (or UUID if hidden), so `/kick @Bob` works with `Recipient`, `PhoneNumber` and `AccountId` parameters. A placeholder without a matching mention fails with `Could not resolve the @mention for <name>.` Before, it would have been accepted as a username.
-- **Received text styles (roadmap 0.4.8):** `DataMessage.TextStyles` lists the sender's formatting as `StyledRange(TextStyle, Start, Length)`.
 - **Sync messages (roadmap 0.4.1):** `EnvelopeContent` has a new case, `SentTranscript`, for messages the account sent from its other devices, raising the new `MessageSent` event. `IncomingEnvelope.Conversation` is the transcript's destination. Transcripts never run commands. They are delivered only with `AccessControl:IgnoreOwnMessages = false`, so the default behavior is unchanged.
 - **Edits, remote deletes and received stickers (roadmap 0.4.2, 0.4.3, 0.4.4):**
   - `EnvelopeContent` has a new case, `EditMessage` (edited message's timestamp plus the new version), raising the new `MessageEdited` event. Edits never run commands.
   - `DataMessage.RemoteDelete` raises the new `MessageDeleted` event.
   - `DataMessage.Sticker` carries received stickers.
+- **Stories (roadmap 0.4.5):** `EnvelopeContent` has a new case, `StoryMessage` (file or text, optional group, `AllowsReplies`), raising the new `StoryReceived` event. Opt-in via `Receive:IgnoreStories = false`.
+- **Calls (roadmap 0.4.6):** `EnvelopeContent` has a new case, `CallMessage` (`CallEventKind` offer, answer, busy or hangup; `CallId`; `IsVideo` for offers), raising the new `CallReceived` event.
+- **Mention-aware binding (roadmap 0.4.7):** a positional command argument that is an `@mention` binds as the mentioned user's phone number (or UUID if hidden), so `/kick @Bob` works with `Recipient`, `PhoneNumber` and `AccountId` parameters. A placeholder without a matching mention fails with `Could not resolve the @mention for <name>.` Before, it would have been accepted as a username.
+- **Received text styles (roadmap 0.4.8):** `DataMessage.TextStyles` lists the sender's formatting as `StyledRange(TextStyle, Start, Length)`.
+- **Group update context (roadmap 0.4.9):** `GroupUpdated` has `Name` and `Revision`, and every group message exposes `DataMessage.GroupName` and `GroupRevision`. Signal doesn't report what changed; compare revisions or fetch the group to find out.
 
 ### Changed
 
@@ -102,7 +107,8 @@ First preview release. Available as a [GitHub Release](https://github.com/Nacorp
 - **Documentation:** full XML documentation (enforced by the build) and the `docs/` guides.
 - **Repository:** sample bot, Docker Compose file, CI workflow for GitHub Actions.
 
-[Unreleased]: https://github.com/Nacorpio/Signal.NET/compare/v0.3.0-preview.1...HEAD
+[Unreleased]: https://github.com/Nacorpio/Signal.NET/compare/v0.4.0-preview.1...HEAD
+[0.4.0-preview.1]: https://github.com/Nacorpio/Signal.NET/compare/v0.3.0-preview.1...v0.4.0-preview.1
 [0.3.0-preview.1]: https://github.com/Nacorpio/Signal.NET/compare/v0.2.0-preview.2...v0.3.0-preview.1
 [0.2.0-preview.2]: https://github.com/Nacorpio/Signal.NET/compare/v0.2.0-preview.1...v0.2.0-preview.2
 [0.2.0-preview.1]: https://github.com/Nacorpio/Signal.NET/releases/tag/v0.2.0-preview.1

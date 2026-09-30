@@ -10,7 +10,7 @@ The layer column shows where the work mainly lands (**D**omain, **A**pplication,
 
 ---
 
-## Where the project stands today (0.3.0-preview.1)
+## Where the project stands today (0.4.0-preview.1)
 
 | Area | State |
 |---|---|
@@ -19,7 +19,7 @@ The layer column shows where the work mainly lands (**D**omain, **A**pplication,
 | Commands | Modules, class and lambda commands; typed binding, flags, remainder; five preconditions and cooldowns; generated help |
 | Processing | Middleware pipeline, domain events, conversation-partitioned concurrency |
 | Language | .NET 11 **RC1** SDK; C# 15 unions (`Recipient`, `EnvelopeContent`, `CommandResult`, `ArgumentBindingResult`), C# 14 extension members |
-| Quality | 180 tests, XML docs and public API tracking enforced by the build, CI with coverage on Linux and Windows |
+| Quality | 211 tests, XML docs and public API tracking enforced by the build, CI with coverage on Linux and Windows |
 | Delivery | Tag-driven releases with NuGet Trusted Publishing (approval-gated `nuget` environment), a [docs site](https://nacorpio.github.io/Signal.NET/), a `dotnet new signalbot` template. Published on nuget.org as [`Nacorpio.Signal.*`](https://www.nuget.org/packages/Nacorpio.Signal.Hosting) since [v0.2.0-preview.2](https://github.com/Nacorpio/Signal.NET/releases/tag/v0.2.0-preview.2). |
 
 These known limitations shape the plan below:
@@ -82,7 +82,7 @@ Item 0.2.8 exists so that can't happen again.
 
 ## Milestone 0.4: Richer incoming model
 
-**Status:** all items are merged into `main` and not yet released (see the [changelog](CHANGELOG.md)).
+**Status:** complete, released in [v0.4.0-preview.1](https://github.com/Nacorpio/Signal.NET/releases/tag/v0.4.0-preview.1).
 
 *Goal: stop dropping envelope content. Each item extends the `EnvelopeContent` union. Because switches over
 it are exhaustive, the compiler points at every place that needs updating.*
