@@ -6,50 +6,50 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.0-preview.1] - 2026-09-30
+
+Milestone 0.5 (command system 2.0). Every change is binary-compatible with 0.4.0-preview.1: new members on existing
+interfaces are default interface members, and new registration helpers are extension methods.
+
 ### Added
 
-- **Reaction commands (roadmap 0.5.11):** `ReactionModule` methods with `[OnReaction("👍")]` run when someone reacts to the bot's messages (or any message with `AnyMessage`, removals with `IncludeRemovals`).
-  - Emojis match regardless of skin tone and variation selector.
-  - Registered with `AddReactionModule<T>()` or `AddCommands(assembly)`; invalid handler signatures fail at registration.
-- **Localisation (roadmap 0.5.5):** every text the framework sends (errors, usage, help, precondition failures, prompt re-asks) goes through the new `ISignalTexts`, with keys in `TextKey`.
-  - Translations go under `Signal:Localization:Texts:{culture}:{key}`. Lookup falls back `de-AT` → `de` → English.
-  - The culture is the conversation's `ConversationSettings.Culture`, otherwise `Localization:DefaultCulture`. Cultures are plain names, so this works in invariant-globalization mode too.
-  - Argument type names are translated via `Type.{English name}`. Custom preconditions can use `Fail(context, key, args)`, and `MessageContext.GetCultureAsync()` exposes the culture.
-  - English output is unchanged.
-
-- **Per-conversation settings (roadmap 0.5.7):** `ConversationSettings` per group or direct chat: `Prefixes` (replace the global ones there), `DisabledCommands` (full or group names) and `Culture`.
-  - Stored through the new `IConversationSettingsStore` port (in memory by default) and read once per message via `MessageContext.GetConversationSettingsAsync()`.
-  - Disabled commands reply with `Commands:DisabledCommandMessage`, and help and suggestions hide them.
-  - `ICommandParser.TryParse(text, prefixes, …)` is a new default interface member.
-- **Roles (roadmap 0.5.6):** `[RequireRole("moderator", Role.GroupAdmin)]` passes when the sender has any listed role.
-  - Roles come from `IRoleProvider`s: `Signal:Commands:Roles` (role → numbers or UUIDs), `admin` (includes `Commands:Admins`) and `group-admin` (Signal group admins, looked up live).
-  - `AddRoleProvider<T>()` adds your own provider, e.g. database-backed. `IRoleService` checks roles outside commands.
-- **Scheduled messages (roadmap 0.5.4):** `CommandModule.ScheduleReplyAsync` / `MessageContext.ScheduleReplyAsync` and `IMessageScheduler` (`ScheduleAsync`, `ListAsync`, `CancelAsync`) send text messages later, once or every `repeatEvery` (at least one minute).
-  - `IScheduledMessageStore` is the persistence port; the default keeps messages in memory.
-  - `AddSignal` hosts the dispatcher, which checks every `Signal:Scheduler:PollInterval` (1 s) and retries failed sends after `RetryDelay` (1 min).
-  - After downtime, a recurring message sends one catch-up, not one per missed occurrence.
+- **Command groups (roadmap 0.5.1):** `[CommandGroup("playlist", Aliases = ["pl"])]` on a module or `ICommand` class makes its commands `/playlist add`, `/pl add`, and so on. Module preconditions apply to the whole group.
+  - `CommandDescriptor.Group` (`CommandGroupInfo`) and `FullName`; `ICommandRegistry.GetGroup` (default interface member).
+  - `/group` alone, or with an unknown subcommand, replies with the group's commands. `/help group` describes a group.
 - **Prompts (roadmap 0.5.2):** `BackgroundWork.PromptAsync(question)` and `PromptAsync<T>` (any `IParsable<T>`, re-asking on invalid input) wait for the triggering sender's next message in the conversation, and return a `PromptResult<T>` (`Answered`, `TimedOut`, `Invalid`).
-  - The host routes answers through the new `IPromptRegistry` before partitioning. Commands are never consumed as answers.
+  - The host routes answers through the new `IPromptRegistry` before partitioning. Commands (by the conversation's own prefixes) are never consumed as answers.
   - New option `Signal:Background:PromptTimeout` (2 minutes). `BackgroundWork.Sender` and `BackgroundWorkItem.Sender` identify who may answer.
 - **Background work (roadmap 0.5.3):** `CommandModule.RunInBackgroundAsync(work => …)` (or `MessageContext.QueueBackgroundWorkAsync`, or `IBackgroundWorkQueue`) runs slow work outside the conversation partition, so later messages aren't held up.
   - Each item runs in its own DI scope and can reply to the original conversation with `work.ReplyAsync`.
   - The queue is bounded and in memory, configured by `Signal:Background:MaxConcurrency` (4) and `Capacity` (100). `AddSignal` hosts the processor (`IBackgroundWorkProcessor`).
   - At shutdown, running work is cancelled and queued items are dropped with a warning.
+- **Scheduled messages (roadmap 0.5.4):** `CommandModule.ScheduleReplyAsync` / `MessageContext.ScheduleReplyAsync` and `IMessageScheduler` (`ScheduleAsync`, `ListAsync`, `CancelAsync`) send text messages later, once or every `repeatEvery` (at least one minute).
+  - `IScheduledMessageStore` is the persistence port; the default keeps messages in memory.
+  - `AddSignal` hosts the dispatcher, which checks every `Signal:Scheduler:PollInterval` (1 s) and retries failed sends after `RetryDelay` (1 min).
+  - After downtime, a recurring message sends one catch-up, not one per missed occurrence.
+- **Localisation (roadmap 0.5.5):** every text the framework sends (errors, usage, help, precondition failures, prompt re-asks) goes through the new `ISignalTexts`, with keys in `TextKey`.
+  - Translations go under `Signal:Localization:Texts:{culture}:{key}`. Lookup falls back `de-AT` → `de` → English.
+  - The culture is the conversation's `ConversationSettings.Culture`, otherwise `Localization:DefaultCulture`. Cultures are plain names, so this works in invariant-globalization mode too.
+  - Argument type names are translated via `Type.{English name}`. Custom preconditions can use `Fail(context, key, args)`, and `MessageContext.GetCultureAsync()` exposes the culture.
+  - English output is unchanged.
+- **Roles (roadmap 0.5.6):** `[RequireRole("moderator", Role.GroupAdmin)]` passes when the sender has any listed role.
+  - Roles come from `IRoleProvider`s: `Signal:Commands:Roles` (role → numbers or UUIDs), `admin` (includes `Commands:Admins`) and `group-admin` (Signal group admins, looked up live).
+  - `AddRoleProvider<T>()` adds your own provider, e.g. database-backed. `IRoleService` checks roles outside commands.
+- **Per-conversation settings (roadmap 0.5.7):** `ConversationSettings` per group or direct chat: `Prefixes` (replace the global ones there), `DisabledCommands` (full or group names) and `Culture`.
+  - Stored through the new `IConversationSettingsStore` port (in memory by default) and read once per message via `MessageContext.GetConversationSettingsAsync()`.
+  - Disabled commands reply with `Commands:DisabledCommandMessage`, and help and suggestions hide them.
+  - `ICommandParser.TryParse(text, prefixes, …)` is a new default interface member.
 - **Better help (roadmap 0.5.8):** `/help` lists commands under headings for each command group and `[Category("…")]` (a flat list when there's only one section). It pages by `Commands:HelpPageSize` (default 20; `/help 2`). `/help <command>` shows `[Example("…")]`s. `CommandDescriptor.Category` and `Examples` describe them.
-- **Collection parameters (roadmap 0.5.10):** `params int[] numbers`, `List<PhoneNumber> people`, `IReadOnlyList<string> tags`, and other array, list or collection-interface parameters take all remaining positional arguments, each converted (and `@mention`-resolved) individually. `CommandParameter.ElementType` and `IsCollection` describe them.
 - **"Did you mean …?" (roadmap 0.5.9):** unknown-command replies suggest the closest visible command, alias, group or subcommand (`/hlep` → "Did you mean /help?"). Adjacent swaps count as one typo. Controlled by `Commands:SuggestSimilarCommands` (default `true`).
-- **Command groups (roadmap 0.5.1):** `[CommandGroup("playlist", Aliases = ["pl"])]` on a module or `ICommand` class makes its commands `/playlist add`, `/pl add`, and so on. Module preconditions apply to the whole group.
-  - `CommandDescriptor.Group` (`CommandGroupInfo`) and `FullName`; `ICommandRegistry.GetGroup` (default interface member).
-  - `/group` alone, or with an unknown subcommand, replies with the group's commands. `/help group` describes a group.
+- **Collection parameters (roadmap 0.5.10):** `params int[] numbers`, `List<PhoneNumber> people`, `IReadOnlyList<string> tags`, and other array, list or collection-interface parameters take all remaining positional arguments, each converted (and `@mention`-resolved) individually. `CommandParameter.ElementType` and `IsCollection` describe them.
+- **Reaction commands (roadmap 0.5.11):** `ReactionModule` methods with `[OnReaction("👍")]` run when someone reacts to the bot's messages (or any message with `AnyMessage`, removals with `IncludeRemovals`).
+  - Emojis match regardless of skin tone and variation selector.
+  - Registered with `AddReactionModule<T>()` or `AddCommands(assembly)`; invalid handler signatures fail at registration.
 
 ### Changed
 
 - Cooldowns, usage lines, logs and `CommandDescriptor.ToString()` use the full command name (`playlist add`). Nothing changes for commands outside a group.
 - `/help` takes the rest of the text, so `/help playlist add` works.
-
-### Fixed
-
-- Prompts now recognise commands by the conversation's own prefixes, so `!help` in a `!` group is no longer taken as an answer. `IPromptRegistry.WaitAsync` has a new `prefixes` parameter (unreleased API).
 
 ## [0.4.0-preview.1] - 2026-09-30
 
@@ -152,7 +152,8 @@ First preview release. Available as a [GitHub Release](https://github.com/Nacorp
 - **Documentation:** full XML documentation (enforced by the build) and the `docs/` guides.
 - **Repository:** sample bot, Docker Compose file, CI workflow for GitHub Actions.
 
-[Unreleased]: https://github.com/Nacorpio/Signal.NET/compare/v0.4.0-preview.1...HEAD
+[Unreleased]: https://github.com/Nacorpio/Signal.NET/compare/v0.5.0-preview.1...HEAD
+[0.5.0-preview.1]: https://github.com/Nacorpio/Signal.NET/compare/v0.4.0-preview.1...v0.5.0-preview.1
 [0.4.0-preview.1]: https://github.com/Nacorpio/Signal.NET/compare/v0.3.0-preview.1...v0.4.0-preview.1
 [0.3.0-preview.1]: https://github.com/Nacorpio/Signal.NET/compare/v0.2.0-preview.2...v0.3.0-preview.1
 [0.2.0-preview.2]: https://github.com/Nacorpio/Signal.NET/compare/v0.2.0-preview.1...v0.2.0-preview.2
