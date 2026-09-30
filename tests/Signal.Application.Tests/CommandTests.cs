@@ -186,9 +186,10 @@ public class CommandTests
     }
 
     [Fact]
-    public async Task Edits_deletes_and_stickers_never_run_commands()
+    public async Task Edits_deletes_stickers_and_transcripts_never_run_commands()
     {
-        await using var harness = Harness();
+        // Own messages must be let through, or access control would drop the transcript before the command gate.
+        await using var harness = Harness(o => o.AccessControl.IgnoreOwnMessages = false);
         var account = PhoneNumber.Parse(TestHarness.Account);
         var alice = new Sender(PhoneNumber.Parse(TestHarness.Alice), null, "Alice");
 
@@ -200,9 +201,14 @@ public class CommandTests
         var sticker = await harness.ReceiveAsync(new IncomingEnvelope(account, alice, 4,
             new DataMessage(4, null) { Sticker = new Sticker("abc", 1) }));
 
+        // A command typed on the account's own phone (or sent by another bot instance on the same account).
+        var transcript = await harness.ReceiveAsync(new IncomingEnvelope(account, new Sender(account, null, "Me"), 5,
+            new SentTranscript(account, new DataMessage(5, "/add 1 2"))));
+
         Assert.False(edit.IsHandled);
         Assert.False(delete.IsHandled);
         Assert.False(sticker.IsHandled);
+        Assert.False(transcript.IsHandled);
         Assert.Empty(harness.Signal.Sent);
     }
 
@@ -350,6 +356,34 @@ public class PipelineTests
         lock (RecordingHandler.Received)
         {
             Assert.Contains(marker, RecordingHandler.Received);
+        }
+    }
+
+    [Theory]
+    [InlineData(true, 0)]
+    [InlineData(false, 1)]
+    public async Task Transcripts_reach_MessageSent_handlers_only_when_own_messages_are_not_ignored(bool ignoreOwn, int expected)
+    {
+        var handler = new SentRecorder();
+        await using var harness = TestHarness.Create(
+            o => o.AccessControl.IgnoreOwnMessages = ignoreOwn,
+            (services, _) => services.AddSingleton<IEventHandler<MessageSent>>(handler));
+        var account = PhoneNumber.Parse(TestHarness.Account);
+
+        await harness.ReceiveAsync(new IncomingEnvelope(account, new Sender(account, null, "Me"), 1,
+            new SentTranscript(PhoneNumber.Parse(TestHarness.Alice), new DataMessage(1, "typed on my phone"))));
+
+        Assert.Equal(expected, handler.Count);
+    }
+
+    private sealed class SentRecorder : IEventHandler<MessageSent>
+    {
+        public int Count;
+
+        public Task HandleAsync(MessageSent domainEvent, CancellationToken cancellationToken)
+        {
+            Interlocked.Increment(ref Count);
+            return Task.CompletedTask;
         }
     }
 

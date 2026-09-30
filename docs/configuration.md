@@ -90,7 +90,7 @@ Durations use the `TimeSpan` format `hh:mm:ss`. Enum values are case-insensitive
 |---|---|---|
 | `AllowedSenders` | [] | If not empty, **only** these senders are processed |
 | `BlockedSenders` | [] | Always ignored |
-| `IgnoreOwnMessages` | true | Ignore messages from the receiving account itself |
+| `IgnoreOwnMessages` | true | Ignore messages from the receiving account itself, including transcripts of messages sent from its other devices. Set it to `false` to receive `MessageSent` events; transcripts never run commands. |
 
 ## `RateLimit`
 

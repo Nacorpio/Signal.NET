@@ -91,6 +91,53 @@ public class EnvelopeMapperTests
         Assert.True(sticker.Data.HasContent);
     }
 
+    // syncMessage.sentMessage follows signal-cli's JsonSyncDataMessage: data fields unwrapped next to destination*.
+    [Fact]
+    public void Maps_sent_transcripts_to_their_destination()
+    {
+        var toNumber = MapOne("""
+            "syncMessage":{"sentMessage":{"destination":"+15550002222","destinationNumber":"+15550002222","destinationUuid":null,
+              "timestamp":1700000000400,"message":"sent from my phone"}}
+            """)!;
+        var toUuid = MapOne("""
+            "syncMessage":{"sentMessage":{"destination":null,"destinationNumber":null,"destinationUuid":"8f2b0d6e-5c1a-4b7e-9a0f-2d3c4b5a6e7f",
+              "timestamp":1700000000400,"message":"hidden number"}}
+            """)!;
+
+        var transcript = Assert.IsType<SentTranscript>(toNumber.Content.Value);
+        Assert.Equal("sent from my phone", transcript.Message.Text);
+        Assert.Equal((Recipient)PhoneNumber.Parse("+15550002222"), transcript.Conversation);
+        Assert.Equal(transcript.Conversation, toNumber.Conversation);
+        Assert.Null(transcript.EditTargetTimestamp);
+        Assert.Null(toNumber.Data);
+        Assert.Equal((Recipient)AccountId.Parse("8f2b0d6e-5c1a-4b7e-9a0f-2d3c4b5a6e7f"), toUuid.Transcript!.Conversation);
+    }
+
+    [Fact]
+    public void Maps_group_and_edit_transcripts()
+    {
+        var group = MapOne("""
+            "syncMessage":{"sentMessage":{"destination":null,"timestamp":1700000000400,"message":"hi all",
+              "groupInfo":{"groupId":"abc123==","type":"DELIVER"}}}
+            """)!;
+        var edit = MapOne("""
+            "syncMessage":{"sentMessage":{"destination":"+15550002222","destinationNumber":"+15550002222",
+              "editMessage":{"targetSentTimestamp":1700000000000,"dataMessage":{"timestamp":1700000000400,"message":"fixed"}}}}
+            """)!;
+
+        Assert.Equal((Recipient)GroupId.FromInternalId("abc123=="), group.Transcript!.Conversation);
+        Assert.True(group.IsGroup);
+        Assert.Equal(1700000000000, edit.Transcript!.EditTargetTimestamp);
+        Assert.Equal("fixed", edit.Transcript.Message.Text);
+    }
+
+    [Theory]
+    [InlineData(""" "syncMessage":{"readMessages":[{"senderNumber":"+15550002222","timestamp":1}]} """)]
+    [InlineData(""" "syncMessage":{"type":"CONTACTS_SYNC"} """)]
+    [InlineData(""" "syncMessage":{"sentMessage":{"destination":null,"timestamp":1700000000400,"message":"nowhere"}} """)]
+    [InlineData(""" "syncMessage":{"sentMessage":{"destinationNumber":"+15550002222"}} """)]
+    public void Drops_unsupported_or_incomplete_sync_messages(string json) => Assert.Null(MapOne(json));
+
     [Fact]
     public void Ignores_malformed_stickers_but_keeps_the_message()
     {

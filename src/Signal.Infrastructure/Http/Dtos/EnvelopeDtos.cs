@@ -27,12 +27,13 @@ internal sealed class EnvelopeDto
     public long Timestamp { get; set; }
     public DataMessageDto? DataMessage { get; set; }
     public EditMessageDto? EditMessage { get; set; }
+    public SyncMessageDto? SyncMessage { get; set; }
     public ReceiptMessageDto? ReceiptMessage { get; set; }
     public TypingMessageDto? TypingMessage { get; set; }
 }
 
-/// <summary>A regular message.</summary>
-internal sealed class DataMessageDto
+/// <summary>A regular message. Not sealed: <see cref="SyncSentMessageDto"/> carries the same fields.</summary>
+internal class DataMessageDto
 {
     public long Timestamp { get; set; }
     public string? Message { get; set; }
@@ -44,6 +45,29 @@ internal sealed class DataMessageDto
     public ReactionDto? Reaction { get; set; }
     public StickerDto? Sticker { get; set; }
     public RemoteDeleteDto? RemoteDelete { get; set; }
+}
+
+/// <summary>
+/// A sync message from another device of the receiving account (signal-cli <c>JsonSyncMessage</c>). Only
+/// <see cref="SentMessage"/> is modelled; read, blocked and contact/group sync messages are ignored.
+/// </summary>
+internal sealed class SyncMessageDto
+{
+    public SyncSentMessageDto? SentMessage { get; set; }
+}
+
+/// <summary>
+/// A message sent from another device (signal-cli <c>JsonSyncDataMessage</c>). signal-cli unwraps the data message into
+/// this object (<c>@JsonUnwrapped</c>), so its fields are inherited; they are absent when only an edit was sent.
+/// </summary>
+internal sealed class SyncSentMessageDto : DataMessageDto
+{
+    /// <summary>Legacy destination field: a phone number or UUID. <see langword="null"/> for group messages.</summary>
+    public string? Destination { get; set; }
+
+    public string? DestinationNumber { get; set; }
+    public string? DestinationUuid { get; set; }
+    public EditMessageDto? EditMessage { get; set; }
 }
 
 /// <summary>An edit: the edited message's timestamp and the new version (signal-cli <c>JsonEditMessage</c>).</summary>

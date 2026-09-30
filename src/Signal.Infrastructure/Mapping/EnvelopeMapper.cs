@@ -50,6 +50,10 @@ internal static class EnvelopeMapper
         {
             content = new EditMessage(edit.TargetSentTimestamp, edited);
         }
+        else if (Map(envelope.SyncMessage?.SentMessage) is { } transcript)
+        {
+            content = transcript;
+        }
         else if (Map(envelope.ReceiptMessage) is { } receipt)
         {
             content = receipt;
@@ -96,6 +100,42 @@ internal static class EnvelopeMapper
                 : null,
             RemoteDelete = dto.RemoteDelete is { Timestamp: > 0 } d ? new RemoteDelete(d.Timestamp) : null,
         };
+    }
+
+    /// <summary>
+    /// Maps a message sent from another device. An edit takes precedence over the unwrapped data fields. The
+    /// conversation is the message's group, otherwise the destination (phone number preferred over UUID).
+    /// </summary>
+    private static SentTranscript? Map(SyncSentMessageDto? dto)
+    {
+        if (dto is null)
+        {
+            return null;
+        }
+
+        long? editTarget = null;
+        DataMessage? message;
+        if (dto.EditMessage is { TargetSentTimestamp: > 0 } edit)
+        {
+            message = Map(edit.DataMessage);
+            editTarget = edit.TargetSentTimestamp;
+        }
+        else
+        {
+            // Without an unwrapped message the timestamp is missing (0).
+            message = dto.Timestamp > 0 ? Map((DataMessageDto)dto) : null;
+        }
+
+        Recipient? conversation = message?.Group is { } group ? group
+            : PhoneNumber.TryParse(dto.DestinationNumber, out var number) ? number
+            : PhoneNumber.TryParse(dto.Destination, out number) ? number
+            : AccountId.TryParse(dto.DestinationUuid, out var id) ? id
+            : AccountId.TryParse(dto.Destination, out id) ? id
+            : null;
+
+        return message is not null && conversation is { } target
+            ? new SentTranscript(target, message) { EditTargetTimestamp = editTarget }
+            : null;
     }
 
     /// <summary>Maps a receipt; viewed takes precedence over read over delivery.</summary>
