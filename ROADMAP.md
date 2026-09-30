@@ -111,7 +111,7 @@ it are exhaustive, the compiler points at every place that needs updating.*
 | 0.5.4 | **Scheduled messages** | A/H | M | ✅ `IMessageScheduler` / `ScheduleReplyAsync`, one-off or recurring (at least one minute); `IScheduledMessageStore` persistence port with an in-memory default; polling dispatcher with downtime catch-up and send retries |
 | 0.5.5 | **Localisation** | A | M | Resource-based texts for framework replies (unknown command, binding errors, help), with culture per conversation |
 | 0.5.6 | **Role-based permissions** | A | M | ✅ `[RequireRole("moderator", …)]` (any of); `IRoleProvider`s combined by `IRoleService`: `Commands:Roles`, `admin` (from `Commands:Admins`), `group-admin` (live), plus `AddRoleProvider<T>()` |
-| 0.5.7 | **Per-conversation settings** | A | M | Prefix, language and enabled commands per group, via an `IConversationSettingsStore` port |
+| 0.5.7 | **Per-conversation settings** | A | M | ✅ `ConversationSettings` (prefixes, culture, disabled commands and groups) via `IConversationSettingsStore` (in memory by default); read once per message; help and suggestions respect them |
 | 0.5.8 | **Better help** | A | S | ✅ Headings per command group and `[Category]` (flat list when there's only one section), paging via `HelpPageSize` and `/help 2`, examples via `[Example("…")]` |
 | 0.5.9 | **"Did you mean …?"** | A | S | ✅ Closest visible command, alias, group or subcommand by optimal-string-alignment distance (≤1, or ≤2 for 6+ characters); `Commands:SuggestSimilarCommands` |
 | 0.5.10 | **Variadic and collection parameters** | A | S | ✅ `params T[]`, `T[]`, `List<T>` and the read-only/list interfaces take the remaining positional arguments; per-element conversion and mention resolution |

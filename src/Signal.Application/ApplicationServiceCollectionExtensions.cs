@@ -8,6 +8,7 @@ using Signal.Application.Commands.Binding;
 using Signal.Application.Commands.Parsing;
 using Signal.Application.Commands.Preconditions;
 using Signal.Application.Configuration;
+using Signal.Application.Conversations;
 using Signal.Application.Events;
 using Signal.Application.Pipeline;
 using Signal.Application.Roles;
@@ -55,6 +56,8 @@ public static class ApplicationServiceCollectionExtensions
         services.TryAddSingleton<IBackgroundWorkQueue>(sp => sp.GetRequiredService<ChannelBackgroundWorkQueue>());
         services.TryAddSingleton<IBackgroundWorkProcessor, BackgroundWorkProcessor>();
         services.TryAddSingleton<IPromptRegistry, PromptRegistry>();
+
+        services.TryAddSingleton<IConversationSettingsStore, InMemoryConversationSettingsStore>();
 
         // Roles: configuration and Signal group admins; AddRoleProvider<T>() adds more.
         services.TryAddScoped<IRoleService, RoleService>();

@@ -82,6 +82,7 @@ Durations use the `TimeSpan` format `hh:mm:ss`. Enum values are case-insensitive
 | `CaseSensitive` | false | Applies to command names and aliases |
 | `RespondToUnknown` | true | Reply to prefixed messages that don't match a command |
 | `UnknownCommandMessage` | see above | `{0}` = the typed name, `{1}` = the prefix |
+| `DisabledCommandMessage` | "This command is disabled in this conversation." | Reply when a command is disabled in the conversation's settings; empty for no reply |
 | `SuggestSimilarCommands` | true | Append "Did you mean /help?" when a visible command, alias or group name (or, for `/group typo`, a subcommand) is one typo away, or two for names of 6+ characters. Swapped letters count as one typo. |
 | `ErrorMessage` | see above | Sent when a command throws |
 | `QuoteReplies` | false | Replies quote the triggering message |

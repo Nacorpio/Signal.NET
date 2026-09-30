@@ -8,6 +8,10 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Per-conversation settings (roadmap 0.5.7):** `ConversationSettings` per group or direct chat: `Prefixes` (replace the global ones there), `DisabledCommands` (full or group names) and `Culture`.
+  - Stored through the new `IConversationSettingsStore` port (in memory by default) and read once per message via `MessageContext.GetConversationSettingsAsync()`.
+  - Disabled commands reply with `Commands:DisabledCommandMessage`, and help and suggestions hide them.
+  - `ICommandParser.TryParse(text, prefixes, …)` is a new default interface member.
 - **Roles (roadmap 0.5.6):** `[RequireRole("moderator", Role.GroupAdmin)]` passes when the sender has any listed role.
   - Roles come from `IRoleProvider`s: `Signal:Commands:Roles` (role → numbers or UUIDs), `admin` (includes `Commands:Admins`) and `group-admin` (Signal group admins, looked up live).
   - `AddRoleProvider<T>()` adds your own provider, e.g. database-backed. `IRoleService` checks roles outside commands.

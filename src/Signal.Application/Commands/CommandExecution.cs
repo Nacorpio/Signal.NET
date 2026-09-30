@@ -1,9 +1,11 @@
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Signal.Application.Commands.Binding;
 using Signal.Application.Commands.Parsing;
 using Signal.Application.Configuration;
+using Signal.Application.Conversations;
 using Signal.Application.Pipeline;
 
 namespace Signal.Application.Commands;
@@ -104,6 +106,12 @@ internal sealed partial class CommandExecutor(ICommandRegistry registry, IComman
         }
 
         var context = new CommandContext(message, parsed, command);
+        if (await message.GetConversationSettingsAsync() is { } settings && settings.IsDisabled(command))
+        {
+            var disabled = message.Services.GetRequiredService<IOptionsMonitor<SignalOptions>>().CurrentValue.Commands.DisabledCommandMessage;
+            return new CommandPreconditionFailed(parsed, command, string.IsNullOrEmpty(disabled) ? null : disabled);
+        }
+
         foreach (var precondition in command.Preconditions)
         {
             var check = await precondition.CheckAsync(context, message.CancellationToken);
@@ -167,31 +175,33 @@ public interface ICommandResultHandler
 /// </summary>
 internal sealed class DefaultCommandResultHandler(IOptionsMonitor<SignalOptions> options, ICommandRegistry registry) : ICommandResultHandler
 {
-    public Task HandleAsync(MessageContext context, CommandResult result)
+    public async Task HandleAsync(MessageContext context, CommandResult result)
     {
         var commands = options.CurrentValue.Commands;
+        var settings = result.Value is CommandNotFound ? await context.GetConversationSettingsAsync() : null;
         var reply = result switch
         {
             CommandSucceeded => null,
             CommandNotFound notFound => !commands.RespondToUnknown ? null
-                : (GroupHint(notFound.Parsed)
+                : (GroupHint(notFound.Parsed, settings)
                     ?? string.Format(CultureInfo.InvariantCulture, commands.UnknownCommandMessage, notFound.Parsed.Name, notFound.Parsed.Prefix))
-                    + (commands.SuggestSimilarCommands ? Suggestion(notFound.Parsed) : null),
+                    + (commands.SuggestSimilarCommands ? Suggestion(notFound.Parsed, settings) : null),
             CommandBindingFailed failed => $"{failed.Error}\nUsage: {failed.Command.FormatUsage(failed.Parsed.Prefix)}",
             CommandPreconditionFailed failed => failed.Reason,
             CommandFaulted => commands.ErrorMessage,
             null => null,
         };
 
-        return string.IsNullOrEmpty(reply)
-            ? Task.CompletedTask
-            : context.ReplyAsync(reply, commands.QuoteReplies, context.CancellationToken);
+        if (!string.IsNullOrEmpty(reply))
+        {
+            await context.ReplyAsync(reply, commands.QuoteReplies, context.CancellationToken);
+        }
     }
 
     /// <summary>For <c>/group</c> or <c>/group unknown</c>: names the group's visible commands; otherwise <see langword="null"/>.</summary>
-    private string? GroupHint(ParsedCommand parsed)
+    private string? GroupHint(ParsedCommand parsed, ConversationSettings? settings)
     {
-        var visible = registry.GetGroup(parsed.Name).Where(c => !c.Hidden).Select(c => c.Name).ToList();
+        var visible = registry.GetGroup(parsed.Name).Where(c => IsAvailable(c, settings)).Select(c => c.Name).ToList();
         if (visible.Count == 0)
         {
             return null;
@@ -208,9 +218,9 @@ internal sealed class DefaultCommandResultHandler(IOptionsMonitor<SignalOptions>
     /// <c> Did you mean /x?</c> for the closest visible name: a subcommand of the group for <c>/group typo</c>,
     /// otherwise a top-level command, alias or group name. Empty when nothing is close enough.
     /// </summary>
-    private string? Suggestion(ParsedCommand parsed)
+    private string? Suggestion(ParsedCommand parsed, ConversationSettings? settings)
     {
-        var group = registry.GetGroup(parsed.Name).Where(c => !c.Hidden).ToList();
+        var group = registry.GetGroup(parsed.Name).Where(c => IsAvailable(c, settings)).ToList();
         if (group.Count > 0)
         {
             return parsed.Tokens is [var sub, ..]
@@ -220,10 +230,14 @@ internal sealed class DefaultCommandResultHandler(IOptionsMonitor<SignalOptions>
         }
 
         var candidates = registry.Commands
-            .Where(c => !c.Hidden)
+            .Where(c => IsAvailable(c, settings))
             .SelectMany(c => c.Group is { } g ? g.Aliases.Prepend(g.Name) : c.Aliases.Prepend(c.Name));
         return CommandSuggestions.Closest(parsed.Name, candidates) is { } closest ? $" Did you mean {parsed.Prefix}{closest}?" : null;
     }
+
+    /// <summary>Visible in help and suggestions: not hidden and not disabled in the conversation.</summary>
+    private static bool IsAvailable(CommandDescriptor command, ConversationSettings? settings) =>
+        !command.Hidden && settings?.IsDisabled(command) != true;
 }
 
 /// <summary>
@@ -240,7 +254,7 @@ public sealed class CommandMiddleware(ICommandParser parser, ICommandExecutor ex
     {
         if (!context.IsHandled
             && context.Envelope.Data is { Text: { } text, Reaction: null }
-            && parser.TryParse(text, out var parsed))
+            && await TryParseAsync(context, text) is { } parsed)
         {
             var result = await executor.ExecuteAsync(context, parsed);
             context.Items[typeof(CommandResult)] = result;
@@ -249,5 +263,12 @@ public sealed class CommandMiddleware(ICommandParser parser, ICommandExecutor ex
         }
 
         await next(context);
+    }
+
+    /// <summary>Parses with the conversation's own prefixes if it has any (<see cref="ConversationSettings.Prefixes"/>).</summary>
+    private async ValueTask<ParsedCommand?> TryParseAsync(MessageContext context, string text)
+    {
+        var prefixes = (await context.GetConversationSettingsAsync())?.Prefixes;
+        return (prefixes is { Count: > 0 } ? parser.TryParse(text, prefixes, out var parsed) : parser.TryParse(text, out parsed)) ? parsed : null;
     }
 }

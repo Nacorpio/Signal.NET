@@ -167,6 +167,9 @@ public sealed class CommandOptions
     /// </summary>
     public bool SuggestSimilarCommands { get; set; } = true;
 
+    /// <summary>Reply when a command is disabled in the conversation (<c>ConversationSettings.DisabledCommands</c>); empty for no reply.</summary>
+    public string DisabledCommandMessage { get; set; } = "This command is disabled in this conversation.";
+
     /// <summary>Reply when a command throws an exception (details are only logged).</summary>
     public string ErrorMessage { get; set; } = "Sorry, something went wrong while executing this command.";
 

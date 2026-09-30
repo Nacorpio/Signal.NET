@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Signal.Application.Configuration;
+using Signal.Application.Conversations;
 
 namespace Signal.Application.Commands;
 
@@ -31,42 +32,50 @@ public sealed class HelpModule(ICommandRegistry registry) : CommandModule
     /// <returns>A task that completes when the reply was sent.</returns>
     [Command("help", Aliases = ["?", "commands"], Description = "Lists all commands or shows details of one command.")]
     [Example("help"), Example("help 2"), Example("help add")]
-    public Task HelpAsync([Remainder, Summary("The command or group to describe, or a page number")] string? command = null)
+    public async Task HelpAsync([Remainder, Summary("The command or group to describe, or a page number")] string? command = null)
     {
         var prefix = Context.Parsed.Prefix;
+
+        // Commands disabled in this conversation are treated like hidden ones.
+        var settings = await Context.Message.GetConversationSettingsAsync();
+        bool Visible(CommandDescriptor c) => !c.Hidden && settings?.IsDisabled(c) != true;
+
         if (command is null)
         {
-            return ReplyAsync(List(prefix, page: 1));
+            await ReplyAsync(List(prefix, page: 1, Visible));
+            return;
         }
 
         var trimmed = command.StartsWith(prefix, StringComparison.Ordinal) ? command[prefix.Length..] : command;
         var name = string.Join(' ', trimmed.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
 
-        if (registry.TryGetCommand(name, out var descriptor))
+        if (registry.TryGetCommand(name, out var descriptor) && Visible(descriptor))
         {
-            return ReplyAsync(Describe(descriptor, prefix));
+            await ReplyAsync(Describe(descriptor, prefix));
+            return;
         }
 
-        var group = registry.GetGroup(name).Where(c => !c.Hidden).ToList();
+        var group = registry.GetGroup(name).Where(Visible).ToList();
         if (group.Count > 0)
         {
-            return ReplyAsync(DescribeGroup(group, prefix));
+            await ReplyAsync(DescribeGroup(group, prefix));
+            return;
         }
 
         // A number that isn't a command or group name is a page.
-        return int.TryParse(name, NumberStyles.None, CultureInfo.InvariantCulture, out var page) && page > 0
-            ? ReplyAsync(List(prefix, page))
-            : ReplyAsync($"Unknown command '{command}'.");
+        await ReplyAsync(int.TryParse(name, NumberStyles.None, CultureInfo.InvariantCulture, out var page) && page > 0
+            ? List(prefix, page, Visible)
+            : $"Unknown command '{command}'.");
     }
 
     /// <summary>The command list, split into headed sections and pages.</summary>
-    private string List(string prefix, int page)
+    private string List(string prefix, int page, Func<CommandDescriptor, bool> visible)
     {
         var pageSize = Context.Services.GetRequiredService<IOptionsMonitor<SignalOptions>>().CurrentValue.Commands.HelpPageSize;
 
         // Ungrouped, uncategorised commands first, then groups and categories alphabetically.
         var sections = registry.Commands
-            .Where(c => !c.Hidden)
+            .Where(visible)
             .GroupBy(c => c.Group is { } g ? $"{prefix}{g.Name}{(g.Description is null ? null : " – " + g.Description)}" : c.Category ?? GeneralHeading)
             .OrderBy(s => s.Key == GeneralHeading ? 0 : 1)
             .ThenBy(s => s.Key, StringComparer.OrdinalIgnoreCase)
