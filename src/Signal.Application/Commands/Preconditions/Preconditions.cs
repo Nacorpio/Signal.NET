@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Signal.Application.Abstractions;
 using Signal.Application.Configuration;
+using Signal.Application.Localization;
 
 namespace Signal.Application.Commands.Preconditions;
 
@@ -54,6 +55,20 @@ public abstract class PreconditionAttribute : Attribute
     /// <returns>The failed result.</returns>
     protected PreconditionResult Fail(string defaultMessage) =>
         PreconditionResult.Fail(ErrorMessage is null ? defaultMessage : ErrorMessage.Length == 0 ? null : ErrorMessage);
+
+    /// <summary>
+    /// Creates a failure with a localised default message (see <see cref="Localization.TextKey"/>), honoring
+    /// <see cref="ErrorMessage"/>. Translations are looked up in the culture of the command's conversation.
+    /// </summary>
+    /// <param name="context">The command context.</param>
+    /// <param name="textKey">The text key.</param>
+    /// <param name="args">Format arguments of the text.</param>
+    /// <returns>The failed result.</returns>
+    protected PreconditionResult Fail(CommandContext context, string textKey, params object?[] args)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        return ErrorMessage is null ? PreconditionResult.Fail(context.Message.Text(textKey, args)) : Fail(ErrorMessage);
+    }
 }
 
 /// <summary>Only senders listed in <c>Signal:Commands:Admins</c> (phone numbers or UUIDs) may run the command.</summary>
@@ -65,7 +80,7 @@ public sealed class RequireAdminAttribute : PreconditionAttribute
         var admins = context.Services.GetRequiredService<IOptionsMonitor<SignalOptions>>().CurrentValue.Commands.Admins;
         return ValueTask.FromResult(admins.Any(context.Sender.Matches)
             ? PreconditionResult.Success
-            : Fail("This command is restricted to administrators."));
+            : Fail(context, TextKey.RequireAdmin));
     }
 }
 
@@ -74,7 +89,7 @@ public sealed class RequireGroupAttribute : PreconditionAttribute
 {
     /// <inheritdoc />
     public override ValueTask<PreconditionResult> CheckAsync(CommandContext context, CancellationToken cancellationToken) =>
-        ValueTask.FromResult(context.IsGroup ? PreconditionResult.Success : Fail("This command can only be used in groups."));
+        ValueTask.FromResult(context.IsGroup ? PreconditionResult.Success : Fail(context, TextKey.RequireGroup));
 }
 
 /// <summary>The command may only be used in direct (1:1) conversations.</summary>
@@ -82,7 +97,7 @@ public sealed class RequireDirectMessageAttribute : PreconditionAttribute
 {
     /// <inheritdoc />
     public override ValueTask<PreconditionResult> CheckAsync(CommandContext context, CancellationToken cancellationToken) =>
-        ValueTask.FromResult(!context.IsGroup ? PreconditionResult.Success : Fail("This command can only be used in direct messages."));
+        ValueTask.FromResult(!context.IsGroup ? PreconditionResult.Success : Fail(context, TextKey.RequireDirectMessage));
 }
 
 /// <summary>
@@ -96,13 +111,13 @@ public sealed class RequireGroupAdminAttribute : PreconditionAttribute
     {
         if (context.Group is not { } groupId)
         {
-            return Fail("This command can only be used in groups.");
+            return Fail(context, TextKey.RequireGroup);
         }
 
         var group = await context.Services.GetRequiredService<IGroupService>().GetAsync(context.Account, groupId, cancellationToken);
         var isAdmin = group is not null
             && ((context.Sender.Number is { } n && group.IsAdmin(n.Value)) || (context.Sender.Uuid is { } u && group.IsAdmin(u.ToString("D"))));
-        return isAdmin ? PreconditionResult.Success : Fail("Only group admins can use this command.");
+        return isAdmin ? PreconditionResult.Success : Fail(context, TextKey.RequireGroupAdmin);
     }
 }
 
@@ -145,7 +160,7 @@ public sealed class CooldownAttribute(double seconds) : PreconditionAttribute
         var tracker = context.Services.GetRequiredService<ICooldownTracker>();
         return ValueTask.FromResult(tracker.TryEnter($"{context.Command.FullName}|{Scope}|{scopeKey}", Period, out var remaining)
             ? PreconditionResult.Success
-            : Fail($"Please wait {Math.Ceiling(remaining.TotalSeconds)} s before using this command again."));
+            : Fail(context, TextKey.Cooldown, Math.Ceiling(remaining.TotalSeconds)));
     }
 }
 

@@ -6,6 +6,7 @@ using Signal.Application.Commands.Binding;
 using Signal.Application.Commands.Parsing;
 using Signal.Application.Configuration;
 using Signal.Application.Conversations;
+using Signal.Application.Localization;
 using Signal.Application.Pipeline;
 
 namespace Signal.Application.Commands;
@@ -108,7 +109,7 @@ internal sealed partial class CommandExecutor(ICommandRegistry registry, IComman
         var context = new CommandContext(message, parsed, command);
         if (await message.GetConversationSettingsAsync() is { } settings && settings.IsDisabled(command))
         {
-            var disabled = message.Services.GetRequiredService<IOptionsMonitor<SignalOptions>>().CurrentValue.Commands.DisabledCommandMessage;
+            var disabled = message.Text(TextKey.DisabledCommand);
             return new CommandPreconditionFailed(parsed, command, string.IsNullOrEmpty(disabled) ? null : disabled);
         }
 
@@ -173,22 +174,28 @@ public interface ICommandResultHandler
 /// For a command group typed without a known subcommand it lists the group's commands instead. With
 /// <see cref="CommandOptions.SuggestSimilarCommands"/> it appends the closest command or subcommand name.
 /// </summary>
-internal sealed class DefaultCommandResultHandler(IOptionsMonitor<SignalOptions> options, ICommandRegistry registry) : ICommandResultHandler
+internal sealed class DefaultCommandResultHandler(IOptionsMonitor<SignalOptions> options, ICommandRegistry registry, ISignalTexts texts) : ICommandResultHandler
 {
     public async Task HandleAsync(MessageContext context, CommandResult result)
     {
         var commands = options.CurrentValue.Commands;
-        var settings = result.Value is CommandNotFound ? await context.GetConversationSettingsAsync() : null;
+        if (result.Value is CommandSucceeded)
+        {
+            return;
+        }
+
+        var settings = await context.GetConversationSettingsAsync();
+        var culture = await context.GetCultureAsync();
         var reply = result switch
         {
             CommandSucceeded => null,
             CommandNotFound notFound => !commands.RespondToUnknown ? null
-                : (GroupHint(notFound.Parsed, settings)
-                    ?? string.Format(CultureInfo.InvariantCulture, commands.UnknownCommandMessage, notFound.Parsed.Name, notFound.Parsed.Prefix))
-                    + (commands.SuggestSimilarCommands ? Suggestion(notFound.Parsed, settings) : null),
-            CommandBindingFailed failed => $"{failed.Error}\nUsage: {failed.Command.FormatUsage(failed.Parsed.Prefix)}",
+                : (GroupHint(notFound.Parsed, settings, culture)
+                    ?? texts.Get(TextKey.UnknownCommand, culture, notFound.Parsed.Name, notFound.Parsed.Prefix))
+                    + (commands.SuggestSimilarCommands ? Suggestion(notFound.Parsed, settings, culture) : null),
+            CommandBindingFailed failed => $"{failed.Error}\n{texts.Get(TextKey.Usage, culture, failed.Command.FormatUsage(failed.Parsed.Prefix))}",
             CommandPreconditionFailed failed => failed.Reason,
-            CommandFaulted => commands.ErrorMessage,
+            CommandFaulted => texts.Get(TextKey.CommandError, culture),
             null => null,
         };
 
@@ -199,7 +206,7 @@ internal sealed class DefaultCommandResultHandler(IOptionsMonitor<SignalOptions>
     }
 
     /// <summary>For <c>/group</c> or <c>/group unknown</c>: names the group's visible commands; otherwise <see langword="null"/>.</summary>
-    private string? GroupHint(ParsedCommand parsed, ConversationSettings? settings)
+    private string? GroupHint(ParsedCommand parsed, ConversationSettings? settings, string culture)
     {
         var visible = registry.GetGroup(parsed.Name).Where(c => IsAvailable(c, settings)).Select(c => c.Name).ToList();
         if (visible.Count == 0)
@@ -210,29 +217,29 @@ internal sealed class DefaultCommandResultHandler(IOptionsMonitor<SignalOptions>
         var group = parsed.Prefix + parsed.Name;
         var available = string.Join(", ", visible);
         return parsed.Tokens is [var sub, ..]
-            ? $"Unknown subcommand '{sub.Value}' for {group}. Available: {available}."
-            : $"{group} needs a subcommand: {available}. Send {parsed.Prefix}help {parsed.Name} for details.";
+            ? texts.Get(TextKey.UnknownSubcommand, culture, sub.Value, group, available)
+            : texts.Get(TextKey.SubcommandRequired, culture, group, available, parsed.Prefix, parsed.Name);
     }
 
     /// <summary>
     /// <c> Did you mean /x?</c> for the closest visible name: a subcommand of the group for <c>/group typo</c>,
     /// otherwise a top-level command, alias or group name. Empty when nothing is close enough.
     /// </summary>
-    private string? Suggestion(ParsedCommand parsed, ConversationSettings? settings)
+    private string? Suggestion(ParsedCommand parsed, ConversationSettings? settings, string culture)
     {
         var group = registry.GetGroup(parsed.Name).Where(c => IsAvailable(c, settings)).ToList();
         if (group.Count > 0)
         {
             return parsed.Tokens is [var sub, ..]
                 && CommandSuggestions.Closest(sub.Value, group.SelectMany(c => c.Aliases.Prepend(c.Name))) is { } closestSub
-                    ? $" Did you mean {parsed.Prefix}{parsed.Name} {closestSub}?"
+                    ? texts.Get(TextKey.DidYouMean, culture, $"{parsed.Prefix}{parsed.Name} {closestSub}")
                     : null;
         }
 
         var candidates = registry.Commands
             .Where(c => IsAvailable(c, settings))
             .SelectMany(c => c.Group is { } g ? g.Aliases.Prepend(g.Name) : c.Aliases.Prepend(c.Name));
-        return CommandSuggestions.Closest(parsed.Name, candidates) is { } closest ? $" Did you mean {parsed.Prefix}{closest}?" : null;
+        return CommandSuggestions.Closest(parsed.Name, candidates) is { } closest ? texts.Get(TextKey.DidYouMean, culture, parsed.Prefix + closest) : null;
     }
 
     /// <summary>Visible in help and suggestions: not hidden and not disabled in the conversation.</summary>

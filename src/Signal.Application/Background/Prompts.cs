@@ -5,6 +5,8 @@ using Microsoft.Extensions.Options;
 using Signal.Application.Commands.Binding;
 using Signal.Application.Commands.Parsing;
 using Signal.Application.Configuration;
+using Signal.Application.Conversations;
+using Signal.Application.Localization;
 using Signal.Domain.Messaging;
 using Signal.Domain.ValueObjects;
 
@@ -58,25 +60,44 @@ public interface IPromptRegistry
     /// <param name="sender">The sender whose answer counts (in groups, other members are ignored).</param>
     /// <param name="timeout">How long to wait.</param>
     /// <param name="cancellationToken">Cancels waiting.</param>
+    /// <param name="prefixes">
+    /// The conversation's own command prefixes (<c>ConversationSettings.Prefixes</c>), so messages that are commands
+    /// there are not taken as answers; <see langword="null"/> for the configured prefixes.
+    /// </param>
     /// <returns>The answering envelope, or <see langword="null"/> on timeout or when a newer prompt replaced this one.</returns>
-    Task<IncomingEnvelope?> WaitAsync(PhoneNumber account, Recipient conversation, Sender sender, TimeSpan timeout, CancellationToken cancellationToken);
+    Task<IncomingEnvelope?> WaitAsync(PhoneNumber account, Recipient conversation, Sender sender, TimeSpan timeout, CancellationToken cancellationToken, IReadOnlyList<string>? prefixes = null);
 }
 
 /// <summary>In-memory <see cref="IPromptRegistry"/>. A sender is keyed by UUID and phone number, whichever are known.</summary>
 internal sealed class PromptRegistry(ICommandParser parser) : IPromptRegistry
 {
-    private readonly ConcurrentDictionary<string, TaskCompletionSource<IncomingEnvelope?>> _pending = new(StringComparer.Ordinal);
+    /// <summary>A waiting prompt and the command prefixes of its conversation.</summary>
+    private sealed record Pending(TaskCompletionSource<IncomingEnvelope?> Waiter, IReadOnlyList<string>? Prefixes);
+
+    private readonly ConcurrentDictionary<string, Pending> _pending = new(StringComparer.Ordinal);
 
     public bool TryDeliver(IncomingEnvelope envelope)
     {
-        if (envelope.Data is not { Text: { } text, Reaction: null } || parser.TryParse(text, out _))
+        if (envelope.Data is not { Text: { } text, Reaction: null })
         {
             return false;
         }
 
         foreach (var key in Keys(envelope.Account, envelope.Conversation, envelope.Source))
         {
-            if (_pending.TryRemove(key, out var waiter) && waiter.TrySetResult(envelope))
+            if (!_pending.TryGetValue(key, out var pending))
+            {
+                continue;
+            }
+
+            // Commands (by the conversation's own prefixes) keep working while a prompt waits.
+            var isCommand = pending.Prefixes is { Count: > 0 } prefixes ? parser.TryParse(text, prefixes, out _) : parser.TryParse(text, out _);
+            if (isCommand)
+            {
+                return false;
+            }
+
+            if (_pending.TryRemove(new KeyValuePair<string, Pending>(key, pending)) && pending.Waiter.TrySetResult(envelope))
             {
                 return true;
             }
@@ -85,19 +106,20 @@ internal sealed class PromptRegistry(ICommandParser parser) : IPromptRegistry
         return false;
     }
 
-    public async Task<IncomingEnvelope?> WaitAsync(PhoneNumber account, Recipient conversation, Sender sender, TimeSpan timeout, CancellationToken cancellationToken)
+    public async Task<IncomingEnvelope?> WaitAsync(PhoneNumber account, Recipient conversation, Sender sender, TimeSpan timeout, CancellationToken cancellationToken, IReadOnlyList<string>? prefixes = null)
     {
         var waiter = new TaskCompletionSource<IncomingEnvelope?>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var entry = new Pending(waiter, prefixes);
         var keys = Keys(account, conversation, sender).ToList();
         foreach (var key in keys)
         {
             // A newer prompt to the same sender in the same conversation replaces the older one.
-            if (_pending.TryGetValue(key, out var previous) && !ReferenceEquals(previous, waiter))
+            if (_pending.TryGetValue(key, out var previous) && !ReferenceEquals(previous, entry))
             {
-                previous.TrySetResult(null);
+                previous.Waiter.TrySetResult(null);
             }
 
-            _pending[key] = waiter;
+            _pending[key] = entry;
         }
 
         try
@@ -112,7 +134,7 @@ internal sealed class PromptRegistry(ICommandParser parser) : IPromptRegistry
         {
             foreach (var key in keys)
             {
-                _pending.TryRemove(new KeyValuePair<string, TaskCompletionSource<IncomingEnvelope?>>(key, waiter));
+                _pending.TryRemove(new KeyValuePair<string, Pending>(key, entry));
             }
         }
     }
@@ -163,10 +185,14 @@ public sealed partial class BackgroundWork
         where T : IParsable<T>
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(attempts, 1);
+        var (culture, _) = await ConversationAsync();
+        var texts = Services.GetRequiredService<ISignalTexts>();
         string? answer = null;
         for (var attempt = 1; attempt <= attempts; attempt++)
         {
-            answer = await AskAsync(attempt == 1 ? question : $"'{answer}' is not a valid {DisplayName<T>()}. {question}", timeout);
+            answer = await AskAsync(
+                attempt == 1 ? question : texts.Get(TextKey.PromptInvalid, culture, answer, texts.Get(TextKey.TypePrefix + DisplayName<T>(), culture), question),
+                timeout);
             if (answer is null)
             {
                 return new PromptResult<T>(PromptStatus.TimedOut, default, null);
@@ -187,9 +213,11 @@ public sealed partial class BackgroundWork
         var wait = timeout ?? Services.GetRequiredService<IOptions<SignalOptions>>().Value.Background.PromptTimeout;
         ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(wait, TimeSpan.Zero, nameof(timeout));
 
+        var (_, prefixes) = await ConversationAsync();
+
         // Register before asking: an answer that arrives right after the question must find the prompt waiting.
         using var cancel = CancellationTokenSource.CreateLinkedTokenSource(CancellationToken);
-        var answer = Services.GetRequiredService<IPromptRegistry>().WaitAsync(Account, Conversation, sender, wait, cancel.Token);
+        var answer = Services.GetRequiredService<IPromptRegistry>().WaitAsync(Account, Conversation, sender, wait, cancel.Token, prefixes);
         try
         {
             await ReplyAsync(question);
@@ -202,6 +230,13 @@ public sealed partial class BackgroundWork
         }
 
         return (await answer)?.Data?.Text;
+    }
+
+    /// <summary>The culture and command prefixes of <see cref="Conversation"/>, from its settings.</summary>
+    private async ValueTask<(string Culture, IReadOnlyList<string>? Prefixes)> ConversationAsync()
+    {
+        var settings = await Services.GetRequiredService<IConversationSettingsStore>().GetAsync(Account, Conversation, CancellationToken);
+        return (LocalizationExtensions.Resolve(settings?.Culture, Services), settings?.Prefixes);
     }
 
     /// <summary>The same wording as argument errors ("whole number", "phone number …"), or the type name.</summary>

@@ -1,4 +1,5 @@
 using Signal.Application.Commands.Parsing;
+using Signal.Application.Localization;
 
 namespace Signal.Application.Commands.Binding;
 
@@ -77,7 +78,7 @@ internal sealed class CommandArgumentBinder(IArgumentConverterProvider converter
                 {
                     if (!parameter.IsOptional)
                     {
-                        return new ArgumentBindingError($"Missing required option --{name}.");
+                        return new ArgumentBindingError(context.Message.Text(TextKey.MissingOption, name));
                     }
 
                     values[i] = parameter.DefaultValue;
@@ -88,7 +89,7 @@ internal sealed class CommandArgumentBinder(IArgumentConverterProvider converter
                 {
                     if (!parameter.IsSwitch)
                     {
-                        return new ArgumentBindingError($"Option --{name} requires a value.");
+                        return new ArgumentBindingError(context.Message.Text(TextKey.OptionNeedsValue, name));
                     }
 
                     values[i] = true;
@@ -107,7 +108,7 @@ internal sealed class CommandArgumentBinder(IArgumentConverterProvider converter
             {
                 if (!parameter.IsOptional)
                 {
-                    return new ArgumentBindingError($"Missing argument <{parameter.Name}>.");
+                    return new ArgumentBindingError(context.Message.Text(TextKey.MissingArgument, parameter.Name));
                 }
 
                 values[i] = parameter.DefaultValue;
@@ -154,12 +155,12 @@ internal sealed class CommandArgumentBinder(IArgumentConverterProvider converter
 
         if (position < split.Positional.Count)
         {
-            return new ArgumentBindingError($"Too many arguments ('{split.Positional[position].Value}' was not expected).");
+            return new ArgumentBindingError(context.Message.Text(TextKey.TooManyArguments, split.Positional[position].Value));
         }
 
         if (unusedFlags.Count > 0)
         {
-            return new ArgumentBindingError($"Unknown option --{unusedFlags.First()}.");
+            return new ArgumentBindingError(context.Message.Text(TextKey.UnknownOption, unusedFlags.First()));
         }
 
         return new BoundArguments(values);
@@ -231,7 +232,7 @@ internal sealed class CommandArgumentBinder(IArgumentConverterProvider converter
         }
 
         input = ResolveMention(context, token);
-        return input is null ? $"Could not resolve the @mention for <{parameter.Name}>." : null;
+        return input is null ? context.Message.Text(TextKey.UnresolvedMention, parameter.Name) : null;
     }
 
     /// <summary>Whether a collection parameter needs a <see cref="List{T}"/> rather than an array.</summary>
@@ -251,6 +252,6 @@ internal sealed class CommandArgumentBinder(IArgumentConverterProvider converter
         var shown = input == MentionPlaceholder.ToString() ? "@mention" : input;
         return converter.TryConvert(input, context, out value)
             ? null
-            : $"'{shown}' is not a valid {converter.DisplayName} for <{parameter.Name}>.";
+            : context.Message.Text(TextKey.InvalidArgument, shown, context.Message.Text(TextKey.TypePrefix + converter.DisplayName), parameter.Name);
     }
 }

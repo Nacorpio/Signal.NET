@@ -102,11 +102,10 @@ public async Task PrefixAsync(string prefix)
 - **`DisabledCommands`** lists full names (`ban`, `playlist add`) or group names (`playlist`), case-insensitive.
   Using one replies with `Commands:DisabledCommandMessage` (empty for no reply), and help and "Did you mean"
   treat them as hidden there.
-- **`Culture`** is stored for localised replies.
+- **`Culture`** selects the language of the framework's replies there (see [Localisation](configuration.md#localization)).
 - **Storage:** settings are loaded **once per text message** and cached in `MessageContext.Items`
   (`GetConversationSettingsAsync()`). The default store is in memory; implement `IConversationSettingsStore` to persist them.
-- **Known limitation:** prompts recognise commands by the global prefixes only. In a conversation with its own
-  prefix, an answer like `!help` is taken as the answer.
+- Prompts respect the conversation's prefixes: `!help` in a `!` group is a command, not an answer.
 
 ## Components
 

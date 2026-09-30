@@ -8,6 +8,7 @@ using Signal.Application.Commands.Binding;
 using Signal.Application.Commands.Parsing;
 using Signal.Application.Commands.Preconditions;
 using Signal.Application.Configuration;
+using Signal.Application.Localization;
 using Signal.Application.Conversations;
 using Signal.Application.Events;
 using Signal.Application.Pipeline;
@@ -56,6 +57,7 @@ public static class ApplicationServiceCollectionExtensions
         services.TryAddSingleton<IBackgroundWorkQueue>(sp => sp.GetRequiredService<ChannelBackgroundWorkQueue>());
         services.TryAddSingleton<IBackgroundWorkProcessor, BackgroundWorkProcessor>();
         services.TryAddSingleton<IPromptRegistry, PromptRegistry>();
+        services.TryAddSingleton<ISignalTexts, SignalTexts>();
 
         services.TryAddSingleton<IConversationSettingsStore, InMemoryConversationSettingsStore>();
 

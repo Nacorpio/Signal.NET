@@ -1,4 +1,38 @@
 #nullable enable
+const Signal.Application.Localization.TextKey.CommandError = "CommandError" -> string!
+const Signal.Application.Localization.TextKey.Cooldown = "Cooldown" -> string!
+const Signal.Application.Localization.TextKey.DidYouMean = "DidYouMean" -> string!
+const Signal.Application.Localization.TextKey.DisabledCommand = "DisabledCommand" -> string!
+const Signal.Application.Localization.TextKey.HelpAliases = "HelpAliases" -> string!
+const Signal.Application.Localization.TextKey.HelpDetails = "HelpDetails" -> string!
+const Signal.Application.Localization.TextKey.HelpExamples = "HelpExamples" -> string!
+const Signal.Application.Localization.TextKey.HelpGeneral = "HelpGeneral" -> string!
+const Signal.Application.Localization.TextKey.HelpGroupDetails = "HelpGroupDetails" -> string!
+const Signal.Application.Localization.TextKey.HelpHeader = "HelpHeader" -> string!
+const Signal.Application.Localization.TextKey.HelpHeaderPaged = "HelpHeaderPaged" -> string!
+const Signal.Application.Localization.TextKey.HelpMore = "HelpMore" -> string!
+const Signal.Application.Localization.TextKey.HelpOnlyOnePage = "HelpOnlyOnePage" -> string!
+const Signal.Application.Localization.TextKey.HelpOnlyPages = "HelpOnlyPages" -> string!
+const Signal.Application.Localization.TextKey.HelpUnknown = "HelpUnknown" -> string!
+const Signal.Application.Localization.TextKey.InvalidArgument = "InvalidArgument" -> string!
+const Signal.Application.Localization.TextKey.MissingArgument = "MissingArgument" -> string!
+const Signal.Application.Localization.TextKey.MissingOption = "MissingOption" -> string!
+const Signal.Application.Localization.TextKey.OptionNeedsValue = "OptionNeedsValue" -> string!
+const Signal.Application.Localization.TextKey.PromptInvalid = "PromptInvalid" -> string!
+const Signal.Application.Localization.TextKey.RequireAdmin = "RequireAdmin" -> string!
+const Signal.Application.Localization.TextKey.RequireAnyRole = "RequireAnyRole" -> string!
+const Signal.Application.Localization.TextKey.RequireDirectMessage = "RequireDirectMessage" -> string!
+const Signal.Application.Localization.TextKey.RequireGroup = "RequireGroup" -> string!
+const Signal.Application.Localization.TextKey.RequireGroupAdmin = "RequireGroupAdmin" -> string!
+const Signal.Application.Localization.TextKey.RequireRole = "RequireRole" -> string!
+const Signal.Application.Localization.TextKey.SubcommandRequired = "SubcommandRequired" -> string!
+const Signal.Application.Localization.TextKey.TooManyArguments = "TooManyArguments" -> string!
+const Signal.Application.Localization.TextKey.TypePrefix = "Type." -> string!
+const Signal.Application.Localization.TextKey.UnknownCommand = "UnknownCommand" -> string!
+const Signal.Application.Localization.TextKey.UnknownOption = "UnknownOption" -> string!
+const Signal.Application.Localization.TextKey.UnknownSubcommand = "UnknownSubcommand" -> string!
+const Signal.Application.Localization.TextKey.UnresolvedMention = "UnresolvedMention" -> string!
+const Signal.Application.Localization.TextKey.Usage = "Usage" -> string!
 const Signal.Application.Roles.Role.Admin = "admin" -> string!
 const Signal.Application.Roles.Role.GroupAdmin = "group-admin" -> string!
 override Signal.Application.Background.BackgroundWorkItem.Equals(object? obj) -> bool
@@ -48,7 +82,7 @@ Signal.Application.Background.IBackgroundWorkQueue
 Signal.Application.Background.IBackgroundWorkQueue.QueueAsync(Signal.Application.Background.BackgroundWorkItem! item, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
 Signal.Application.Background.IPromptRegistry
 Signal.Application.Background.IPromptRegistry.TryDeliver(Signal.Domain.Messaging.IncomingEnvelope! envelope) -> bool
-Signal.Application.Background.IPromptRegistry.WaitAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient conversation, Signal.Domain.Messaging.Sender! sender, System.TimeSpan timeout, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Signal.Domain.Messaging.IncomingEnvelope?>!
+Signal.Application.Background.IPromptRegistry.WaitAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient conversation, Signal.Domain.Messaging.Sender! sender, System.TimeSpan timeout, System.Threading.CancellationToken cancellationToken, System.Collections.Generic.IReadOnlyList<string!>? prefixes = null) -> System.Threading.Tasks.Task<Signal.Domain.Messaging.IncomingEnvelope?>!
 Signal.Application.Background.PromptResult<T>
 Signal.Application.Background.PromptResult<T>.<Clone>$() -> Signal.Application.Background.PromptResult<T>!
 Signal.Application.Background.PromptResult<T>.Deconstruct(out Signal.Application.Background.PromptStatus Status, out T? Value, out string? Text) -> void
@@ -103,6 +137,7 @@ Signal.Application.Commands.ExampleAttribute.ExampleAttribute(string! text) -> v
 Signal.Application.Commands.ExampleAttribute.Text.get -> string!
 Signal.Application.Commands.ICommandRegistry.GetGroup(string! groupNameOrAlias) -> System.Collections.Generic.IReadOnlyList<Signal.Application.Commands.CommandDescriptor!>!
 Signal.Application.Commands.Parsing.ICommandParser.TryParse(string? text, System.Collections.Generic.IReadOnlyList<string!>! prefixes, out Signal.Application.Commands.Parsing.ParsedCommand? command) -> bool
+Signal.Application.Commands.Preconditions.PreconditionAttribute.Fail(Signal.Application.Commands.CommandContext! context, string! textKey, params object?[]! args) -> Signal.Application.Commands.Preconditions.PreconditionResult
 Signal.Application.Configuration.BackgroundOptions
 Signal.Application.Configuration.BackgroundOptions.BackgroundOptions() -> void
 Signal.Application.Configuration.BackgroundOptions.Capacity.get -> int
@@ -119,6 +154,12 @@ Signal.Application.Configuration.CommandOptions.Roles.get -> System.Collections.
 Signal.Application.Configuration.CommandOptions.Roles.set -> void
 Signal.Application.Configuration.CommandOptions.SuggestSimilarCommands.get -> bool
 Signal.Application.Configuration.CommandOptions.SuggestSimilarCommands.set -> void
+Signal.Application.Configuration.LocalizationOptions
+Signal.Application.Configuration.LocalizationOptions.DefaultCulture.get -> string!
+Signal.Application.Configuration.LocalizationOptions.DefaultCulture.set -> void
+Signal.Application.Configuration.LocalizationOptions.LocalizationOptions() -> void
+Signal.Application.Configuration.LocalizationOptions.Texts.get -> System.Collections.Generic.Dictionary<string!, System.Collections.Generic.Dictionary<string!, string!>!>!
+Signal.Application.Configuration.LocalizationOptions.Texts.set -> void
 Signal.Application.Configuration.SchedulerOptions
 Signal.Application.Configuration.SchedulerOptions.PollInterval.get -> System.TimeSpan
 Signal.Application.Configuration.SchedulerOptions.PollInterval.set -> void
@@ -127,6 +168,8 @@ Signal.Application.Configuration.SchedulerOptions.RetryDelay.set -> void
 Signal.Application.Configuration.SchedulerOptions.SchedulerOptions() -> void
 Signal.Application.Configuration.SignalOptions.Background.get -> Signal.Application.Configuration.BackgroundOptions!
 Signal.Application.Configuration.SignalOptions.Background.set -> void
+Signal.Application.Configuration.SignalOptions.Localization.get -> Signal.Application.Configuration.LocalizationOptions!
+Signal.Application.Configuration.SignalOptions.Localization.set -> void
 Signal.Application.Configuration.SignalOptions.Scheduler.get -> Signal.Application.Configuration.SchedulerOptions!
 Signal.Application.Configuration.SignalOptions.Scheduler.set -> void
 Signal.Application.Conversations.ConversationSettings
@@ -145,6 +188,10 @@ Signal.Application.Conversations.IConversationSettingsStore
 Signal.Application.Conversations.IConversationSettingsStore.GetAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient conversation, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<Signal.Application.Conversations.ConversationSettings?>
 Signal.Application.Conversations.IConversationSettingsStore.RemoveAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient conversation, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
 Signal.Application.Conversations.IConversationSettingsStore.SetAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient conversation, Signal.Application.Conversations.ConversationSettings! settings, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
+Signal.Application.Localization.ISignalTexts
+Signal.Application.Localization.ISignalTexts.Get(string! key, string! culture, params object?[]! args) -> string!
+Signal.Application.Localization.LocalizationExtensions
+Signal.Application.Localization.TextKey
 Signal.Application.Roles.IRoleProvider
 Signal.Application.Roles.IRoleProvider.HasRoleAsync(Signal.Application.Pipeline.MessageContext! message, string! role, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<bool>
 Signal.Application.Roles.IRoleService
@@ -196,6 +243,7 @@ static Signal.Application.Commands.CommandGroupInfo.operator ==(Signal.Applicati
 static Signal.Application.Conversations.ConversationSettings.operator !=(Signal.Application.Conversations.ConversationSettings? left, Signal.Application.Conversations.ConversationSettings? right) -> bool
 static Signal.Application.Conversations.ConversationSettings.operator ==(Signal.Application.Conversations.ConversationSettings? left, Signal.Application.Conversations.ConversationSettings? right) -> bool
 static Signal.Application.Conversations.ConversationSettingsExtensions.GetConversationSettingsAsync(this Signal.Application.Pipeline.MessageContext! context) -> System.Threading.Tasks.ValueTask<Signal.Application.Conversations.ConversationSettings?>
+static Signal.Application.Localization.LocalizationExtensions.GetCultureAsync(this Signal.Application.Pipeline.MessageContext! context) -> System.Threading.Tasks.ValueTask<string!>
 static Signal.Application.Scheduling.ScheduledMessage.operator !=(Signal.Application.Scheduling.ScheduledMessage? left, Signal.Application.Scheduling.ScheduledMessage? right) -> bool
 static Signal.Application.Scheduling.ScheduledMessage.operator ==(Signal.Application.Scheduling.ScheduledMessage? left, Signal.Application.Scheduling.ScheduledMessage? right) -> bool
 static Signal.Application.Scheduling.SchedulingExtensions.ScheduleReplyAsync(this Signal.Application.Pipeline.MessageContext! context, string! text, System.DateTimeOffset dueAt, System.TimeSpan? repeatEvery = null) -> System.Threading.Tasks.Task<Signal.Application.Scheduling.ScheduledMessage!>!

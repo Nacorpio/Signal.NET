@@ -8,6 +8,12 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Localisation (roadmap 0.5.5):** every text the framework sends (errors, usage, help, precondition failures, prompt re-asks) goes through the new `ISignalTexts`, with keys in `TextKey`.
+  - Translations go under `Signal:Localization:Texts:{culture}:{key}`. Lookup falls back `de-AT` → `de` → English.
+  - The culture is the conversation's `ConversationSettings.Culture`, otherwise `Localization:DefaultCulture`. Cultures are plain names, so this works in invariant-globalization mode too.
+  - Argument type names are translated via `Type.{English name}`. Custom preconditions can use `Fail(context, key, args)`, and `MessageContext.GetCultureAsync()` exposes the culture.
+  - English output is unchanged.
+
 - **Per-conversation settings (roadmap 0.5.7):** `ConversationSettings` per group or direct chat: `Prefixes` (replace the global ones there), `DisabledCommands` (full or group names) and `Culture`.
   - Stored through the new `IConversationSettingsStore` port (in memory by default) and read once per message via `MessageContext.GetConversationSettingsAsync()`.
   - Disabled commands reply with `Commands:DisabledCommandMessage`, and help and suggestions hide them.
@@ -37,6 +43,10 @@ All notable changes to this project are documented here. The format follows
 
 - Cooldowns, usage lines, logs and `CommandDescriptor.ToString()` use the full command name (`playlist add`). Nothing changes for commands outside a group.
 - `/help` takes the rest of the text, so `/help playlist add` works.
+
+### Fixed
+
+- Prompts now recognise commands by the conversation's own prefixes, so `!help` in a `!` group is no longer taken as an answer. `IPromptRegistry.WaitAsync` has a new `prefixes` parameter (unreleased API).
 
 ## [0.4.0-preview.1] - 2026-09-30
 

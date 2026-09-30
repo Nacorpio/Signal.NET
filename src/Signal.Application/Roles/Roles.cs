@@ -4,6 +4,7 @@ using Signal.Application.Abstractions;
 using Signal.Application.Commands;
 using Signal.Application.Commands.Preconditions;
 using Signal.Application.Configuration;
+using Signal.Application.Localization;
 using Signal.Application.Pipeline;
 
 namespace Signal.Application.Roles;
@@ -125,7 +126,7 @@ public sealed class RequireRoleAttribute(params string[] roles) : PreconditionAt
     public override async ValueTask<PreconditionResult> CheckAsync(CommandContext context, CancellationToken cancellationToken) =>
         await context.Services.GetRequiredService<IRoleService>().HasAnyRoleAsync(context.Message, Roles, cancellationToken)
             ? PreconditionResult.Success
-            : Fail(Roles.Count == 1
-                ? $"This command requires the {Roles[0]} role."
-                : $"This command requires one of these roles: {string.Join(", ", Roles)}.");
+            : Roles.Count == 1
+                ? Fail(context, TextKey.RequireRole, Roles[0])
+                : Fail(context, TextKey.RequireAnyRole, string.Join(", ", Roles));
 }

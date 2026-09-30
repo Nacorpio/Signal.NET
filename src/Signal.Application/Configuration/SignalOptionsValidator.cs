@@ -104,6 +104,12 @@ public sealed class SignalOptionsValidator : IValidateOptions<SignalOptions>
             errors.Add("Signal:Background:PromptTimeout must be positive.");
         }
 
+        // Checked for form only: which cultures exist depends on the platform (and none do in invariant-globalization mode).
+        if (!Localization.LocalizationExtensions.IsWellFormed(options.Localization.DefaultCulture))
+        {
+            errors.Add($"Signal:Localization:DefaultCulture '{options.Localization.DefaultCulture}' is not a well-formed culture name (e.g. en, de-AT).");
+        }
+
         if (options.Commands.HelpPageSize < 0)
         {
             errors.Add("Signal:Commands:HelpPageSize must not be negative (0 disables paging).");

@@ -129,6 +129,40 @@ Scheduled messages (`IMessageScheduler`, `ScheduleReplyAsync`).
 
 After downtime, overdue one-off messages are sent on the first check. A recurring message sends one catch-up and then continues at its next future time; it doesn't replay every missed occurrence.
 
+## `Localization`
+
+Languages of the texts the framework sends: errors, usage lines, help, precondition failures and prompt re-asks.
+
+| Key | Default | Notes |
+|---|---|---|
+| `DefaultCulture` | `en` | Culture of conversations without their own `ConversationSettings.Culture`; must be a well-formed culture name (`en`, `de-AT`) |
+| `Texts` | {} | Culture → text key → text. The keys are the constants of `TextKey`; `{0}`, `{1}` … are their documented arguments. |
+
+```jsonc
+"Localization": {
+  "DefaultCulture": "en",
+  "Texts": {
+    "de": {
+      "UnknownCommand": "Unbekannter Befehl '{0}'. Sende {1}help für eine Liste.",
+      "InvalidArgument": "'{0}' ist keine gültige {1} für <{2}>.",
+      "Type.whole number": "Ganzzahl"
+    }
+  }
+}
+```
+
+- **Culture:** a conversation's culture comes from its settings (`ConversationSettings.Culture`), otherwise from
+  `DefaultCulture`. Cultures are plain names, so lookup falls back by name (`zh-Hant-TW` → `zh-Hant` → `zh` → English).
+  This also works in invariant-globalization mode (common in small container images), and CI tests that mode.
+- **Type names in errors** ("whole number", "yes/no", …) are translated with the key `Type.{English name}`. That
+  also works for custom converters' `DisplayName`.
+- **Existing message options stay the defaults:** `Commands:UnknownCommandMessage`, `DisabledCommandMessage` and
+  `ErrorMessage` remain the English texts for `UnknownCommand`, `DisabledCommand` and `CommandError`.
+- **Broken translations don't break replies:** a translation with invalid placeholders is logged and replaced by
+  the English text.
+- **In your own code,** `await context.GetCultureAsync()` and `ISignalTexts` give you the same lookup, and custom
+  preconditions can call `Fail(context, key, args)`.
+
 ## Hot reload
 
 Options read through `IOptionsMonitor` take effect without a restart when the configuration file changes:

@@ -64,6 +64,22 @@ public sealed class SignalOptions
 
     /// <summary>Scheduled messages (<c>IMessageScheduler</c>).</summary>
     public SchedulerOptions Scheduler { get; set; } = new();
+
+    /// <summary>Languages of the texts the framework sends (errors, help, prompts).</summary>
+    public LocalizationOptions Localization { get; set; } = new();
+}
+
+/// <summary>Localisation settings.</summary>
+public sealed class LocalizationOptions
+{
+    /// <summary>The culture for conversations without their own (<c>ConversationSettings.Culture</c>). Default <c>en</c>.</summary>
+    public string DefaultCulture { get; set; } = "en";
+
+    /// <summary>
+    /// Translations: culture name → text key → text, e.g. <c>{ "de": { "UnknownCommand": "Unbekannter Befehl '{0}'." } }</c>.
+    /// Keys are listed in <c>TextKey</c>. Missing texts fall back to the parent culture, then to English.
+    /// </summary>
+    public Dictionary<string, Dictionary<string, string>> Texts { get; set; } = [];
 }
 
 /// <summary>Scheduled message settings.</summary>

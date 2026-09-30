@@ -50,6 +50,14 @@ jobs:
           --results-directory TestResults
           --collect "XPlat Code Coverage"
 
+      # Many container images run .NET in invariant-globalization mode, where most CultureInfos can't be created;
+      # localisation must keep working there (it treats cultures as plain names).
+      - name: Test (invariant globalization)
+        if: runner.os == 'Linux'
+        env:
+          DOTNET_SYSTEM_GLOBALIZATION_INVARIANT: "1"
+        run: dotnet test --no-build --configuration Release tests/Signal.Application.Tests
+
       - name: Coverage report
         if: matrix.os == 'ubuntu-latest'
         uses: danielpalme/ReportGenerator-GitHub-Action@5

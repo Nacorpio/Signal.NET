@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Signal.Application.Configuration;
 using Signal.Application.Conversations;
+using Signal.Application.Localization;
 
 namespace Signal.Application.Commands;
 
@@ -65,7 +66,7 @@ public sealed class HelpModule(ICommandRegistry registry) : CommandModule
         // A number that isn't a command or group name is a page.
         await ReplyAsync(int.TryParse(name, NumberStyles.None, CultureInfo.InvariantCulture, out var page) && page > 0
             ? List(prefix, page, Visible)
-            : $"Unknown command '{command}'.");
+            : Text(TextKey.HelpUnknown, command));
     }
 
     /// <summary>The command list, split into headed sections and pages.</summary>
@@ -85,18 +86,18 @@ public sealed class HelpModule(ICommandRegistry registry) : CommandModule
         var pages = pageSize > 0 ? Math.Max(1, (entries.Count + pageSize - 1) / pageSize) : 1;
         if (page > pages)
         {
-            return $"There {(pages == 1 ? "is only 1 page" : $"are only {pages} pages")} of commands.";
+            return pages == 1 ? Text(TextKey.HelpOnlyOnePage) : Text(TextKey.HelpOnlyPages, pages);
         }
 
         var shown = pageSize > 0 ? entries.Skip((page - 1) * pageSize).Take(pageSize) : entries;
-        var builder = new StringBuilder(pages > 1 ? $"Available commands (page {page}/{pages}):" : "Available commands:").AppendLine();
+        var builder = new StringBuilder(pages > 1 ? Text(TextKey.HelpHeaderPaged, page, pages) : Text(TextKey.HelpHeader)).AppendLine();
         string? heading = null;
         foreach (var (entryHeading, descriptor) in shown)
         {
             // Headings only help when there is more than one section; small bots keep a flat list.
             if (sections.Count > 1 && entryHeading != heading)
             {
-                builder.AppendLine().AppendLine(entryHeading);
+                builder.AppendLine().AppendLine(entryHeading == GeneralHeading ? Text(TextKey.HelpGeneral) : entryHeading);
                 heading = entryHeading;
             }
 
@@ -105,13 +106,13 @@ public sealed class HelpModule(ICommandRegistry registry) : CommandModule
 
         if (page < pages)
         {
-            builder.AppendLine($"Send {prefix}help {page + 1} for more.");
+            builder.AppendLine(Text(TextKey.HelpMore, prefix, page + 1));
         }
 
-        return builder.Append($"Send {prefix}help <command> for details.").ToString();
+        return builder.Append(Text(TextKey.HelpDetails, prefix)).ToString();
     }
 
-    private static string DescribeGroup(List<CommandDescriptor> group, string prefix)
+    private string DescribeGroup(List<CommandDescriptor> group, string prefix)
     {
         var info = group[0].Group!;
         var builder = new StringBuilder().AppendLine($"{prefix}{info.Name} <command>");
@@ -122,7 +123,7 @@ public sealed class HelpModule(ICommandRegistry registry) : CommandModule
 
         if (info.Aliases.Count > 0)
         {
-            builder.AppendLine($"Aliases: {string.Join(", ", info.Aliases.Select(a => prefix + a))}");
+            builder.AppendLine(Text(TextKey.HelpAliases, string.Join(", ", info.Aliases.Select(a => prefix + a))));
         }
 
         foreach (var descriptor in group)
@@ -130,10 +131,10 @@ public sealed class HelpModule(ICommandRegistry registry) : CommandModule
             AppendEntry(builder, descriptor, prefix);
         }
 
-        return builder.Append($"Send {prefix}help {info.Name} <command> for details.").ToString();
+        return builder.Append(Text(TextKey.HelpGroupDetails, prefix, info.Name)).ToString();
     }
 
-    private static string Describe(CommandDescriptor descriptor, string prefix)
+    private string Describe(CommandDescriptor descriptor, string prefix)
     {
         var builder = new StringBuilder();
         builder.AppendLine(descriptor.FormatUsage(prefix));
@@ -145,7 +146,7 @@ public sealed class HelpModule(ICommandRegistry registry) : CommandModule
         if (descriptor.Aliases.Count > 0)
         {
             var group = descriptor.Group is { } g ? g.Name + " " : string.Empty;
-            builder.AppendLine($"Aliases: {string.Join(", ", descriptor.Aliases.Select(a => prefix + group + a))}");
+            builder.AppendLine(Text(TextKey.HelpAliases, string.Join(", ", descriptor.Aliases.Select(a => prefix + group + a))));
         }
 
         foreach (var parameter in descriptor.Parameters.Where(p => p.Summary is not null))
@@ -155,7 +156,7 @@ public sealed class HelpModule(ICommandRegistry registry) : CommandModule
 
         if (descriptor.Examples.Count > 0)
         {
-            builder.AppendLine("Examples:");
+            builder.AppendLine(Text(TextKey.HelpExamples));
             foreach (var example in descriptor.Examples)
             {
                 builder.AppendLine($"  {prefix}{example}");
@@ -164,6 +165,9 @@ public sealed class HelpModule(ICommandRegistry registry) : CommandModule
 
         return builder.ToString().TrimEnd();
     }
+
+    /// <summary>A text in the culture of the conversation.</summary>
+    private string Text(string key, params object?[] args) => Context.Message.Text(key, args);
 
     private static void AppendEntry(StringBuilder builder, CommandDescriptor descriptor, string prefix)
     {
