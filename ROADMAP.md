@@ -105,7 +105,7 @@ it are exhaustive, the compiler points at every place that needs updating.*
 
 | # | Feature | Layer | Size | Notes |
 |---|---|---|---|---|
-| 0.5.1 | **Command groups and subcommands** | A | M | `[CommandGroup("group")]` on a module lets `/group add`, `/group remove` share the group's preconditions |
+| 0.5.1 | **Command groups and subcommands** | A | M | ✅ `[CommandGroup("group", Aliases, Description)]` on a module or command class; module preconditions shared; subcommand hints; group help; cooldowns keyed by full name |
 | 0.5.2 | **Conversations and prompts** | A | L | `await Context.PromptAsync<int>("How many?", timeout)` waits for the sender's next message in the conversation. Needs a pending-reply registry checked by the pipeline before command parsing. |
 | 0.5.3 | **Background work from commands** | A/H | M | `IBackgroundWorkQueue` so commands can reply later without blocking their partition. Fixes limitation 1. |
 | 0.5.4 | **Scheduled messages** | A/H | M | `IMessageScheduler` (in-memory plus a persistence port) for reminders and digests |

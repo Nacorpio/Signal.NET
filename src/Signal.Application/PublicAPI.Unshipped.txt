@@ -1,1 +1,29 @@
 #nullable enable
+override Signal.Application.Commands.CommandGroupInfo.Equals(object? obj) -> bool
+override Signal.Application.Commands.CommandGroupInfo.GetHashCode() -> int
+override Signal.Application.Commands.CommandGroupInfo.ToString() -> string!
+Signal.Application.Commands.CommandDescriptor.FullName.get -> string!
+Signal.Application.Commands.CommandDescriptor.Group.get -> Signal.Application.Commands.CommandGroupInfo?
+Signal.Application.Commands.CommandDescriptor.Group.init -> void
+Signal.Application.Commands.CommandGroupAttribute
+Signal.Application.Commands.CommandGroupAttribute.Aliases.get -> string![]!
+Signal.Application.Commands.CommandGroupAttribute.Aliases.set -> void
+Signal.Application.Commands.CommandGroupAttribute.CommandGroupAttribute(string! name) -> void
+Signal.Application.Commands.CommandGroupAttribute.Description.get -> string?
+Signal.Application.Commands.CommandGroupAttribute.Description.set -> void
+Signal.Application.Commands.CommandGroupAttribute.Name.get -> string!
+Signal.Application.Commands.CommandGroupInfo
+Signal.Application.Commands.CommandGroupInfo.<Clone>$() -> Signal.Application.Commands.CommandGroupInfo!
+Signal.Application.Commands.CommandGroupInfo.Aliases.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Signal.Application.Commands.CommandGroupInfo.Aliases.init -> void
+Signal.Application.Commands.CommandGroupInfo.CommandGroupInfo(string! Name, System.Collections.Generic.IReadOnlyList<string!>! Aliases, string? Description) -> void
+Signal.Application.Commands.CommandGroupInfo.Deconstruct(out string! Name, out System.Collections.Generic.IReadOnlyList<string!>! Aliases, out string? Description) -> void
+Signal.Application.Commands.CommandGroupInfo.Description.get -> string?
+Signal.Application.Commands.CommandGroupInfo.Description.init -> void
+Signal.Application.Commands.CommandGroupInfo.Equals(Signal.Application.Commands.CommandGroupInfo? other) -> bool
+Signal.Application.Commands.CommandGroupInfo.Name.get -> string!
+Signal.Application.Commands.CommandGroupInfo.Name.init -> void
+Signal.Application.Commands.ICommandRegistry.GetGroup(string! groupNameOrAlias) -> System.Collections.Generic.IReadOnlyList<Signal.Application.Commands.CommandDescriptor!>!
+static Signal.Application.Commands.CommandGroupInfo.From(Signal.Application.Commands.CommandGroupAttribute! attribute) -> Signal.Application.Commands.CommandGroupInfo!
+static Signal.Application.Commands.CommandGroupInfo.operator !=(Signal.Application.Commands.CommandGroupInfo? left, Signal.Application.Commands.CommandGroupInfo? right) -> bool
+static Signal.Application.Commands.CommandGroupInfo.operator ==(Signal.Application.Commands.CommandGroupInfo? left, Signal.Application.Commands.CommandGroupInfo? right) -> bool

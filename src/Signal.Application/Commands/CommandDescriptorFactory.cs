@@ -36,7 +36,10 @@ internal static class CommandDescriptorFactory
         instance.Description,
         instance.Usage,
         preconditions: commandType.GetCustomAttributes<PreconditionAttribute>(inherit: true),
-        hidden: instance.Hidden);
+        hidden: instance.Hidden)
+    {
+        Group = GroupOf(commandType),
+    };
 
     /// <summary>Describes every public <c>[Command]</c> method of a module.</summary>
     /// <param name="moduleType">A non-abstract <see cref="CommandModule"/>.</param>
@@ -52,6 +55,7 @@ internal static class CommandDescriptorFactory
 
         var factory = ActivatorUtilities.CreateFactory(moduleType, Type.EmptyTypes);
         var modulePreconditions = moduleType.GetCustomAttributes<PreconditionAttribute>(inherit: true).ToArray();
+        var group = GroupOf(moduleType);
         var nullability = new NullabilityInfoContext();
 
         foreach (var method in moduleType.GetMethods(BindingFlags.Public | BindingFlags.Instance))
@@ -107,9 +111,16 @@ internal static class CommandDescriptorFactory
                 parameters,
                 [.. modulePreconditions, .. method.GetCustomAttributes<PreconditionAttribute>(inherit: true)],
                 attribute.Hidden,
-                method);
+                method)
+            {
+                Group = group,
+            };
         }
     }
+
+    /// <summary>The <see cref="CommandGroupAttribute"/> of a module or command class, if any.</summary>
+    private static CommandGroupInfo? GroupOf(Type type) =>
+        type.GetCustomAttribute<CommandGroupAttribute>() is { } attribute ? CommandGroupInfo.From(attribute) : null;
 
     /// <summary>Classifies the method parameters into injected slots and bindable <see cref="CommandParameter"/>s.</summary>
     private static (List<CommandParameter> Parameters, SlotKind[] Slots) DescribeParameters(MethodInfo method, NullabilityInfoContext nullability)

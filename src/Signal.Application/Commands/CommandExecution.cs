@@ -90,7 +90,17 @@ internal sealed partial class CommandExecutor(ICommandRegistry registry, IComman
     {
         if (!registry.TryGetCommand(parsed.Name, out var command))
         {
-            return new CommandNotFound(parsed);
+            // A grouped command: "/group sub args" parses as name "group" with arguments "sub args".
+            if (parsed.Tokens is not [{ IsQuoted: false } sub, ..]
+                || !registry.TryGetCommand($"{parsed.Name} {sub.Value}", out command))
+            {
+                return new CommandNotFound(parsed);
+            }
+
+            parsed = new ParsedCommand(
+                parsed.Prefix,
+                $"{parsed.Name} {sub.Value}",
+                parsed.RawArguments[(sub.Start + sub.Value.Length)..].TrimStart());
         }
 
         var context = new CommandContext(message, parsed, command);
@@ -117,7 +127,7 @@ internal sealed partial class CommandExecutor(ICommandRegistry registry, IComman
 
         try
         {
-            LogExecuting(command.Name, message.Sender.ToString());
+            LogExecuting(command.FullName, message.Sender.ToString());
             await command.Executor(context, values);
             return new CommandSucceeded(parsed, command);
         }
@@ -127,7 +137,7 @@ internal sealed partial class CommandExecutor(ICommandRegistry registry, IComman
         }
         catch (Exception ex)
         {
-            LogFailed(ex, command.Name);
+            LogFailed(ex, command.FullName);
             return new CommandFaulted(parsed, command, ex);
         }
     }
@@ -152,8 +162,9 @@ public interface ICommandResultHandler
 /// <summary>
 /// Default result handler: replies with the unknown-command message (if enabled), binding errors plus the usage
 /// line, precondition reasons, or the generic error message for faulted commands. Exception details are never sent.
+/// For a command group typed without a known subcommand it lists the group's commands instead.
 /// </summary>
-internal sealed class DefaultCommandResultHandler(IOptionsMonitor<SignalOptions> options) : ICommandResultHandler
+internal sealed class DefaultCommandResultHandler(IOptionsMonitor<SignalOptions> options, ICommandRegistry registry) : ICommandResultHandler
 {
     public Task HandleAsync(MessageContext context, CommandResult result)
     {
@@ -161,9 +172,9 @@ internal sealed class DefaultCommandResultHandler(IOptionsMonitor<SignalOptions>
         var reply = result switch
         {
             CommandSucceeded => null,
-            CommandNotFound notFound => commands.RespondToUnknown
-                ? string.Format(CultureInfo.InvariantCulture, commands.UnknownCommandMessage, notFound.Parsed.Name, notFound.Parsed.Prefix)
-                : null,
+            CommandNotFound notFound => !commands.RespondToUnknown ? null
+                : GroupHint(notFound.Parsed)
+                    ?? string.Format(CultureInfo.InvariantCulture, commands.UnknownCommandMessage, notFound.Parsed.Name, notFound.Parsed.Prefix),
             CommandBindingFailed failed => $"{failed.Error}\nUsage: {failed.Command.FormatUsage(failed.Parsed.Prefix)}",
             CommandPreconditionFailed failed => failed.Reason,
             CommandFaulted => commands.ErrorMessage,
@@ -173,6 +184,22 @@ internal sealed class DefaultCommandResultHandler(IOptionsMonitor<SignalOptions>
         return string.IsNullOrEmpty(reply)
             ? Task.CompletedTask
             : context.ReplyAsync(reply, commands.QuoteReplies, context.CancellationToken);
+    }
+
+    /// <summary>For <c>/group</c> or <c>/group unknown</c>: names the group's visible commands; otherwise <see langword="null"/>.</summary>
+    private string? GroupHint(ParsedCommand parsed)
+    {
+        var visible = registry.GetGroup(parsed.Name).Where(c => !c.Hidden).Select(c => c.Name).ToList();
+        if (visible.Count == 0)
+        {
+            return null;
+        }
+
+        var group = parsed.Prefix + parsed.Name;
+        var available = string.Join(", ", visible);
+        return parsed.Tokens is [var sub, ..]
+            ? $"Unknown subcommand '{sub.Value}' for {group}. Available: {available}."
+            : $"{group} needs a subcommand: {available}. Send {parsed.Prefix}help {parsed.Name} for details.";
     }
 }
 

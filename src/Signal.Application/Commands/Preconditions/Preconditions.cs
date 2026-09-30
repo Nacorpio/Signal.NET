@@ -143,7 +143,7 @@ public sealed class CooldownAttribute(double seconds) : PreconditionAttribute
         };
 
         var tracker = context.Services.GetRequiredService<ICooldownTracker>();
-        return ValueTask.FromResult(tracker.TryEnter($"{context.Command.Name}|{Scope}|{scopeKey}", Period, out var remaining)
+        return ValueTask.FromResult(tracker.TryEnter($"{context.Command.FullName}|{Scope}|{scopeKey}", Period, out var remaining)
             ? PreconditionResult.Success
             : Fail($"Please wait {Math.Ceiling(remaining.TotalSeconds)} s before using this command again."));
     }
