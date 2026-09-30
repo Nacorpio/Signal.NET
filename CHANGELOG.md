@@ -8,6 +8,9 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Roles (roadmap 0.5.6):** `[RequireRole("moderator", Role.GroupAdmin)]` passes when the sender has any listed role.
+  - Roles come from `IRoleProvider`s: `Signal:Commands:Roles` (role → numbers or UUIDs), `admin` (includes `Commands:Admins`) and `group-admin` (Signal group admins, looked up live).
+  - `AddRoleProvider<T>()` adds your own provider, e.g. database-backed. `IRoleService` checks roles outside commands.
 - **Scheduled messages (roadmap 0.5.4):** `CommandModule.ScheduleReplyAsync` / `MessageContext.ScheduleReplyAsync` and `IMessageScheduler` (`ScheduleAsync`, `ListAsync`, `CancelAsync`) send text messages later, once or every `repeatEvery` (at least one minute).
   - `IScheduledMessageStore` is the persistence port; the default keeps messages in memory.
   - `AddSignal` hosts the dispatcher, which checks every `Signal:Scheduler:PollInterval` (1 s) and retries failed sends after `RetryDelay` (1 min).

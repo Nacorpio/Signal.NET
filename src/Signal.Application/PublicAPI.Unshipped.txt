@@ -1,4 +1,6 @@
 #nullable enable
+const Signal.Application.Roles.Role.Admin = "admin" -> string!
+const Signal.Application.Roles.Role.GroupAdmin = "group-admin" -> string!
 override Signal.Application.Background.BackgroundWorkItem.Equals(object? obj) -> bool
 override Signal.Application.Background.BackgroundWorkItem.GetHashCode() -> int
 override Signal.Application.Background.BackgroundWorkItem.ToString() -> string!
@@ -8,6 +10,7 @@ override Signal.Application.Background.PromptResult<T>.ToString() -> string!
 override Signal.Application.Commands.CommandGroupInfo.Equals(object? obj) -> bool
 override Signal.Application.Commands.CommandGroupInfo.GetHashCode() -> int
 override Signal.Application.Commands.CommandGroupInfo.ToString() -> string!
+override Signal.Application.Roles.RequireRoleAttribute.CheckAsync(Signal.Application.Commands.CommandContext! context, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<Signal.Application.Commands.Preconditions.PreconditionResult>
 override Signal.Application.Scheduling.ScheduledMessage.Equals(object? obj) -> bool
 override Signal.Application.Scheduling.ScheduledMessage.GetHashCode() -> int
 override Signal.Application.Scheduling.ScheduledMessage.ToString() -> string!
@@ -106,6 +109,8 @@ Signal.Application.Configuration.BackgroundOptions.PromptTimeout.get -> System.T
 Signal.Application.Configuration.BackgroundOptions.PromptTimeout.set -> void
 Signal.Application.Configuration.CommandOptions.HelpPageSize.get -> int
 Signal.Application.Configuration.CommandOptions.HelpPageSize.set -> void
+Signal.Application.Configuration.CommandOptions.Roles.get -> System.Collections.Generic.Dictionary<string!, System.Collections.Generic.List<string!>!>!
+Signal.Application.Configuration.CommandOptions.Roles.set -> void
 Signal.Application.Configuration.CommandOptions.SuggestSimilarCommands.get -> bool
 Signal.Application.Configuration.CommandOptions.SuggestSimilarCommands.set -> void
 Signal.Application.Configuration.SchedulerOptions
@@ -118,6 +123,14 @@ Signal.Application.Configuration.SignalOptions.Background.get -> Signal.Applicat
 Signal.Application.Configuration.SignalOptions.Background.set -> void
 Signal.Application.Configuration.SignalOptions.Scheduler.get -> Signal.Application.Configuration.SchedulerOptions!
 Signal.Application.Configuration.SignalOptions.Scheduler.set -> void
+Signal.Application.Roles.IRoleProvider
+Signal.Application.Roles.IRoleProvider.HasRoleAsync(Signal.Application.Pipeline.MessageContext! message, string! role, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.ValueTask<bool>
+Signal.Application.Roles.IRoleService
+Signal.Application.Roles.IRoleService.HasAnyRoleAsync(Signal.Application.Pipeline.MessageContext! message, System.Collections.Generic.IEnumerable<string!>! roles, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask<bool>
+Signal.Application.Roles.RequireRoleAttribute
+Signal.Application.Roles.RequireRoleAttribute.RequireRoleAttribute(params string![]! roles) -> void
+Signal.Application.Roles.RequireRoleAttribute.Roles.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Signal.Application.Roles.Role
 Signal.Application.Scheduling.IMessageScheduler
 Signal.Application.Scheduling.IMessageScheduler.CancelAsync(System.Guid id, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<bool>!
 Signal.Application.Scheduling.IMessageScheduler.ListAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Collections.Generic.IReadOnlyList<Signal.Application.Scheduling.ScheduledMessage!>!>!
