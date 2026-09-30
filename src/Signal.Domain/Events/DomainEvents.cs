@@ -78,6 +78,17 @@ public sealed record ReceiptReceived(IncomingEnvelope Envelope, ReceiptMessage R
 public sealed record TypingIndicatorChanged(IncomingEnvelope Envelope, TypingMessage Typing) : DomainEvent(Envelope);
 
 /// <summary>A group's name, members or settings changed (for example because the account was added to it).</summary>
+/// <remarks>
+/// Signal only reports <em>that</em> the group changed, not what changed. Compare <see cref="Revision"/> with a stored
+/// value, or fetch the group with <c>IGroupService.GetAsync</c>, to find out.
+/// </remarks>
 /// <param name="Envelope">The envelope that produced the event.</param>
 /// <param name="Group">The changed group.</param>
-public sealed record GroupUpdated(IncomingEnvelope Envelope, GroupId Group) : DomainEvent(Envelope);
+public sealed record GroupUpdated(IncomingEnvelope Envelope, GroupId Group) : DomainEvent(Envelope)
+{
+    /// <summary>The group's name after the change, if reported.</summary>
+    public string? Name { get; init; }
+
+    /// <summary>The group's revision after the change; it increases with every change to the group.</summary>
+    public int? Revision { get; init; }
+}

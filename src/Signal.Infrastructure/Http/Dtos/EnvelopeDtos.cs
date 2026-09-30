@@ -143,6 +143,10 @@ internal sealed class GroupInfoDto
 {
     public string? GroupId { get; set; }
     public string? GroupName { get; set; }
+
+    /// <summary>The group revision (groups v2); increases with every change to the group.</summary>
+    public int? Revision { get; set; }
+
     public string? Type { get; set; }
 }
 

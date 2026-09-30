@@ -175,7 +175,7 @@ produces a compiler warning at every `switch` that doesn't handle it yet. `EditM
 
 **Purpose:** a regular message.
 
-- **Content:** `Timestamp` and `Text`, plus `Group`, `Attachments`, `Mentions`, `TextStyles`, `Quote`, `Reaction`, `Sticker`, `RemoteDelete`, `IsGroupUpdate` and `ViewOnce`.
+- **Content:** `Timestamp` and `Text`, plus `Group`, `Attachments`, `GroupName`, `GroupRevision`, `Mentions`, `TextStyles`, `Quote`, `Reaction`, `Sticker`, `RemoteDelete`, `IsGroupUpdate` and `ViewOnce`.
 - **`TextStyles`:** the sender's formatting as `StyledRange(Style, Start, Length)` entries, with `TextStyle` being `Bold`, `Italic`, `Spoiler`, `Strikethrough` or `Monospace`. Positions are UTF-16 offsets into `Text`, like mentions.
 - **`HasContent`:** true when there is text, at least one attachment, or a sticker.
 - **`Sticker`:** a received sticker as the same `Sticker` value object used for sending, so a bot can send it back with `WithSticker`.
@@ -330,7 +330,7 @@ receives messages. Events are raised by `IncomingEnvelope.ToDomainEvent()` and d
 | `ReactionReceived` | `Reaction` | Polls, acknowledgements |
 | `ReceiptReceived` | `Receipt` | Delivery tracking |
 | `TypingIndicatorChanged` | `Typing` | Presence features |
-| `GroupUpdated` | `Group` | Welcome messages, audit logs |
+| `GroupUpdated` | `Group`, `Name`, `Revision` | Welcome messages, audit logs. Signal doesn't say *what* changed: compare `Revision` with a stored value, or fetch the group with `IGroupService.GetAsync`. |
 
 Every event implements `IDomainEvent`, exposing `Envelope` (the full context) and `OccurredAt`
 (the envelope's timestamp).
