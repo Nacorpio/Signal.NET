@@ -26,7 +26,7 @@ These known limitations shape the plan below:
 
 1. **Long-running commands block their conversation partition.** The docs currently only advise against them.
 2. **Reflection and `Expression.Compile`** in `CommandDescriptorFactory`, `ArgumentConverters` and `DomainEventDispatcher` rule out trimming and Native AOT.
-3. **Unmodelled envelope content.** Sync, story and call messages are dropped by `EnvelopeMapper` (edits, remote deletes and stickers are handled since 0.4).
+3. **Unmodelled envelope content.** Story and call messages, and sync messages other than sent transcripts, are dropped by `EnvelopeMapper` (edits, remote deletes, stickers and sent transcripts are handled since 0.4).
 4. **State is in memory only.** Cooldowns and rate limits don't survive restarts and aren't shared between instances.
 5. **Partial API coverage.** Registration, devices, stickers, username, account settings, remote delete and search are missing.
 6. **Pre-release SDK dependency.** The project builds with the .NET 11 RC1 SDK and `LangVersion=preview`. It cannot declare a stable 1.0 before .NET 11 and C# 15 are generally available.
@@ -87,7 +87,7 @@ it are exhaustive, the compiler points at every place that needs updating.*
 
 | # | Feature | Layer | Size | Notes |
 |---|---|---|---|---|
-| 0.4.1 | **Sync messages** | D/I | M | Messages sent from the account's own devices (`SentTranscript`); enables "note to self" bots and multi-device awareness |
+| 0.4.1 | **Sync messages** | D/I | M | ✅ New `EnvelopeContent` case `SentTranscript` (destination, message, edit target) and `MessageSent` event. Transcripts never run commands (no echo loops); receiving them is opt-in via `IgnoreOwnMessages = false`. Read, blocked and contact sync messages remain unmodelled. |
 | 0.4.2 | **Edited messages** | D/I | S | ✅ New `EnvelopeContent` case `EditMessage` (signal-cli reports edits at envelope level) and `MessageEdited` event. Edits never run commands. |
 | 0.4.3 | **Remote deletes** | D/I | S | ✅ `DataMessage.RemoteDelete` and `MessageDeleted` event (takes precedence over the other data-message events) |
 | 0.4.4 | **Stickers received** | D/I | S | ✅ `DataMessage.Sticker` (the `Sticker` value object from 0.3.6); sticker-only messages now raise `MessageReceived` |

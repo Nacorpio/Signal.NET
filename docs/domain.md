@@ -7,9 +7,9 @@ speaks this language. The project has no dependencies, performs no I/O, and neve
 |---|---|
 | `/` | `ExecutionMode`, `ExecutionModeExtensions` |
 | `ValueObjects/` | `PhoneNumber`, `AccountId`, `Username`, `GroupId`, `Recipient` (union) |
-| `Messaging/` | `IncomingEnvelope`, `EnvelopeContent` (union), `DataMessage`, `EditMessage`, `RemoteDelete`, `ReceiptMessage`, `TypingMessage`, `Sender`, `OutgoingMessage`, `OutgoingMessageBuilder`, `Attachment`, `Mention`, `Quote`, `Reaction`, `TextMode`, `ReceiptType`, `TypingAction` |
+| `Messaging/` | `IncomingEnvelope`, `EnvelopeContent` (union), `DataMessage`, `EditMessage`, `RemoteDelete`, `SentTranscript`, `ReceiptMessage`, `TypingMessage`, `Sender`, `OutgoingMessage`, `OutgoingMessageBuilder`, `Attachment`, `Mention`, `Quote`, `Reaction`, `TextMode`, `ReceiptType`, `TypingAction` |
 | `Entities/` | `Entity<TId>`, `Group`, `Contact`, `Identity` |
-| `Events/` | `IDomainEvent`, `DomainEvent`, `MessageReceived`, `MessageEdited`, `MessageDeleted`, `ReactionReceived`, `ReceiptReceived`, `TypingIndicatorChanged`, `GroupUpdated` |
+| `Events/` | `IDomainEvent`, `DomainEvent`, `MessageReceived`, `MessageEdited`, `MessageDeleted`, `MessageSent`, `ReactionReceived`, `ReceiptReceived`, `TypingIndicatorChanged`, `GroupUpdated` |
 | `Exceptions/` | `SignalDomainException`, `InvalidPhoneNumberException`, `InvalidRecipientException` |
 
 ---
@@ -138,10 +138,10 @@ it with an `ArgumentException`.
 | `Account` | The receiving account |
 | `Source` | The `Sender` |
 | `Timestamp` / `ReceivedAt` | Server timestamp (ms) / as a `DateTimeOffset` |
-| `Content` | The `EnvelopeContent` union: **exactly one** of `DataMessage`, `EditMessage`, `ReceiptMessage`, `TypingMessage` |
-| `Data` / `Edit` / `Receipt` / `Typing` | Convenience accessors. Each returns the content if it has that type, otherwise `null`. |
-| `Group`, `IsGroup` | Group context, from the data message, the edited message or the typing message |
-| `Conversation` | **Where replies go:** the group recipient for group messages, otherwise the sender (by phone number, or by `AccountId` if the number is hidden) |
+| `Content` | The `EnvelopeContent` union: **exactly one** of `DataMessage`, `EditMessage`, `SentTranscript`, `ReceiptMessage`, `TypingMessage` |
+| `Data` / `Edit` / `Transcript` / `Receipt` / `Typing` | Convenience accessors. Each returns the content if it has that type, otherwise `null`. |
+| `Group`, `IsGroup` | Group context, from the data message, the edited or sent message, or the typing message |
+| `Conversation` | **Where replies go:** the group recipient for group messages, otherwise the sender (by phone number, or by `AccountId` if the number is hidden). For a `SentTranscript` it is the transcript's destination, because the sender is the account itself. |
 | `ToDomainEvent()` | Converts the envelope into its domain event (see below) |
 
 `ToDomainEvent()` is an exhaustive switch over `Content`:
@@ -154,19 +154,20 @@ it with an `ArgumentException`.
 | `DataMessage` with text, attachments or a sticker | `MessageReceived` |
 | `DataMessage` without content | none (`null`) |
 | `EditMessage` | `MessageEdited` |
+| `SentTranscript` | `MessageSent` |
 | `ReceiptMessage` | `ReceiptReceived` |
 | `TypingMessage` | `TypingIndicatorChanged` |
 
 ### `EnvelopeContent` (union)
 
 ```csharp
-public union EnvelopeContent(DataMessage, EditMessage, ReceiptMessage, TypingMessage);
+public union EnvelopeContent(DataMessage, EditMessage, SentTranscript, ReceiptMessage, TypingMessage);
 ```
 
 **Purpose:** a Signal envelope carries exactly one kind of content. Modelling that as a union makes it
 impossible to build an envelope with no content or with two kinds at once. Adding a new content kind
-produces a compiler warning at every `switch` that doesn't handle it yet. `EditMessage` was added this way in
-0.4, so exhaustive switches written against 0.3 now warn until they handle edits.
+produces a compiler warning at every `switch` that doesn't handle it yet. `EditMessage` and `SentTranscript` were added this
+way in 0.4, so exhaustive switches written against 0.3 now warn until they handle them.
 
 ### `DataMessage`
 
@@ -184,6 +185,19 @@ produces a compiler warning at every `switch` that doesn't handle it yet. `EditM
 data message, so `EditMessage` is its own union case: `TargetTimestamp` names the edited message and `Message`
 is the new version (a full `DataMessage`, with its own timestamp). **Edits never run commands**, so editing a
 message into `/something` doesn't execute it; handle `MessageEdited` to react to edits.
+
+### `SentTranscript`
+
+**Purpose:** a copy of a message the receiving account sent from one of its **other devices** (for example
+typed on the phone), delivered by Signal as a sync message. `Conversation` is where it went: the group, the
+direct-message recipient, or the account itself for "note to self". `Message` is the sent `DataMessage`; for a
+transcript of an edit, `EditTargetTimestamp` names the edited message.
+
+- **Transcripts never run commands.** Two bot instances sharing an account therefore can't trigger each other
+  in a loop. Handle `MessageSent` instead.
+- **They're filtered by default.** Their sender is the account itself, so `AccessControl:IgnoreOwnMessages`
+  (default `true`) drops them. Set it to `false` to receive `MessageSent`. If you use `AllowedSenders`, include
+  the account's own number too.
 
 ### `ReceiptMessage`, `TypingMessage`
 
@@ -291,6 +305,7 @@ receives messages. Events are raised by `IncomingEnvelope.ToDomainEvent()` and d
 | `MessageReceived` | `Message` (`DataMessage`) | Logging, auto-replies, moderation, non-command bots |
 | `MessageEdited` | `Edit` (`EditMessage`) | Keeping stored copies or moderation up to date |
 | `MessageDeleted` | `Delete` (`RemoteDelete`) | Removing stored copies (e.g. logs, archives) |
+| `MessageSent` | `Transcript` (`SentTranscript`) | "Note to self" bots, multi-device awareness. Requires `IgnoreOwnMessages = false`. |
 | `ReactionReceived` | `Reaction` | Polls, acknowledgements |
 | `ReceiptReceived` | `Receipt` | Delivery tracking |
 | `TypingIndicatorChanged` | `Typing` | Presence features |

@@ -8,6 +8,7 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Sync messages (roadmap 0.4.1):** `EnvelopeContent` has a new case, `SentTranscript`, for messages the account sent from its other devices, raising the new `MessageSent` event. `IncomingEnvelope.Conversation` is the transcript's destination. Transcripts never run commands. They are delivered only with `AccessControl:IgnoreOwnMessages = false`, so the default behavior is unchanged.
 - **Edits, remote deletes and received stickers (roadmap 0.4.2, 0.4.3, 0.4.4):**
   - `EnvelopeContent` has a new case, `EditMessage` (edited message's timestamp plus the new version), raising the new `MessageEdited` event. Edits never run commands.
   - `DataMessage.RemoteDelete` raises the new `MessageDeleted` event.
@@ -15,7 +16,7 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
-- Exhaustive `switch`es over `EnvelopeContent` now produce a warning until they handle `EditMessage`. This is source-compatible and binary-compatible.
+- Exhaustive `switch`es over `EnvelopeContent` now produce a warning until they handle `EditMessage` and `SentTranscript`. This is source-compatible and binary-compatible.
 - Sticker-only messages now raise `MessageReceived` (they were dropped before). `DataMessage.HasContent` is `true` for them, while `Text` is `null`.
 
 ## [0.3.0-preview.1] - 2026-09-29

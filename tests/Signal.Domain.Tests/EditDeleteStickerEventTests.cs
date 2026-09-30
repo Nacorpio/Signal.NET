@@ -40,6 +40,21 @@ public class EditDeleteStickerEventTests
     }
 
     [Fact]
+    public void Transcripts_raise_MessageSent_and_reply_to_their_destination()
+    {
+        var self = new Sender(Account, null, "Me");
+        var bob = PhoneNumber.Parse("+15550002222");
+        var transcript = new SentTranscript(bob, new DataMessage(20, "hello bob"));
+
+        var envelope = new IncomingEnvelope(Account, self, 1, transcript);
+
+        var sent = Assert.IsType<MessageSent>(envelope.ToDomainEvent());
+        Assert.Same(transcript, sent.Transcript);
+        Assert.Equal((Recipient)bob, envelope.Conversation);
+        Assert.False(envelope.IsGroup);
+    }
+
+    [Fact]
     public void A_sticker_alone_counts_as_content()
     {
         var data = new DataMessage(20, null) { Sticker = new Sticker("abc", 1) };

@@ -36,6 +36,14 @@ public sealed record MessageReceived(IncomingEnvelope Envelope, DataMessage Mess
 /// <param name="Edit">The edit: the original message's timestamp and the new version.</param>
 public sealed record MessageEdited(IncomingEnvelope Envelope, EditMessage Edit) : DomainEvent(Envelope);
 
+/// <summary>
+/// The receiving account sent a message from one of its other devices, e.g. typed on the phone. Useful for
+/// "note to self" bots and multi-device awareness. Transcripts never run commands.
+/// </summary>
+/// <param name="Envelope">The envelope that produced the event; its <see cref="IncomingEnvelope.Conversation"/> is the destination.</param>
+/// <param name="Transcript">The sent message and its destination.</param>
+public sealed record MessageSent(IncomingEnvelope Envelope, SentTranscript Transcript) : DomainEvent(Envelope);
+
 /// <summary>The sender deleted one of their earlier messages for everyone.</summary>
 /// <param name="Envelope">The envelope that produced the event.</param>
 /// <param name="Delete">The deletion, naming the deleted message's timestamp.</param>

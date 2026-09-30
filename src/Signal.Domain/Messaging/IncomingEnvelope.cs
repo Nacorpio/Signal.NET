@@ -57,6 +57,23 @@ public sealed record RemoteDelete(long TargetTimestamp);
 /// <param name="Message">The new version of the message; its <see cref="DataMessage.Timestamp"/> identifies this edit.</param>
 public sealed record EditMessage(long TargetTimestamp, DataMessage Message);
 
+/// <summary>
+/// A copy of a message the receiving account sent from one of its other devices (for example the phone), delivered
+/// as a sync message. The envelope's sender is the account itself; <see cref="Conversation"/> says where the
+/// message went.
+/// </summary>
+/// <remarks>Transcripts never run commands, so bots that share an account cannot trigger each other in a loop.</remarks>
+/// <param name="Conversation">The group, or the direct-message recipient (the account itself for "note to self").</param>
+/// <param name="Message">The sent message.</param>
+public sealed record SentTranscript(Recipient Conversation, DataMessage Message)
+{
+    /// <summary>
+    /// Set when the transcript is an edit: the timestamp of the edited message. <see cref="Message"/> is then the new
+    /// version.
+    /// </summary>
+    public long? EditTargetTimestamp { get; init; }
+}
+
 /// <summary>A delivery, read or viewed receipt for previously sent messages.</summary>
 /// <param name="Type">The kind of receipt.</param>
 /// <param name="When">When the receipt was issued (Unix milliseconds).</param>
@@ -71,8 +88,8 @@ public sealed record TypingMessage(TypingAction Action, long Timestamp, GroupId?
 
 /// <summary>
 /// What an envelope carries: exactly one of a <see cref="DataMessage"/>, an <see cref="EditMessage"/>, a
-/// <see cref="ReceiptMessage"/> or a <see cref="TypingMessage"/>. Signal envelopes never combine them, and the union
-/// makes that impossible to violate.
+/// <see cref="SentTranscript"/>, a <see cref="ReceiptMessage"/> or a <see cref="TypingMessage"/>. Signal envelopes
+/// never combine them, and the union makes that impossible to violate.
 /// </summary>
 /// <remarks>
 /// Switch over the content to handle every kind; the compiler warns when a case is missing (for example when a
@@ -82,12 +99,13 @@ public sealed record TypingMessage(TypingAction Action, long Timestamp, GroupId?
 /// {
 ///     DataMessage data =&gt; data.Text,
 ///     EditMessage edit =&gt; $"edited: {edit.Message.Text}",
+///     SentTranscript sent =&gt; $"sent from another device: {sent.Message.Text}",
 ///     ReceiptMessage receipt =&gt; $"{receipt.Type} receipt",
 ///     TypingMessage typing =&gt; $"typing {typing.Action}",
 /// };
 /// </code>
 /// </remarks>
-public union EnvelopeContent(DataMessage, EditMessage, ReceiptMessage, TypingMessage);
+public union EnvelopeContent(DataMessage, EditMessage, SentTranscript, ReceiptMessage, TypingMessage);
 
 /// <summary>
 /// Aggregate root for everything received from Signal. Knows which conversation it belongs to
@@ -105,6 +123,9 @@ public sealed record IncomingEnvelope(PhoneNumber Account, Sender Source, long T
     /// <summary>The content if it is an edit; otherwise <see langword="null"/>.</summary>
     public EditMessage? Edit => Content.Value as EditMessage;
 
+    /// <summary>The content if it is a transcript of a message sent from another device; otherwise <see langword="null"/>.</summary>
+    public SentTranscript? Transcript => Content.Value as SentTranscript;
+
     /// <summary>The content if it is a receipt; otherwise <see langword="null"/>.</summary>
     public ReceiptMessage? Receipt => Content.Value as ReceiptMessage;
 
@@ -112,13 +133,14 @@ public sealed record IncomingEnvelope(PhoneNumber Account, Sender Source, long T
     public TypingMessage? Typing => Content.Value as TypingMessage;
 
     /// <summary>
-    /// The group context of a data message, edit or typing indicator; <see langword="null"/> for direct conversations
-    /// and receipts.
+    /// The group context of a data message, edit, transcript or typing indicator; <see langword="null"/> for direct
+    /// conversations and receipts.
     /// </summary>
     public GroupId? Group => Content switch
     {
         DataMessage data => data.Group,
         EditMessage edit => edit.Message.Group,
+        SentTranscript sent => sent.Message.Group,
         TypingMessage typing => typing.Group,
         ReceiptMessage => null,
         null => null,
@@ -127,8 +149,13 @@ public sealed record IncomingEnvelope(PhoneNumber Account, Sender Source, long T
     /// <summary>Whether the envelope belongs to a group conversation.</summary>
     public bool IsGroup => Group is not null;
 
-    /// <summary>Where a reply should go: the group, or the sender for direct messages.</summary>
-    public Recipient Conversation => Group is { } group ? group : Source.ToRecipient();
+    /// <summary>
+    /// Where a reply should go: the group, or the sender for direct messages. For a <see cref="SentTranscript"/> it is
+    /// the transcript's destination, because the sender is the account itself.
+    /// </summary>
+    public Recipient Conversation => Content.Value is SentTranscript sent ? sent.Conversation
+        : Group is { } group ? group
+        : Source.ToRecipient();
 
     /// <summary><see cref="Timestamp"/> as a <see cref="DateTimeOffset"/>.</summary>
     public DateTimeOffset ReceivedAt => DateTimeOffset.FromUnixTimeMilliseconds(Timestamp);
@@ -138,7 +165,7 @@ public sealed record IncomingEnvelope(PhoneNumber Account, Sender Source, long T
     /// <list type="bullet">
     /// <item>for data messages, in this order of precedence: <see cref="MessageDeleted"/>, <see cref="ReactionReceived"/>,
     /// <see cref="GroupUpdated"/>, <see cref="MessageReceived"/>;</item>
-    /// <item><see cref="MessageEdited"/> for edits;</item>
+    /// <item><see cref="MessageEdited"/> for edits and <see cref="MessageSent"/> for transcripts;</item>
     /// <item><see cref="ReceiptReceived"/> for receipts and <see cref="TypingIndicatorChanged"/> for typing indicators.</item>
     /// </list>
     /// </summary>
@@ -151,6 +178,7 @@ public sealed record IncomingEnvelope(PhoneNumber Account, Sender Source, long T
         DataMessage { HasContent: true } data => new MessageReceived(this, data),
         DataMessage => null,
         EditMessage edit => new MessageEdited(this, edit),
+        SentTranscript sent => new MessageSent(this, sent),
         ReceiptMessage receipt => new ReceiptReceived(this, receipt),
         TypingMessage typing => new TypingIndicatorChanged(this, typing),
         null => null,

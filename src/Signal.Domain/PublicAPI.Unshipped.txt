@@ -1,6 +1,7 @@
 #nullable enable
 override sealed Signal.Domain.Events.MessageDeleted.Equals(Signal.Domain.Events.DomainEvent? other) -> bool
 override sealed Signal.Domain.Events.MessageEdited.Equals(Signal.Domain.Events.DomainEvent? other) -> bool
+override sealed Signal.Domain.Events.MessageSent.Equals(Signal.Domain.Events.DomainEvent? other) -> bool
 override Signal.Domain.Events.MessageDeleted.<Clone>$() -> Signal.Domain.Events.MessageDeleted!
 override Signal.Domain.Events.MessageDeleted.Equals(object? obj) -> bool
 override Signal.Domain.Events.MessageDeleted.GetHashCode() -> int
@@ -9,12 +10,19 @@ override Signal.Domain.Events.MessageEdited.<Clone>$() -> Signal.Domain.Events.M
 override Signal.Domain.Events.MessageEdited.Equals(object? obj) -> bool
 override Signal.Domain.Events.MessageEdited.GetHashCode() -> int
 override Signal.Domain.Events.MessageEdited.ToString() -> string!
+override Signal.Domain.Events.MessageSent.<Clone>$() -> Signal.Domain.Events.MessageSent!
+override Signal.Domain.Events.MessageSent.Equals(object? obj) -> bool
+override Signal.Domain.Events.MessageSent.GetHashCode() -> int
+override Signal.Domain.Events.MessageSent.ToString() -> string!
 override Signal.Domain.Messaging.EditMessage.Equals(object? obj) -> bool
 override Signal.Domain.Messaging.EditMessage.GetHashCode() -> int
 override Signal.Domain.Messaging.EditMessage.ToString() -> string!
 override Signal.Domain.Messaging.RemoteDelete.Equals(object? obj) -> bool
 override Signal.Domain.Messaging.RemoteDelete.GetHashCode() -> int
 override Signal.Domain.Messaging.RemoteDelete.ToString() -> string!
+override Signal.Domain.Messaging.SentTranscript.Equals(object? obj) -> bool
+override Signal.Domain.Messaging.SentTranscript.GetHashCode() -> int
+override Signal.Domain.Messaging.SentTranscript.ToString() -> string!
 Signal.Domain.Events.MessageDeleted
 Signal.Domain.Events.MessageDeleted.Deconstruct(out Signal.Domain.Messaging.IncomingEnvelope! Envelope, out Signal.Domain.Messaging.RemoteDelete! Delete) -> void
 Signal.Domain.Events.MessageDeleted.Delete.get -> Signal.Domain.Messaging.RemoteDelete!
@@ -27,6 +35,12 @@ Signal.Domain.Events.MessageEdited.Edit.get -> Signal.Domain.Messaging.EditMessa
 Signal.Domain.Events.MessageEdited.Edit.init -> void
 Signal.Domain.Events.MessageEdited.Equals(Signal.Domain.Events.MessageEdited? other) -> bool
 Signal.Domain.Events.MessageEdited.MessageEdited(Signal.Domain.Messaging.IncomingEnvelope! Envelope, Signal.Domain.Messaging.EditMessage! Edit) -> void
+Signal.Domain.Events.MessageSent
+Signal.Domain.Events.MessageSent.Deconstruct(out Signal.Domain.Messaging.IncomingEnvelope! Envelope, out Signal.Domain.Messaging.SentTranscript! Transcript) -> void
+Signal.Domain.Events.MessageSent.Equals(Signal.Domain.Events.MessageSent? other) -> bool
+Signal.Domain.Events.MessageSent.MessageSent(Signal.Domain.Messaging.IncomingEnvelope! Envelope, Signal.Domain.Messaging.SentTranscript! Transcript) -> void
+Signal.Domain.Events.MessageSent.Transcript.get -> Signal.Domain.Messaging.SentTranscript!
+Signal.Domain.Events.MessageSent.Transcript.init -> void
 Signal.Domain.Messaging.DataMessage.RemoteDelete.get -> Signal.Domain.Messaging.RemoteDelete?
 Signal.Domain.Messaging.DataMessage.RemoteDelete.init -> void
 Signal.Domain.Messaging.DataMessage.Sticker.get -> Signal.Domain.Messaging.Sticker?
@@ -41,7 +55,9 @@ Signal.Domain.Messaging.EditMessage.Message.init -> void
 Signal.Domain.Messaging.EditMessage.TargetTimestamp.get -> long
 Signal.Domain.Messaging.EditMessage.TargetTimestamp.init -> void
 Signal.Domain.Messaging.EnvelopeContent.EnvelopeContent(Signal.Domain.Messaging.EditMessage! value) -> void
+Signal.Domain.Messaging.EnvelopeContent.EnvelopeContent(Signal.Domain.Messaging.SentTranscript! value) -> void
 Signal.Domain.Messaging.IncomingEnvelope.Edit.get -> Signal.Domain.Messaging.EditMessage?
+Signal.Domain.Messaging.IncomingEnvelope.Transcript.get -> Signal.Domain.Messaging.SentTranscript?
 Signal.Domain.Messaging.RemoteDelete
 Signal.Domain.Messaging.RemoteDelete.<Clone>$() -> Signal.Domain.Messaging.RemoteDelete!
 Signal.Domain.Messaging.RemoteDelete.Deconstruct(out long TargetTimestamp) -> void
@@ -49,11 +65,26 @@ Signal.Domain.Messaging.RemoteDelete.Equals(Signal.Domain.Messaging.RemoteDelete
 Signal.Domain.Messaging.RemoteDelete.RemoteDelete(long TargetTimestamp) -> void
 Signal.Domain.Messaging.RemoteDelete.TargetTimestamp.get -> long
 Signal.Domain.Messaging.RemoteDelete.TargetTimestamp.init -> void
+Signal.Domain.Messaging.SentTranscript
+Signal.Domain.Messaging.SentTranscript.<Clone>$() -> Signal.Domain.Messaging.SentTranscript!
+Signal.Domain.Messaging.SentTranscript.Conversation.get -> Signal.Domain.ValueObjects.Recipient
+Signal.Domain.Messaging.SentTranscript.Conversation.init -> void
+Signal.Domain.Messaging.SentTranscript.Deconstruct(out Signal.Domain.ValueObjects.Recipient Conversation, out Signal.Domain.Messaging.DataMessage! Message) -> void
+Signal.Domain.Messaging.SentTranscript.EditTargetTimestamp.get -> long?
+Signal.Domain.Messaging.SentTranscript.EditTargetTimestamp.init -> void
+Signal.Domain.Messaging.SentTranscript.Equals(Signal.Domain.Messaging.SentTranscript? other) -> bool
+Signal.Domain.Messaging.SentTranscript.Message.get -> Signal.Domain.Messaging.DataMessage!
+Signal.Domain.Messaging.SentTranscript.Message.init -> void
+Signal.Domain.Messaging.SentTranscript.SentTranscript(Signal.Domain.ValueObjects.Recipient Conversation, Signal.Domain.Messaging.DataMessage! Message) -> void
 static Signal.Domain.Events.MessageDeleted.operator !=(Signal.Domain.Events.MessageDeleted? left, Signal.Domain.Events.MessageDeleted? right) -> bool
 static Signal.Domain.Events.MessageDeleted.operator ==(Signal.Domain.Events.MessageDeleted? left, Signal.Domain.Events.MessageDeleted? right) -> bool
 static Signal.Domain.Events.MessageEdited.operator !=(Signal.Domain.Events.MessageEdited? left, Signal.Domain.Events.MessageEdited? right) -> bool
 static Signal.Domain.Events.MessageEdited.operator ==(Signal.Domain.Events.MessageEdited? left, Signal.Domain.Events.MessageEdited? right) -> bool
+static Signal.Domain.Events.MessageSent.operator !=(Signal.Domain.Events.MessageSent? left, Signal.Domain.Events.MessageSent? right) -> bool
+static Signal.Domain.Events.MessageSent.operator ==(Signal.Domain.Events.MessageSent? left, Signal.Domain.Events.MessageSent? right) -> bool
 static Signal.Domain.Messaging.EditMessage.operator !=(Signal.Domain.Messaging.EditMessage? left, Signal.Domain.Messaging.EditMessage? right) -> bool
 static Signal.Domain.Messaging.EditMessage.operator ==(Signal.Domain.Messaging.EditMessage? left, Signal.Domain.Messaging.EditMessage? right) -> bool
 static Signal.Domain.Messaging.RemoteDelete.operator !=(Signal.Domain.Messaging.RemoteDelete? left, Signal.Domain.Messaging.RemoteDelete? right) -> bool
 static Signal.Domain.Messaging.RemoteDelete.operator ==(Signal.Domain.Messaging.RemoteDelete? left, Signal.Domain.Messaging.RemoteDelete? right) -> bool
+static Signal.Domain.Messaging.SentTranscript.operator !=(Signal.Domain.Messaging.SentTranscript? left, Signal.Domain.Messaging.SentTranscript? right) -> bool
+static Signal.Domain.Messaging.SentTranscript.operator ==(Signal.Domain.Messaging.SentTranscript? left, Signal.Domain.Messaging.SentTranscript? right) -> bool
