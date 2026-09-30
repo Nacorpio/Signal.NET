@@ -2,6 +2,13 @@
 override Signal.Application.Commands.CommandGroupInfo.Equals(object? obj) -> bool
 override Signal.Application.Commands.CommandGroupInfo.GetHashCode() -> int
 override Signal.Application.Commands.CommandGroupInfo.ToString() -> string!
+Signal.Application.Commands.CategoryAttribute
+Signal.Application.Commands.CategoryAttribute.CategoryAttribute(string! name) -> void
+Signal.Application.Commands.CategoryAttribute.Name.get -> string!
+Signal.Application.Commands.CommandDescriptor.Category.get -> string?
+Signal.Application.Commands.CommandDescriptor.Category.init -> void
+Signal.Application.Commands.CommandDescriptor.Examples.get -> System.Collections.Generic.IReadOnlyList<string!>!
+Signal.Application.Commands.CommandDescriptor.Examples.init -> void
 Signal.Application.Commands.CommandDescriptor.FullName.get -> string!
 Signal.Application.Commands.CommandDescriptor.Group.get -> Signal.Application.Commands.CommandGroupInfo?
 Signal.Application.Commands.CommandDescriptor.Group.init -> void
@@ -26,7 +33,12 @@ Signal.Application.Commands.CommandGroupInfo.Name.init -> void
 Signal.Application.Commands.CommandParameter.ElementType.get -> System.Type?
 Signal.Application.Commands.CommandParameter.ElementType.init -> void
 Signal.Application.Commands.CommandParameter.IsCollection.get -> bool
+Signal.Application.Commands.ExampleAttribute
+Signal.Application.Commands.ExampleAttribute.ExampleAttribute(string! text) -> void
+Signal.Application.Commands.ExampleAttribute.Text.get -> string!
 Signal.Application.Commands.ICommandRegistry.GetGroup(string! groupNameOrAlias) -> System.Collections.Generic.IReadOnlyList<Signal.Application.Commands.CommandDescriptor!>!
+Signal.Application.Configuration.CommandOptions.HelpPageSize.get -> int
+Signal.Application.Configuration.CommandOptions.HelpPageSize.set -> void
 Signal.Application.Configuration.CommandOptions.SuggestSimilarCommands.get -> bool
 Signal.Application.Configuration.CommandOptions.SuggestSimilarCommands.set -> void
 static Signal.Application.Commands.CommandGroupInfo.From(Signal.Application.Commands.CommandGroupAttribute! attribute) -> Signal.Application.Commands.CommandGroupInfo!

@@ -26,7 +26,7 @@ Durations use the `TimeSpan` format `hh:mm:ss`. Enum values are case-insensitive
                    "UnknownCommandMessage": "Unknown command '{0}'. Send {1}help for a list of commands.",
                    "SuggestSimilarCommands": true,
                    "ErrorMessage": "Sorry, something went wrong while executing this command.",
-                   "QuoteReplies": false, "EnableHelp": true, "Admins": [ "+4915112345678" ] },
+                   "QuoteReplies": false, "EnableHelp": true, "HelpPageSize": 20, "Admins": [ "+4915112345678" ] },
     "AccessControl": { "AllowedSenders": [], "BlockedSenders": [], "IgnoreOwnMessages": true },
     "RateLimit": { "PermitsPerWindow": 0, "Window": "00:01:00" }
   }
@@ -84,6 +84,7 @@ Durations use the `TimeSpan` format `hh:mm:ss`. Enum values are case-insensitive
 | `ErrorMessage` | see above | Sent when a command throws |
 | `QuoteReplies` | false | Replies quote the triggering message |
 | `EnableHelp` | true | Enables the built-in `help` command |
+| `HelpPageSize` | 20 | Commands per `/help` page (`/help 2` for the next). 0 disables paging. |
 | `Admins` | [] | Phone numbers or UUIDs allowed to use `[RequireAdmin]` commands |
 
 ## `AccessControl`

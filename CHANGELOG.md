@@ -8,6 +8,7 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Better help (roadmap 0.5.8):** `/help` lists commands under headings for each command group and `[Category("…")]` (a flat list when there's only one section). It pages by `Commands:HelpPageSize` (default 20; `/help 2`). `/help <command>` shows `[Example("…")]`s. `CommandDescriptor.Category` and `Examples` describe them.
 - **Collection parameters (roadmap 0.5.10):** `params int[] numbers`, `List<PhoneNumber> people`, `IReadOnlyList<string> tags`, and other array, list or collection-interface parameters take all remaining positional arguments, each converted (and `@mention`-resolved) individually. `CommandParameter.ElementType` and `IsCollection` describe them.
 - **"Did you mean …?" (roadmap 0.5.9):** unknown-command replies suggest the closest visible command, alias, group or subcommand (`/hlep` → "Did you mean /help?"). Adjacent swaps count as one typo. Controlled by `Commands:SuggestSimilarCommands` (default `true`).
 - **Command groups (roadmap 0.5.1):** `[CommandGroup("playlist", Aliases = ["pl"])]` on a module or `ICommand` class makes its commands `/playlist add`, `/pl add`, and so on. Module preconditions apply to the whole group.

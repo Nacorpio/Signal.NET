@@ -89,6 +89,11 @@ public sealed class SignalOptionsValidator : IValidateOptions<SignalOptions>
             errors.Add("Signal:Commands:Prefixes must not contain empty values.");
         }
 
+        if (options.Commands.HelpPageSize < 0)
+        {
+            errors.Add("Signal:Commands:HelpPageSize must not be negative (0 disables paging).");
+        }
+
         if (options.RateLimit.PermitsPerWindow < 0 || options.RateLimit.Window <= TimeSpan.Zero)
         {
             errors.Add("Signal:RateLimit:PermitsPerWindow must not be negative and Window must be positive.");

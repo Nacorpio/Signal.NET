@@ -1,64 +1,127 @@
+using System.Globalization;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Signal.Application.Configuration;
 
 namespace Signal.Application.Commands;
 
 /// <summary>
-/// Built-in <c>help</c> command (aliases <c>?</c>, <c>commands</c>), generated from command metadata.
-/// <c>/help</c> lists all visible commands; <c>/help &lt;command&gt;</c> shows usage, description, aliases and
-/// parameter summaries; <c>/help &lt;group&gt;</c> lists a command group. Disable with
-/// <c>Signal:Commands:EnableHelp = false</c>.
+/// Built-in <c>help</c> command (aliases <c>?</c>, <c>commands</c>), generated from command metadata:
+/// <list type="bullet">
+/// <item><c>/help</c> lists all visible commands, under headings (command groups and <see cref="CategoryAttribute"/>)
+/// when there is more than one, paged by <see cref="CommandOptions.HelpPageSize"/>;</item>
+/// <item><c>/help 2</c> shows the second page;</item>
+/// <item><c>/help &lt;command&gt;</c> shows usage, description, aliases, parameter summaries and examples;</item>
+/// <item><c>/help &lt;group&gt;</c> lists a command group.</item>
+/// </list>
+/// Disable with <c>Signal:Commands:EnableHelp = false</c>.
 /// </summary>
 /// <param name="registry">The command registry.</param>
 public sealed class HelpModule(ICommandRegistry registry) : CommandModule
 {
-    /// <summary>Lists all commands or describes one command or group.</summary>
+    /// <summary>The heading for commands without a group or category, when headings are shown.</summary>
+    private const string GeneralHeading = "General";
+
+    /// <summary>Lists all commands (or one page of them), or describes one command or group.</summary>
     /// <param name="command">
-    /// The command or group to describe (with or without prefix, e.g. <c>add</c> or <c>playlist add</c>), or
-    /// <see langword="null"/> to list all.
+    /// The command or group to describe (with or without prefix, e.g. <c>add</c> or <c>playlist add</c>), a page
+    /// number, or <see langword="null"/> for the first page.
     /// </param>
     /// <returns>A task that completes when the reply was sent.</returns>
     [Command("help", Aliases = ["?", "commands"], Description = "Lists all commands or shows details of one command.")]
-    public Task HelpAsync([Remainder, Summary("The command or group to describe")] string? command = null)
+    [Example("help"), Example("help 2"), Example("help add")]
+    public Task HelpAsync([Remainder, Summary("The command or group to describe, or a page number")] string? command = null)
     {
         var prefix = Context.Parsed.Prefix;
-        var builder = new StringBuilder();
-
-        if (command is not null)
+        if (command is null)
         {
-            var trimmed = command.StartsWith(prefix, StringComparison.Ordinal) ? command[prefix.Length..] : command;
-            var name = string.Join(' ', trimmed.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
-
-            if (registry.TryGetCommand(name, out var descriptor))
-            {
-                return ReplyAsync(Describe(descriptor, prefix));
-            }
-
-            var group = registry.GetGroup(name).Where(c => !c.Hidden).ToList();
-            if (group.Count == 0)
-            {
-                return ReplyAsync($"Unknown command '{command}'.");
-            }
-
-            builder.AppendLine($"{prefix}{group[0].Group!.Name} <command>");
-            if (group[0].Group!.Description is { } description)
-            {
-                builder.AppendLine(description);
-            }
-
-            if (group[0].Group!.Aliases.Count > 0)
-            {
-                builder.AppendLine($"Aliases: {string.Join(", ", group[0].Group!.Aliases.Select(a => prefix + a))}");
-            }
-
-            AppendList(builder, group, prefix);
-            builder.Append($"Send {prefix}help {group[0].Group!.Name} <command> for details.");
-            return ReplyAsync(builder.ToString());
+            return ReplyAsync(List(prefix, page: 1));
         }
 
-        builder.AppendLine("Available commands:");
-        AppendList(builder, registry.Commands.Where(c => !c.Hidden), prefix);
-        builder.Append($"Send {prefix}help <command> for details.");
-        return ReplyAsync(builder.ToString());
+        var trimmed = command.StartsWith(prefix, StringComparison.Ordinal) ? command[prefix.Length..] : command;
+        var name = string.Join(' ', trimmed.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+
+        if (registry.TryGetCommand(name, out var descriptor))
+        {
+            return ReplyAsync(Describe(descriptor, prefix));
+        }
+
+        var group = registry.GetGroup(name).Where(c => !c.Hidden).ToList();
+        if (group.Count > 0)
+        {
+            return ReplyAsync(DescribeGroup(group, prefix));
+        }
+
+        // A number that isn't a command or group name is a page.
+        return int.TryParse(name, NumberStyles.None, CultureInfo.InvariantCulture, out var page) && page > 0
+            ? ReplyAsync(List(prefix, page))
+            : ReplyAsync($"Unknown command '{command}'.");
+    }
+
+    /// <summary>The command list, split into headed sections and pages.</summary>
+    private string List(string prefix, int page)
+    {
+        var pageSize = Context.Services.GetRequiredService<IOptionsMonitor<SignalOptions>>().CurrentValue.Commands.HelpPageSize;
+
+        // Ungrouped, uncategorised commands first, then groups and categories alphabetically.
+        var sections = registry.Commands
+            .Where(c => !c.Hidden)
+            .GroupBy(c => c.Group is { } g ? $"{prefix}{g.Name}{(g.Description is null ? null : " – " + g.Description)}" : c.Category ?? GeneralHeading)
+            .OrderBy(s => s.Key == GeneralHeading ? 0 : 1)
+            .ThenBy(s => s.Key, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        var entries = sections.SelectMany(s => s.Select(c => (Heading: s.Key, Command: c))).ToList();
+
+        var pages = pageSize > 0 ? Math.Max(1, (entries.Count + pageSize - 1) / pageSize) : 1;
+        if (page > pages)
+        {
+            return $"There {(pages == 1 ? "is only 1 page" : $"are only {pages} pages")} of commands.";
+        }
+
+        var shown = pageSize > 0 ? entries.Skip((page - 1) * pageSize).Take(pageSize) : entries;
+        var builder = new StringBuilder(pages > 1 ? $"Available commands (page {page}/{pages}):" : "Available commands:").AppendLine();
+        string? heading = null;
+        foreach (var (entryHeading, descriptor) in shown)
+        {
+            // Headings only help when there is more than one section; small bots keep a flat list.
+            if (sections.Count > 1 && entryHeading != heading)
+            {
+                builder.AppendLine().AppendLine(entryHeading);
+                heading = entryHeading;
+            }
+
+            AppendEntry(builder, descriptor, prefix);
+        }
+
+        if (page < pages)
+        {
+            builder.AppendLine($"Send {prefix}help {page + 1} for more.");
+        }
+
+        return builder.Append($"Send {prefix}help <command> for details.").ToString();
+    }
+
+    private static string DescribeGroup(List<CommandDescriptor> group, string prefix)
+    {
+        var info = group[0].Group!;
+        var builder = new StringBuilder().AppendLine($"{prefix}{info.Name} <command>");
+        if (info.Description is not null)
+        {
+            builder.AppendLine(info.Description);
+        }
+
+        if (info.Aliases.Count > 0)
+        {
+            builder.AppendLine($"Aliases: {string.Join(", ", info.Aliases.Select(a => prefix + a))}");
+        }
+
+        foreach (var descriptor in group)
+        {
+            AppendEntry(builder, descriptor, prefix);
+        }
+
+        return builder.Append($"Send {prefix}help {info.Name} <command> for details.").ToString();
     }
 
     private static string Describe(CommandDescriptor descriptor, string prefix)
@@ -81,20 +144,26 @@ public sealed class HelpModule(ICommandRegistry registry) : CommandModule
             builder.AppendLine($"  {(parameter.IsFlag ? "--" + parameter.FlagName : parameter.Name)}: {parameter.Summary}");
         }
 
+        if (descriptor.Examples.Count > 0)
+        {
+            builder.AppendLine("Examples:");
+            foreach (var example in descriptor.Examples)
+            {
+                builder.AppendLine($"  {prefix}{example}");
+            }
+        }
+
         return builder.ToString().TrimEnd();
     }
 
-    private static void AppendList(StringBuilder builder, IEnumerable<CommandDescriptor> commands, string prefix)
+    private static void AppendEntry(StringBuilder builder, CommandDescriptor descriptor, string prefix)
     {
-        foreach (var descriptor in commands)
+        builder.Append(prefix).Append(descriptor.FullName);
+        if (descriptor.Description is not null)
         {
-            builder.Append(prefix).Append(descriptor.FullName);
-            if (descriptor.Description is not null)
-            {
-                builder.Append(" – ").Append(descriptor.Description);
-            }
-
-            builder.AppendLine();
+            builder.Append(" – ").Append(descriptor.Description);
         }
+
+        builder.AppendLine();
     }
 }

@@ -147,6 +147,11 @@ public sealed class CommandOptions
     /// <summary>Register the built-in <c>help</c> command. Default <see langword="true"/>.</summary>
     public bool EnableHelp { get; set; } = true;
 
+    /// <summary>
+    /// Commands per <c>/help</c> page; <c>/help 2</c> shows the second page. 0 disables paging. Default 20.
+    /// </summary>
+    public int HelpPageSize { get; set; } = 20;
+
     /// <summary>Phone numbers or UUIDs allowed to run <c>[RequireAdmin]</c> commands.</summary>
     public List<string> Admins { get; set; } = [];
 
