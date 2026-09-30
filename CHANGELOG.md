@@ -6,6 +6,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **Command groups (roadmap 0.5.1):** `[CommandGroup("playlist", Aliases = ["pl"])]` on a module or `ICommand` class makes its commands `/playlist add`, `/pl add`, and so on. Module preconditions apply to the whole group.
+  - `CommandDescriptor.Group` (`CommandGroupInfo`) and `FullName`; `ICommandRegistry.GetGroup` (default interface member).
+  - `/group` alone, or with an unknown subcommand, replies with the group's commands. `/help group` describes a group.
+
+### Changed
+
+- Cooldowns, usage lines, logs and `CommandDescriptor.ToString()` use the full command name (`playlist add`). Nothing changes for commands outside a group.
+- `/help` takes the rest of the text, so `/help playlist add` works.
+
 ## [0.4.0-preview.1] - 2026-09-30
 
 Milestone 0.4 (richer incoming model). Every change is binary-compatible with 0.3.0-preview.1. New

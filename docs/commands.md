@@ -58,6 +58,29 @@ builder.AddSignal().MapCommand("about", ctx => ctx.ReplyAsync("Signal.NET bot"),
 
 Best for one-liners. Arguments are available through `ctx.Arguments` and `ctx.Flags`.
 
+## Command groups
+
+`[CommandGroup]` on a module (or `ICommand` class) puts its commands under a group, so they're invoked as
+`/group command`:
+
+```csharp
+[CommandGroup("playlist", Aliases = ["pl"], Description = "Manage the playlist"), RequireGroup]
+public sealed class PlaylistModule : CommandModule
+{
+    [Command("add")]    public Task AddAsync([Remainder] string song) => ReplyAsync($"Added {song}");
+    [Command("remove")] public Task RemoveAsync(int index) => ReplyAsync($"Removed #{index}");
+}
+```
+
+- **Names:** any combination of group and command aliases works (`/pl add …`). Usage lines, help and logs use the
+  full name (`CommandDescriptor.FullName`, e.g. `playlist add`).
+- **Shared preconditions:** preconditions on the module apply to every command in the group.
+- **Separate state:** cooldowns are keyed by the full name, so `/playlist add` and `/queue add` don't share one.
+- **Missing or unknown subcommands** get a reply listing the group's commands (`/playlist needs a subcommand: add,
+  remove.`) instead of "Unknown command". `/help playlist` describes the group, `/help playlist add` the command.
+- **Conflicts** are rejected at startup: a group can't have the same name or alias as a top-level command.
+  Several modules may share a group name; their commands are merged.
+
 ## Components
 
 ### Attributes (`Attributes.cs`)
@@ -68,6 +91,7 @@ Best for one-liners. Arguments are available through `ctx.Arguments` and `ctx.Fl
 | `[Remainder]` | `string` parameter | Takes the rest of the text verbatim. Must be the last positional parameter. |
 | `[Flag(name?)]` | parameter | Binds from `--name value` or `--name=value`. A `bool` flag is a switch (`--name`). |
 | `[Summary(text)]` | parameter | Parameter description shown by `/help <command>` |
+| `[CommandGroup(name)]` | module / command class | Puts the commands under `/name`. Properties: `Aliases`, `Description`. See [Command groups](#command-groups). |
 
 ### Parsing (`Parsing/CommandParser.cs`)
 
@@ -145,9 +169,9 @@ binding, so users without permission never see usage details.
 | Type | Purpose |
 |---|---|
 | `CommandParameter` | A bindable parameter: name, type, optional/default, remainder, flag name, summary. `ToString()` produces its usage fragment. |
-| `CommandDescriptor` | Everything about one command. `FormatUsage(prefix)` generates `/add <a> <b>` when no custom `Usage` is set. |
+| `CommandDescriptor` | Everything about one command. `FormatUsage(prefix)` generates `/add <a> <b>` when no custom `Usage` is set. `Group` (`CommandGroupInfo`) and `FullName` describe grouped commands. |
 | `CommandCatalog` | The registration-time list of command types, modules and descriptors. The builder fills it. |
-| `ICommandRegistry` / `CommandRegistry` | Built **lazily on first use**, so every registration is complete. Rejects duplicate names or aliases with a clear error. Honours `CaseSensitive` and skips `HelpModule` when `EnableHelp` is false. |
+| `ICommandRegistry` / `CommandRegistry` | Built **lazily on first use**, so every registration is complete. Rejects duplicate names or aliases with a clear error. Honours `CaseSensitive` and skips `HelpModule` when `EnableHelp` is false. Grouped commands are keyed as `group command`; `GetGroup(name)` lists a group. |
 | `CommandDescriptorFactory` (internal) | Reflection at startup only. Module methods are invoked through **compiled expression trees**, and modules are created with a cached `ActivatorUtilities` factory. |
 
 ### Execution and results

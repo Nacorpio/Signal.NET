@@ -35,6 +35,19 @@ public sealed record CommandParameter(
         : IsOptional ? $"[{Name}]" : $"<{Name}>";
 }
 
+/// <summary>The group a command belongs to (<see cref="CommandGroupAttribute"/>).</summary>
+/// <param name="Name">The group name.</param>
+/// <param name="Aliases">Alternative group names.</param>
+/// <param name="Description">One-line description for help.</param>
+public sealed record CommandGroupInfo(string Name, IReadOnlyList<string> Aliases, string? Description)
+{
+    /// <summary>Creates the group info from an attribute.</summary>
+    /// <param name="attribute">The attribute.</param>
+    /// <returns>The group info.</returns>
+    public static CommandGroupInfo From(CommandGroupAttribute attribute) =>
+        new(attribute.Name, [.. attribute.Aliases], attribute.Description);
+}
+
 /// <summary>
 /// Everything the framework knows about a command: metadata, parameters, preconditions and how to invoke it.
 /// Created by the registry from <see cref="ICommand"/> classes and <see cref="CommandModule"/> methods, or directly
@@ -84,8 +97,14 @@ public sealed class CommandDescriptor
         Method = method;
     }
 
-    /// <summary>The command name.</summary>
+    /// <summary>The command name (within its <see cref="Group"/>, if any).</summary>
     public string Name { get; }
+
+    /// <summary>The group the command belongs to, or <see langword="null"/> for a top-level command.</summary>
+    public CommandGroupInfo? Group { get; init; }
+
+    /// <summary>The name as typed after the prefix: <c>group name</c> for grouped commands, otherwise <see cref="Name"/>.</summary>
+    public string FullName => Group is null ? Name : $"{Group.Name} {Name}";
 
     /// <summary>Alternative names.</summary>
     public IReadOnlyList<string> Aliases { get; }
@@ -114,7 +133,7 @@ public sealed class CommandDescriptor
     /// <summary>Invokes the command with the bound parameter values (in <see cref="Parameters"/> order).</summary>
     public Func<CommandContext, object?[], Task> Executor { get; }
 
-    /// <summary>Formats the usage line, e.g. <c>/add &lt;a&gt; &lt;b&gt;</c>.</summary>
+    /// <summary>Formats the usage line, e.g. <c>/add &lt;a&gt; &lt;b&gt;</c> or <c>/playlist add &lt;song...&gt;</c>.</summary>
     /// <param name="prefix">The prefix to show (usually the one the user typed).</param>
     /// <returns>The usage line.</returns>
     public string FormatUsage(string prefix)
@@ -124,7 +143,7 @@ public sealed class CommandDescriptor
             return prefix + Usage;
         }
 
-        var builder = new StringBuilder(prefix).Append(Name);
+        var builder = new StringBuilder(prefix).Append(FullName);
         foreach (var parameter in Parameters)
         {
             builder.Append(' ').Append(parameter);
@@ -133,7 +152,7 @@ public sealed class CommandDescriptor
         return builder.ToString();
     }
 
-    /// <summary>Returns <see cref="Name"/>.</summary>
-    /// <returns>The command name.</returns>
-    public override string ToString() => Name;
+    /// <summary>Returns <see cref="FullName"/>.</summary>
+    /// <returns>The command name, including the group.</returns>
+    public override string ToString() => FullName;
 }

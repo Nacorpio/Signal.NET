@@ -38,6 +38,34 @@ public sealed class CommandAttribute(string name) : Attribute
 public sealed class RemainderAttribute : Attribute;
 
 /// <summary>
+/// Puts every command of a <see cref="CommandModule"/> (or an <see cref="ICommand"/> class) under a group, so it is
+/// invoked as <c>/group command</c>. Preconditions on the module apply to all of its commands.
+/// </summary>
+/// <example>
+/// <code>
+/// [CommandGroup("playlist", Aliases = ["pl"], Description = "Manage the playlist"), RequireGroup]
+/// public sealed class PlaylistModule : CommandModule
+/// {
+///     [Command("add")]    public Task AddAsync([Remainder] string song) =&gt; …;   // /playlist add …, /pl add …
+///     [Command("remove")] public Task RemoveAsync(int index) =&gt; …;           // /playlist remove 2
+/// }
+/// </code>
+/// </example>
+/// <param name="name">The group name (no whitespace).</param>
+[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+public sealed class CommandGroupAttribute(string name) : Attribute
+{
+    /// <summary>The group name.</summary>
+    public string Name { get; } = name;
+
+    /// <summary>Alternative group names.</summary>
+    public string[] Aliases { get; set; } = [];
+
+    /// <summary>One-line description for help.</summary>
+    public string? Description { get; set; }
+}
+
+/// <summary>
 /// Binds the parameter to a named option (<c>--name value</c> or <c>--name=value</c>) instead of a position.
 /// <see cref="bool"/> flags are switches: <c>--name</c> sets them to <see langword="true"/>.
 /// </summary>
