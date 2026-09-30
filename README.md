@@ -163,7 +163,7 @@ public sealed class Welcome(IMessageSender sender) : IEventHandler<GroupUpdated>
 }
 ```
 
-The available events are `MessageReceived`, `ReactionReceived`, `ReceiptReceived`, `TypingIndicatorChanged` and `GroupUpdated`.
+The available events are `MessageReceived`, `MessageEdited`, `MessageDeleted`, `ReactionReceived`, `ReceiptReceived`, `TypingIndicatorChanged` and `GroupUpdated`.
 
 ### Using the API directly
 

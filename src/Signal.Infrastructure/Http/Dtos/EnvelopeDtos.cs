@@ -26,6 +26,7 @@ internal sealed class EnvelopeDto
     public int SourceDevice { get; set; }
     public long Timestamp { get; set; }
     public DataMessageDto? DataMessage { get; set; }
+    public EditMessageDto? EditMessage { get; set; }
     public ReceiptMessageDto? ReceiptMessage { get; set; }
     public TypingMessageDto? TypingMessage { get; set; }
 }
@@ -41,6 +42,28 @@ internal sealed class DataMessageDto
     public List<IncomingMentionDto>? Mentions { get; set; }
     public QuoteDto? Quote { get; set; }
     public ReactionDto? Reaction { get; set; }
+    public StickerDto? Sticker { get; set; }
+    public RemoteDeleteDto? RemoteDelete { get; set; }
+}
+
+/// <summary>An edit: the edited message's timestamp and the new version (signal-cli <c>JsonEditMessage</c>).</summary>
+internal sealed class EditMessageDto
+{
+    public long TargetSentTimestamp { get; set; }
+    public DataMessageDto? DataMessage { get; set; }
+}
+
+/// <summary>A received sticker (signal-cli <c>JsonSticker</c>); the pack id is hex.</summary>
+internal sealed class StickerDto
+{
+    public string? PackId { get; set; }
+    public int StickerId { get; set; }
+}
+
+/// <summary>A deletion for everyone; <see cref="Timestamp"/> is the deleted message's timestamp.</summary>
+internal sealed class RemoteDeleteDto
+{
+    public long Timestamp { get; set; }
 }
 
 /// <summary>Group context of a message. <see cref="GroupId"/> is the internal id; <see cref="Type"/> is <c>DELIVER</c> or <c>UPDATE</c>.</summary>
