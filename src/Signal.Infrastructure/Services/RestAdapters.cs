@@ -5,6 +5,7 @@ using Signal.Domain.Messaging;
 using Signal.Domain.ValueObjects;
 using Signal.Infrastructure.Http;
 using Signal.Infrastructure.Http.Dtos;
+using Signal.Infrastructure.JsonRpc;
 
 namespace Signal.Infrastructure.Services;
 
@@ -103,7 +104,7 @@ internal sealed class RestTypingIndicatorService(SignalApiClient api) : ITypingI
 }
 
 /// <summary>Implements <see cref="IGroupService"/> with the <c>/v1/groups/{number}</c> endpoints; maps <see cref="GroupDto"/> to <see cref="Group"/>.</summary>
-internal sealed class RestGroupService(SignalApiClient api) : IGroupService
+internal sealed class RestGroupService(SignalApiClient api, SignalCliDaemonClient daemon) : IGroupService
 {
     public async Task<IReadOnlyList<Group>> ListAsync(PhoneNumber account, CancellationToken cancellationToken = default)
     {
@@ -213,6 +214,60 @@ internal sealed class RestGroupService(SignalApiClient api) : IGroupService
             new PinMessageRequestDto { TargetAuthor = targetAuthor.Trim(), Timestamp = targetTimestamp },
             SignalRestJsonContext.Default.PinMessageRequestDto, cancellationToken);
     }
+
+    public async Task<GroupJoinResult> JoinByLinkAsync(PhoneNumber account, Uri inviteLink, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(inviteLink);
+        if (!inviteLink.IsAbsoluteUri
+            || inviteLink.Scheme != Uri.UriSchemeHttps
+            || !string.Equals(inviteLink.Host, "signal.group", StringComparison.OrdinalIgnoreCase)
+            || inviteLink.Fragment.Length < 2)
+        {
+            throw new ArgumentException("Expected a Signal group invite link (https://signal.group/#…).", nameof(inviteLink));
+        }
+
+        if (!daemon.IsConfigured)
+        {
+            throw new NotSupportedException(
+                "signal-cli-rest-api has no endpoint for joining by invite link. Use a json-rpc mode, share the container's network " +
+                "with the bot and set Signal:JsonRpc:Endpoint (e.g. 127.0.0.1:6001).");
+        }
+
+        // The daemon parses the link itself (group master key and invite password), so no group id is needed.
+        System.Text.Json.JsonElement result;
+        try
+        {
+            result = await daemon.CallAsync("joinGroup",
+                new Dictionary<string, string> { ["account"] = account.Value, ["uri"] = inviteLink.OriginalString }, cancellationToken);
+        }
+        catch (TimeoutException timeout)
+        {
+            // Joining sends a group update to every member, which can outlast the timeout for large groups while the
+            // join itself already succeeded. Check before reporting failure, since retrying could join or request twice.
+            return await JoinedByLinkAsync(account, inviteLink, cancellationToken)
+                ?? throw new TimeoutException(
+                    $"{timeout.Message} The join may still complete; check the account's groups before retrying.", timeout);
+        }
+
+        var groupId = result.ValueKind == System.Text.Json.JsonValueKind.Object && result.TryGetProperty("groupId", out var id) ? id.GetString() : null;
+        return new GroupJoinResult(
+            ToGroupIdFromDaemon(groupId) ?? throw new SignalCliException("joinGroup", 0, "The daemon did not return a group id."),
+            result.TryGetProperty("onlyRequested", out var requested) && requested.ValueKind == System.Text.Json.JsonValueKind.True);
+    }
+
+    /// <summary>The group with this invite link, if the account already knows it (after a join that timed out).</summary>
+    private async Task<GroupJoinResult?> JoinedByLinkAsync(PhoneNumber account, Uri inviteLink, CancellationToken cancellationToken)
+    {
+        var fragment = inviteLink.Fragment.TrimStart('#');
+        var groups = await api.GetAsync(GroupsPath(account), SignalRestJsonContext.Default.ListGroupDto, cancellationToken);
+        var joined = groups.FirstOrDefault(g =>
+            Uri.TryCreate(g.InviteLink, UriKind.Absolute, out var link) && string.Equals(link.Fragment.TrimStart('#'), fragment, StringComparison.Ordinal));
+        return joined is not null && GroupId.TryParse(joined.Id, out var id) ? new GroupJoinResult(id, IsPendingApproval: joined.Member == false) : null;
+    }
+
+    /// <summary>signal-cli reports the internal group id (base64); the REST API uses <c>group.base64(internal id)</c>.</summary>
+    private static GroupId? ToGroupIdFromDaemon(string? internalId) =>
+        string.IsNullOrWhiteSpace(internalId) ? null : GroupId.FromInternalId(internalId);
 
     private static string ToApi(GroupPermission permission) => permission switch
     {

@@ -67,6 +67,39 @@ Durations use the `TimeSpan` format `hh:mm:ss`. Enum values are case-insensitive
 | `KeepAlive` | 20 s | Ping interval. Keeps idle connections open through proxies. |
 | `ReceiveBufferSize` | 16384 | ≥ 1024 bytes. Larger messages are reassembled. |
 
+## `JsonRpc`
+
+Direct access to signal-cli's JSON-RPC daemon, for features signal-cli-rest-api has no endpoint for. Currently
+that's joining a group by its invite link (`IGroupService.JoinByLinkAsync`).
+
+| Key | Default | Notes |
+|---|---|---|
+| `Endpoint` | none (off) | The daemon's `host:port`, normally `127.0.0.1:6001` |
+| `Timeout` | 30 s | Per call. Joining a large group can take longer: the join sends an update to every member. `JoinByLinkAsync` then checks the account's groups for the invite link before reporting a timeout. |
+
+In the `json-rpc` modes the container runs `signal-cli daemon --tcp 127.0.0.1:6001`, which listens **only on the
+container's loopback interface**. The bot therefore has to share the container's network, as a sidecar in the same
+Kubernetes pod or like this in Docker Compose:
+
+```yaml
+services:
+  signal-api:
+    image: bbernhard/signal-cli-rest-api
+    environment: [ MODE=json-rpc ]
+    ports: [ "8080:8080" ]
+  bot:
+    image: my-bot
+    network_mode: "service:signal-api"      # shares signal-api's localhost
+    environment:
+      Signal__BaseUrl: http://127.0.0.1:8080
+      Signal__Mode: JsonRpc
+      Signal__JsonRpc__Endpoint: 127.0.0.1:6001
+```
+
+A second connection to the daemon is safe: each connection gets its own copy of incoming messages, so the REST API
+misses nothing. `JoinByLinkAsync` opens a short-lived connection per call. Verified against signal-cli 0.14.5
+(signal-cli-rest-api 0.100).
+
 ## `Http`
 
 | Key | Default | Validation / notes |

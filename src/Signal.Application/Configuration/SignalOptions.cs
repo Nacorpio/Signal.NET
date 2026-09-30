@@ -50,6 +50,9 @@ public sealed class SignalOptions
     /// <summary>HTTP client timeout and retry settings.</summary>
     public HttpOptions Http { get; set; } = new();
 
+    /// <summary>Direct access to signal-cli's JSON-RPC daemon, for features the REST API doesn't expose.</summary>
+    public JsonRpcOptions JsonRpc { get; set; } = new();
+
     /// <summary>Command system settings.</summary>
     public CommandOptions Commands { get; set; } = new();
 
@@ -144,6 +147,19 @@ public sealed class WebSocketOptions
 
     /// <summary>Receive buffer size in bytes; larger frames are assembled from several reads. Default 16 KiB.</summary>
     public int ReceiveBufferSize { get; set; } = 16 * 1024;
+}
+
+/// <summary>
+/// signal-cli JSON-RPC daemon settings. In the <c>json-rpc</c> modes the container runs the daemon on its loopback
+/// interface (<c>127.0.0.1:6001</c>), so the bot must share the container's network to reach it.
+/// </summary>
+public sealed class JsonRpcOptions
+{
+    /// <summary>The daemon's <c>host:port</c>, e.g. <c>127.0.0.1:6001</c>; <see langword="null"/> (default) disables daemon features.</summary>
+    public string? Endpoint { get; set; }
+
+    /// <summary>Timeout of one daemon call. Default 30 seconds.</summary>
+    public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(30);
 }
 
 /// <summary>HTTP client resilience settings.</summary>

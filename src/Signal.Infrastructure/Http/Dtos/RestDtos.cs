@@ -218,6 +218,9 @@ internal sealed class GroupDto
     public List<string>? PendingRequests { get; set; }
     public bool Blocked { get; set; }
     public string? InviteLink { get; set; }
+
+    /// <summary>Whether the account is a member (false while a join request awaits approval).</summary>
+    public bool? Member { get; set; }
 }
 
 /// <summary>Body of <c>POST /v1/groups/{number}</c>.</summary>

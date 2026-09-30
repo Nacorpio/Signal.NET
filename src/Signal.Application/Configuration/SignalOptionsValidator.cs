@@ -110,6 +110,16 @@ public sealed class SignalOptionsValidator : IValidateOptions<SignalOptions>
             errors.Add($"Signal:Localization:DefaultCulture '{options.Localization.DefaultCulture}' is not a well-formed culture name (e.g. en, de-AT).");
         }
 
+        if (options.JsonRpc.Endpoint is { } endpoint && !System.Net.IPEndPoint.TryParse(endpoint, out _) && !IsHostAndPort(endpoint))
+        {
+            errors.Add($"Signal:JsonRpc:Endpoint '{endpoint}' must be host:port, e.g. 127.0.0.1:6001.");
+        }
+
+        if (options.JsonRpc.Timeout <= TimeSpan.Zero)
+        {
+            errors.Add("Signal:JsonRpc:Timeout must be positive.");
+        }
+
         if (options.Commands.HelpPageSize < 0)
         {
             errors.Add("Signal:Commands:HelpPageSize must not be negative (0 disables paging).");
@@ -122,4 +132,11 @@ public sealed class SignalOptionsValidator : IValidateOptions<SignalOptions>
 
         return errors.Count == 0 ? ValidateOptionsResult.Success : ValidateOptionsResult.Fail(errors);
     }
+
+    /// <summary><c>name:port</c> with a port in range (host names; IP addresses are checked by <see cref="System.Net.IPEndPoint"/>).</summary>
+    private static bool IsHostAndPort(string value) =>
+        value.LastIndexOf(':') is > 0 and var colon
+        && Uri.CheckHostName(value[..colon]) != UriHostNameType.Unknown
+        && int.TryParse(value[(colon + 1)..], System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var port)
+        && port is > 0 and <= 65535;
 }

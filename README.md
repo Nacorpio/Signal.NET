@@ -188,6 +188,7 @@ await signal.Groups.CreateAsync(account, "Team", ["+4915112345678"]);
 | `VerifyModeOnStartup` / `FailOnModeMismatch` | `true` / `false` | |
 | `Receive:*` | 1 s interval, 1 s timeout | `IgnoreStories` (all modes). Polling modes only: `PollingInterval`, `TimeoutSeconds`, `MaxMessages`, `IgnoreAttachments`, `SendReadReceipts`, `MaxErrorBackoff`. |
 | `WebSocket:*` | 1 s–30 s backoff, 20 s keep-alive | WebSocket modes only. |
+| `JsonRpc:*` | off | `Endpoint` (e.g. `127.0.0.1:6001`), `Timeout`: direct signal-cli daemon access for joining groups by invite link. |
 | `Http:Timeout` / `Http:RetryCount` | 30 s / 3 | Only GET/PUT/DELETE requests are retried. Sends are never retried, so a message is not duplicated. |
 | `Commands:*` | prefix `/` | `Prefixes`, `CaseSensitive`, `RespondToUnknown`, `UnknownCommandMessage`, `DisabledCommandMessage`, `SuggestSimilarCommands`, `ErrorMessage`, `QuoteReplies`, `EnableHelp`, `HelpPageSize`, `Admins`, `Roles`. |
 | `AccessControl:*` | | `AllowedSenders`, `BlockedSenders`, `IgnoreOwnMessages`. |

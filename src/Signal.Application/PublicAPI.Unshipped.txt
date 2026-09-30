@@ -1,1 +1,29 @@
 #nullable enable
+override Signal.Application.Abstractions.GroupJoinResult.Equals(object? obj) -> bool
+override Signal.Application.Abstractions.GroupJoinResult.GetHashCode() -> int
+override Signal.Application.Abstractions.GroupJoinResult.ToString() -> string!
+Signal.Application.Abstractions.GroupJoinResult
+Signal.Application.Abstractions.GroupJoinResult.<Clone>$() -> Signal.Application.Abstractions.GroupJoinResult!
+Signal.Application.Abstractions.GroupJoinResult.Deconstruct(out Signal.Domain.ValueObjects.GroupId Group, out bool IsPendingApproval) -> void
+Signal.Application.Abstractions.GroupJoinResult.Equals(Signal.Application.Abstractions.GroupJoinResult? other) -> bool
+Signal.Application.Abstractions.GroupJoinResult.Group.get -> Signal.Domain.ValueObjects.GroupId
+Signal.Application.Abstractions.GroupJoinResult.Group.init -> void
+Signal.Application.Abstractions.GroupJoinResult.GroupJoinResult(Signal.Domain.ValueObjects.GroupId Group, bool IsPendingApproval) -> void
+Signal.Application.Abstractions.GroupJoinResult.IsPendingApproval.get -> bool
+Signal.Application.Abstractions.GroupJoinResult.IsPendingApproval.init -> void
+Signal.Application.Abstractions.IGroupService.JoinByLinkAsync(Signal.Domain.ValueObjects.PhoneNumber account, System.Uri! inviteLink, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.GroupJoinResult!>!
+Signal.Application.Abstractions.SignalCliException
+Signal.Application.Abstractions.SignalCliException.Code.get -> int
+Signal.Application.Abstractions.SignalCliException.Error.get -> string?
+Signal.Application.Abstractions.SignalCliException.Method.get -> string!
+Signal.Application.Abstractions.SignalCliException.SignalCliException(string! method, int code, string? error) -> void
+Signal.Application.Configuration.JsonRpcOptions
+Signal.Application.Configuration.JsonRpcOptions.Endpoint.get -> string?
+Signal.Application.Configuration.JsonRpcOptions.Endpoint.set -> void
+Signal.Application.Configuration.JsonRpcOptions.JsonRpcOptions() -> void
+Signal.Application.Configuration.JsonRpcOptions.Timeout.get -> System.TimeSpan
+Signal.Application.Configuration.JsonRpcOptions.Timeout.set -> void
+Signal.Application.Configuration.SignalOptions.JsonRpc.get -> Signal.Application.Configuration.JsonRpcOptions!
+Signal.Application.Configuration.SignalOptions.JsonRpc.set -> void
+static Signal.Application.Abstractions.GroupJoinResult.operator !=(Signal.Application.Abstractions.GroupJoinResult? left, Signal.Application.Abstractions.GroupJoinResult? right) -> bool
+static Signal.Application.Abstractions.GroupJoinResult.operator ==(Signal.Application.Abstractions.GroupJoinResult? left, Signal.Application.Abstractions.GroupJoinResult? right) -> bool

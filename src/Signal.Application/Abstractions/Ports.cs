@@ -269,6 +269,31 @@ public interface IGroupService
     /// <exception cref="ArgumentException"><paramref name="targetAuthor"/> is empty.</exception>
     Task UnpinMessageAsync(PhoneNumber account, GroupId group, string targetAuthor, long targetTimestamp, CancellationToken cancellationToken = default) =>
         throw new NotSupportedException($"{GetType().Name} does not support pinned messages.");
+
+    /// <summary>
+    /// Joins a group through its invite link (<c>https://signal.group/#…</c>), without knowing its id. If the group
+    /// requires admin approval, this sends a join request instead (<see cref="GroupJoinResult.IsPendingApproval"/>).
+    /// </summary>
+    /// <remarks>
+    /// signal-cli-rest-api has no endpoint for this, so it calls signal-cli's <c>joinGroup</c> through its JSON-RPC
+    /// daemon. That requires a <c>json-rpc</c> mode and <c>Signal:JsonRpc:Endpoint</c>, with the bot sharing the
+    /// container's network (a sidecar, or <c>network_mode: "service:signal-api"</c>), because the daemon only
+    /// listens on the container's loopback interface.
+    /// </remarks>
+    /// <param name="account">The joining account.</param>
+    /// <param name="inviteLink">The group's invite link.</param>
+    /// <param name="cancellationToken">Cancels the request.</param>
+    /// <returns>The joined group, and whether the join still awaits approval.</returns>
+    /// <exception cref="ArgumentException"><paramref name="inviteLink"/> is not a <c>https://signal.group/#…</c> link.</exception>
+    /// <exception cref="SignalCliException">signal-cli refused, e.g. because the link is invalid or was reset.</exception>
+    /// <exception cref="NotSupportedException">No JSON-RPC endpoint is configured.</exception>
+    /// <exception cref="TimeoutException">
+    /// No answer in time, and the account doesn't know the group yet. The join may still complete: joining sends an
+    /// update to every member, which takes a while in large groups. Check before retrying. (If the account already knows
+    /// the group after a timeout, the join is reported as successful instead.)
+    /// </exception>
+    Task<GroupJoinResult> JoinByLinkAsync(PhoneNumber account, Uri inviteLink, CancellationToken cancellationToken = default) =>
+        throw new NotSupportedException($"{GetType().Name} does not support joining groups by invite link.");
 }
 
 /// <summary>Who may perform an action in a group.</summary>
@@ -305,6 +330,11 @@ public sealed record GroupPermissions(GroupPermission AddMembers, GroupPermissio
 /// <param name="Link">The invite link mode.</param>
 /// <param name="MessageExpiration">The disappearing-messages timer (whole seconds); <see cref="TimeSpan.Zero"/> turns it off.</param>
 public sealed record GroupSettings(GroupPermissions? Permissions = null, GroupLinkMode? Link = null, TimeSpan? MessageExpiration = null);
+
+/// <summary>The result of <see cref="IGroupService.JoinByLinkAsync"/>.</summary>
+/// <param name="Group">The group's id, e.g. for sending to it once the account is a member.</param>
+/// <param name="IsPendingApproval">The group requires admin approval: a join request was sent, and the account isn't a member yet.</param>
+public sealed record GroupJoinResult(GroupId Group, bool IsPendingApproval);
 
 /// <summary>Lists accounts and links new devices.</summary>
 public interface IAccountService

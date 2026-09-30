@@ -6,6 +6,7 @@ using Signal.Application.Abstractions;
 using Signal.Application.Configuration;
 using Signal.Domain;
 using Signal.Infrastructure.Http;
+using Signal.Infrastructure.JsonRpc;
 using Signal.Infrastructure.Receiving;
 using Signal.Infrastructure.Services;
 
@@ -68,6 +69,7 @@ public static class InfrastructureServiceCollectionExtensions
         services.TryAddTransient<IReactionService, RestReactionService>();
         services.TryAddTransient<IReceiptService, RestReceiptService>();
         services.TryAddTransient<ITypingIndicatorService, RestTypingIndicatorService>();
+        services.TryAddSingleton<SignalCliDaemonClient>();
         services.TryAddTransient<IGroupService, RestGroupService>();
         services.TryAddTransient<IAccountService, RestAccountService>();
         services.TryAddTransient<IRegistrationService, RestRegistrationService>();

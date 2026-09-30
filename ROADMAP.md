@@ -73,7 +73,7 @@ Item 0.2.8 exists so that can't happen again.
 | 0.3.5 | **Remote delete** | D/A/I | S | ✅ `IMessageSender.RemoteDeleteAsync(account, recipient, sendResult.Timestamp)` (added without breaking existing implementations) |
 | 0.3.6 | **Stickers** | D/A/I | M | ✅ `Sticker` value object (`packId:stickerId`, `IParsable`); `OutgoingMessageBuilder.WithSticker`; `IStickerService` lists and installs packs (also from `signal.art` share links) |
 | 0.3.7 | **Link previews** | D/I | S | ✅ `OutgoingMessageBuilder.WithLinkPreview(url, title, …)`; `Build()` requires the URL in the text |
-| 0.3.8 | **Group extras** | A/I | S | ✅ `IGroupService`: `JoinAsync` (accepts an invitation; the API has no join-by-link), `BlockAsync`, `UpdateSettingsAsync` (permissions, invite link mode, timer), `PinMessageAsync`/`UnpinMessageAsync`. Avatars were already covered by `UpdateAsync`. |
+| 0.3.8 | **Group extras** | A/I | S | ✅ `IGroupService`: `JoinAsync` (accepts an invitation). Joining by invite link came later as `JoinByLinkAsync`, through signal-cli's JSON-RPC daemon, because the REST API has no endpoint for it, `BlockAsync`, `UpdateSettingsAsync` (permissions, invite link mode, timer), `PinMessageAsync`/`UnpinMessageAsync`. Avatars were already covered by `UpdateAsync`. |
 | 0.3.9 | **Contact sync** | A/I | S | ✅ `IContactService.SyncAsync`. Contact blocking isn't offered by signal-cli-rest-api, so it's dropped here. |
 | 0.3.10 | **Number search** | A/I | S | ✅ `IContactService.CheckRegisteredAsync` → `NumberRegistration` |
 | 0.3.11 | **Rate-limit challenge** | A/I | S | ✅ `IAccountService.SubmitRateLimitChallengeAsync(challengeToken, captcha)` |
@@ -168,7 +168,7 @@ These need design work or validation of demand first.
 
 | Idea | Description |
 |---|---|
-| **Direct signal-cli JSON-RPC transport** | An `IMessageReceiver`/`IMessageSender` pair that talks to `signal-cli daemon` over TCP or a Unix socket, without the REST container. The ports make this a drop-in addition. |
+| **Direct signal-cli JSON-RPC transport** | An `IMessageReceiver`/`IMessageSender` pair that talks to `signal-cli daemon` over TCP or a Unix socket, without the REST container. The ports make this a drop-in addition. *First step taken:* `SignalCliDaemonClient` (used by `JoinByLinkAsync`) already speaks the daemon's protocol. |
 | **`Signal.NET.Testing` package** | Publish the test harness and `FakeSignal` so users can unit-test their commands in a few lines |
 | **ASP.NET Core integration** | Minimal-API endpoints for sending, status and QR-code linking, plus an optional admin dashboard |
 | **AI assistant integration** | An `IMessageMiddleware` that routes non-command messages to an LLM, with conversation history per chat |

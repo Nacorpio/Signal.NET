@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **Join groups by invite link:** `IGroupService.JoinByLinkAsync(account, link)` joins from a `https://signal.group/#…` link without the group id, or sends a join request if the group needs approval (`GroupJoinResult.IsPendingApproval`).
+  - signal-cli-rest-api has no endpoint for this, so it calls signal-cli's JSON-RPC `joinGroup` directly. This needs a `json-rpc` mode, `Signal:JsonRpc:Endpoint` and a bot that shares the container's network.
+  - If a join outlasts the timeout (large groups), the account's groups are checked for the link before a `TimeoutException` is reported.
+  - Daemon errors surface as the new `SignalCliException`. Verified live against signal-cli 0.14.5.
+
 ## [0.5.0-preview.1] - 2026-09-30
 
 Milestone 0.5 (command system 2.0). Every change is binary-compatible with 0.4.0-preview.1: new members on existing
