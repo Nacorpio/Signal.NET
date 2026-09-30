@@ -27,7 +27,7 @@ These known limitations shape the plan below:
 1. ~~**Long-running commands block their conversation partition.**~~ Resolved in 0.5.3: `RunInBackgroundAsync` / `IBackgroundWorkQueue` run slow work outside the partition.
 2. **Reflection and `Expression.Compile`** in `CommandDescriptorFactory`, `ArgumentConverters` and `DomainEventDispatcher` rule out trimming and Native AOT.
 3. **Unmodelled envelope content.** Sync messages other than sent transcripts (read, blocked, contacts), call ICE updates, payments and polls are dropped by `EnvelopeMapper`. Edits, remote deletes, stickers, sent transcripts, stories and calls are handled since 0.4.
-4. **State is in memory only.** Cooldowns and rate limits don't survive restarts and aren't shared between instances.
+4. **State is in memory only.** Cooldowns and rate limits don't survive restarts and aren't shared between instances. Scheduled messages have a persistence port (`IScheduledMessageStore`) but no built-in durable store.
 5. **API coverage gaps.** Milestone 0.3 covered registration, devices, stickers, usernames, account settings, remote delete and search. Remaining gaps (checked against the Swagger spec): polls (`/v1/polls`), contact and group avatars, single-contact lookup, deleting a device's local data, and the container configuration endpoints (`/v1/configuration`).
 6. **Pre-release SDK dependency.** The project builds with the .NET 11 RC1 SDK and `LangVersion=preview`. It cannot declare a stable 1.0 before .NET 11 and C# 15 are generally available.
 
@@ -108,7 +108,7 @@ it are exhaustive, the compiler points at every place that needs updating.*
 | 0.5.1 | **Command groups and subcommands** | A | M | ✅ `[CommandGroup("group", Aliases, Description)]` on a module or command class; module preconditions shared; subcommand hints; group help; cooldowns keyed by full name |
 | 0.5.2 | **Conversations and prompts** | A/H | L | ✅ `await work.PromptAsync<int>("How many?")` inside `RunInBackgroundAsync`. Answers are routed by `IPromptRegistry` in the receive loop **before** partitioning; checking in the pipeline would deadlock, because the answer would queue behind the waiting work. Prompts live in background work so a wait never holds a partition. |
 | 0.5.3 | **Background work from commands** | A/H | M | ✅ `RunInBackgroundAsync` / `IBackgroundWorkQueue`: bounded in-memory queue, `Background:MaxConcurrency` workers, own DI scope per item, replies to the original conversation. Fixes limitation 1. |
-| 0.5.4 | **Scheduled messages** | A/H | M | `IMessageScheduler` (in-memory plus a persistence port) for reminders and digests |
+| 0.5.4 | **Scheduled messages** | A/H | M | ✅ `IMessageScheduler` / `ScheduleReplyAsync`, one-off or recurring (at least one minute); `IScheduledMessageStore` persistence port with an in-memory default; polling dispatcher with downtime catch-up and send retries |
 | 0.5.5 | **Localisation** | A | M | Resource-based texts for framework replies (unknown command, binding errors, help), with culture per conversation |
 | 0.5.6 | **Role-based permissions** | A | M | `[RequireRole("moderator")]` backed by an `IRoleProvider` (config, database or group admins) |
 | 0.5.7 | **Per-conversation settings** | A | M | Prefix, language and enabled commands per group, via an `IConversationSettingsStore` port |

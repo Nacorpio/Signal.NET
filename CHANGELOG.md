@@ -8,6 +8,10 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Scheduled messages (roadmap 0.5.4):** `CommandModule.ScheduleReplyAsync` / `MessageContext.ScheduleReplyAsync` and `IMessageScheduler` (`ScheduleAsync`, `ListAsync`, `CancelAsync`) send text messages later, once or every `repeatEvery` (at least one minute).
+  - `IScheduledMessageStore` is the persistence port; the default keeps messages in memory.
+  - `AddSignal` hosts the dispatcher, which checks every `Signal:Scheduler:PollInterval` (1 s) and retries failed sends after `RetryDelay` (1 min).
+  - After downtime, a recurring message sends one catch-up, not one per missed occurrence.
 - **Prompts (roadmap 0.5.2):** `BackgroundWork.PromptAsync(question)` and `PromptAsync<T>` (any `IParsable<T>`, re-asking on invalid input) wait for the triggering sender's next message in the conversation, and return a `PromptResult<T>` (`Answered`, `TimedOut`, `Invalid`).
   - The host routes answers through the new `IPromptRegistry` before partitioning. Commands are never consumed as answers.
   - New option `Signal:Background:PromptTimeout` (2 minutes). `BackgroundWork.Sender` and `BackgroundWorkItem.Sender` identify who may answer.

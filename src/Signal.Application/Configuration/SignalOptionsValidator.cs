@@ -94,6 +94,11 @@ public sealed class SignalOptionsValidator : IValidateOptions<SignalOptions>
             errors.Add("Signal:Background:MaxConcurrency and Capacity must be at least 1.");
         }
 
+        if (options.Scheduler.PollInterval <= TimeSpan.Zero || options.Scheduler.RetryDelay <= TimeSpan.Zero)
+        {
+            errors.Add("Signal:Scheduler:PollInterval and RetryDelay must be positive.");
+        }
+
         if (options.Background.PromptTimeout <= TimeSpan.Zero)
         {
             errors.Add("Signal:Background:PromptTimeout must be positive.");

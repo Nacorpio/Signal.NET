@@ -29,7 +29,8 @@ Durations use the `TimeSpan` format `hh:mm:ss`. Enum values are case-insensitive
                    "QuoteReplies": false, "EnableHelp": true, "HelpPageSize": 20, "Admins": [ "+4915112345678" ] },
     "AccessControl": { "AllowedSenders": [], "BlockedSenders": [], "IgnoreOwnMessages": true },
     "RateLimit": { "PermitsPerWindow": 0, "Window": "00:01:00" },
-    "Background": { "MaxConcurrency": 4, "Capacity": 100, "PromptTimeout": "00:02:00" }
+    "Background": { "MaxConcurrency": 4, "Capacity": 100, "PromptTimeout": "00:02:00" },
+    "Scheduler": { "PollInterval": "00:00:01", "RetryDelay": "00:01:00" }
   }
 }
 ```
@@ -114,6 +115,17 @@ Work queued with `RunInBackgroundAsync` / `IBackgroundWorkQueue`.
 | `PromptTimeout` | 2 min | Default wait of `BackgroundWork.PromptAsync`; must be positive |
 
 Items still queued at shutdown are dropped (logged as a warning), so don't use the queue for work that must survive restarts.
+
+## `Scheduler`
+
+Scheduled messages (`IMessageScheduler`, `ScheduleReplyAsync`).
+
+| Key | Default | Notes |
+|---|---|---|
+| `PollInterval` | 1 s | How often due messages are checked for, which is the send-time precision. With a database store, a longer interval means fewer queries. |
+| `RetryDelay` | 1 min | Wait before retrying a message whose send failed |
+
+After downtime, overdue one-off messages are sent on the first check. A recurring message sends one catch-up and then continues at its next future time; it doesn't replay every missed occurrence.
 
 ## Hot reload
 

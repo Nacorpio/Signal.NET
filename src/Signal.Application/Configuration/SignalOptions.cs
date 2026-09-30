@@ -61,6 +61,19 @@ public sealed class SignalOptions
 
     /// <summary>Background work queued by commands and handlers (<c>IBackgroundWorkQueue</c>).</summary>
     public BackgroundOptions Background { get; set; } = new();
+
+    /// <summary>Scheduled messages (<c>IMessageScheduler</c>).</summary>
+    public SchedulerOptions Scheduler { get; set; } = new();
+}
+
+/// <summary>Scheduled message settings.</summary>
+public sealed class SchedulerOptions
+{
+    /// <summary>How often due messages are checked for (the send-time precision). Default 1 second.</summary>
+    public TimeSpan PollInterval { get; set; } = TimeSpan.FromSeconds(1);
+
+    /// <summary>How long to wait before retrying a message whose send failed. Default 1 minute.</summary>
+    public TimeSpan RetryDelay { get; set; } = TimeSpan.FromMinutes(1);
 }
 
 /// <summary>Background work settings.</summary>

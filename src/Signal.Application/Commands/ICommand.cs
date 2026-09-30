@@ -1,6 +1,7 @@
 using System.Reflection;
 using Signal.Application.Abstractions;
 using Signal.Application.Background;
+using Signal.Application.Scheduling;
 
 namespace Signal.Application.Commands;
 
@@ -117,4 +118,12 @@ public abstract class CommandModule
     /// </example>
     protected ValueTask RunInBackgroundAsync(Func<BackgroundWork, Task> work) =>
         Context.Message.QueueBackgroundWorkAsync(work);
+
+    /// <summary>Schedules a reply into the conversation of the triggering message (reminders, digests).</summary>
+    /// <param name="text">The text.</param>
+    /// <param name="dueAt">When to send it.</param>
+    /// <param name="repeatEvery">Repeat interval (at least one minute), or <see langword="null"/> to send once.</param>
+    /// <returns>The scheduled message; keep its id to cancel it with <see cref="IMessageScheduler"/>.</returns>
+    protected Task<ScheduledMessage> ScheduleReplyAsync(string text, DateTimeOffset dueAt, TimeSpan? repeatEvery = null) =>
+        Context.Message.ScheduleReplyAsync(text, dueAt, repeatEvery);
 }
