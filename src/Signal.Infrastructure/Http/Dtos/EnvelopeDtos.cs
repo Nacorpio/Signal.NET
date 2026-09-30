@@ -2,7 +2,7 @@ namespace Signal.Infrastructure.Http.Dtos;
 
 // Received messages use signal-cli's own JSON format (camelCase, see SignalEnvelopeJsonContext). The format is
 // identical for HTTP polling (a JSON array of these objects) and the json-rpc WebSocket (one object per frame).
-// Only the subset Signal.NET models is declared; unknown properties (syncMessage, callMessage, storyMessage, …)
+// Only the subset Signal.NET models is declared; unknown properties (e.g. paymentMessage, pollCreate, …)
 // are ignored. EnvelopeMapper translates these DTOs into IncomingEnvelope.
 
 /// <summary>One received item: the envelope plus the account that received it.</summary>
@@ -28,6 +28,8 @@ internal sealed class EnvelopeDto
     public DataMessageDto? DataMessage { get; set; }
     public EditMessageDto? EditMessage { get; set; }
     public SyncMessageDto? SyncMessage { get; set; }
+    public StoryMessageDto? StoryMessage { get; set; }
+    public CallMessageDto? CallMessage { get; set; }
     public ReceiptMessageDto? ReceiptMessage { get; set; }
     public TypingMessageDto? TypingMessage { get; set; }
 }
@@ -80,6 +82,40 @@ internal sealed class SyncSentMessageDto : DataMessageDto
     public string? DestinationNumber { get; set; }
     public string? DestinationUuid { get; set; }
     public EditMessageDto? EditMessage { get; set; }
+}
+
+/// <summary>A story (signal-cli <c>JsonStoryMessage</c>); <see cref="GroupId"/> is the internal id of a group story.</summary>
+internal sealed class StoryMessageDto
+{
+    public bool AllowsReplies { get; set; }
+    public string? GroupId { get; set; }
+    public AttachmentDto? FileAttachment { get; set; }
+    public StoryTextAttachmentDto? TextAttachment { get; set; }
+}
+
+/// <summary>The text of a text story. Styling (colors, gradients) is not modelled.</summary>
+internal sealed class StoryTextAttachmentDto
+{
+    public string? Text { get; set; }
+}
+
+/// <summary>
+/// A call signalling message (signal-cli <c>JsonCallMessage</c>); at most one of offer, answer, busy and hangup is set.
+/// ICE updates (connection negotiation) are not modelled.
+/// </summary>
+internal sealed class CallMessageDto
+{
+    public CallEventDto? OfferMessage { get; set; }
+    public CallEventDto? AnswerMessage { get; set; }
+    public CallEventDto? BusyMessage { get; set; }
+    public CallEventDto? HangupMessage { get; set; }
+}
+
+/// <summary>One call event. <see cref="Id"/> is an unsigned 64-bit id; <see cref="Type"/> is e.g. <c>AUDIO_CALL</c> or <c>VIDEO_CALL</c> for offers.</summary>
+internal sealed class CallEventDto
+{
+    public ulong Id { get; set; }
+    public string? Type { get; set; }
 }
 
 /// <summary>An edit: the edited message's timestamp and the new version (signal-cli <c>JsonEditMessage</c>).</summary>

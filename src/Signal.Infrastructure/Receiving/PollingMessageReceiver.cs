@@ -42,7 +42,7 @@ internal sealed partial class PollingMessageReceiver(
 
                 foreach (var dto in batch)
                 {
-                    if (EnvelopeMapper.Map(dto, account) is { } envelope)
+                    if (EnvelopeMapper.Map(dto, account, includeStories: !receive.IgnoreStories) is { } envelope)
                     {
                         await writer.WriteAsync(envelope, cancellationToken);
                     }

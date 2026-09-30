@@ -163,7 +163,7 @@ public sealed class Welcome(IMessageSender sender) : IEventHandler<GroupUpdated>
 }
 ```
 
-The available events are `MessageReceived`, `MessageEdited`, `MessageDeleted`, `MessageSent`, `ReactionReceived`, `ReceiptReceived`, `TypingIndicatorChanged` and `GroupUpdated`.
+The available events are `MessageReceived`, `MessageEdited`, `MessageDeleted`, `MessageSent`, `StoryReceived`, `CallReceived`, `ReactionReceived`, `ReceiptReceived`, `TypingIndicatorChanged` and `GroupUpdated`.
 
 ### Using the API directly
 
@@ -186,7 +186,7 @@ await signal.Groups.CreateAsync(account, "Team", ["+4915112345678"]);
 | `Accounts` | – | Required. E.164 numbers to receive for. |
 | `MaxConcurrency` | `4` | Parallel conversations. |
 | `VerifyModeOnStartup` / `FailOnModeMismatch` | `true` / `false` | |
-| `Receive:*` | 1 s interval, 1 s timeout | Polling modes only: `PollingInterval`, `TimeoutSeconds`, `MaxMessages`, `IgnoreAttachments`, `IgnoreStories`, `SendReadReceipts`, `MaxErrorBackoff`. |
+| `Receive:*` | 1 s interval, 1 s timeout | `IgnoreStories` (all modes). Polling modes only: `PollingInterval`, `TimeoutSeconds`, `MaxMessages`, `IgnoreAttachments`, `SendReadReceipts`, `MaxErrorBackoff`. |
 | `WebSocket:*` | 1 s–30 s backoff, 20 s keep-alive | WebSocket modes only. |
 | `Http:Timeout` / `Http:RetryCount` | 30 s / 3 | Only GET/PUT/DELETE requests are retried. Sends are never retried, so a message is not duplicated. |
 | `Commands:*` | prefix `/` | `Prefixes`, `CaseSensitive`, `RespondToUnknown`, `UnknownCommandMessage`, `ErrorMessage`, `QuoteReplies`, `EnableHelp`, `Admins`. |

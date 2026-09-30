@@ -8,6 +8,8 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Stories (roadmap 0.4.5):** `EnvelopeContent` has a new case, `StoryMessage` (file or text, optional group, `AllowsReplies`), raising the new `StoryReceived` event. Opt-in via `Receive:IgnoreStories = false`.
+- **Calls (roadmap 0.4.6):** `EnvelopeContent` has a new case, `CallMessage` (`CallEventKind` offer, answer, busy or hangup; `CallId`; `IsVideo` for offers), raising the new `CallReceived` event.
 - **Mention-aware binding (roadmap 0.4.7):** a positional command argument that is an `@mention` binds as the mentioned user's phone number (or UUID if hidden), so `/kick @Bob` works with `Recipient`, `PhoneNumber` and `AccountId` parameters. A placeholder without a matching mention fails with `Could not resolve the @mention for <name>.` Before, it would have been accepted as a username.
 - **Received text styles (roadmap 0.4.8):** `DataMessage.TextStyles` lists the sender's formatting as `StyledRange(TextStyle, Start, Length)`.
 - **Sync messages (roadmap 0.4.1):** `EnvelopeContent` has a new case, `SentTranscript`, for messages the account sent from its other devices, raising the new `MessageSent` event. `IncomingEnvelope.Conversation` is the transcript's destination. Transcripts never run commands. They are delivered only with `AccessControl:IgnoreOwnMessages = false`, so the default behavior is unchanged.
@@ -18,7 +20,8 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
-- Exhaustive `switch`es over `EnvelopeContent` now produce a warning until they handle `EditMessage` and `SentTranscript`. This is source-compatible and binary-compatible.
+- `Receive:IgnoreStories` is now enforced in the WebSocket (`json-rpc*`) modes too. Before, it was only passed to the API when polling.
+- Exhaustive `switch`es over `EnvelopeContent` now produce a warning until they handle `EditMessage`, `SentTranscript`, `StoryMessage` and `CallMessage`. This is source-compatible and binary-compatible.
 - Sticker-only messages now raise `MessageReceived` (they were dropped before). `DataMessage.HasContent` is `true` for them, while `Text` is `null`.
 
 ## [0.3.0-preview.1] - 2026-09-29

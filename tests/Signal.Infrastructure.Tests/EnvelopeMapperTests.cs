@@ -152,6 +152,55 @@ public class EnvelopeMapperTests
             envelope.Data!.TextStyles);
     }
 
+    private static IncomingEnvelope? MapStory(string envelopeJson, bool includeStories) =>
+        EnvelopeMapper.Map(
+            JsonSerializer.Deserialize(
+                $$$"""{"account":"+15550000000","envelope":{"sourceNumber":"+15550001111","sourceDevice":1,"timestamp":1700000000500,{{{envelopeJson}}}}}""",
+                SignalEnvelopeJsonContext.Default.ReceivedMessageDto)!,
+            Account,
+            includeStories);
+
+    [Fact]
+    public void Stories_are_dropped_unless_included()
+    {
+        const string json = """ "storyMessage":{"allowsReplies":true,"textAttachment":{"text":"my story","style":"BOLD"}} """;
+
+        Assert.Null(MapStory(json, includeStories: false));
+        var story = MapStory(json, includeStories: true)!.Story!;
+        Assert.Equal("my story", story.Text);
+        Assert.True(story.AllowsReplies);
+        Assert.Null(story.Group);
+    }
+
+    [Fact]
+    public void Maps_group_media_stories_and_drops_empty_ones()
+    {
+        var media = MapStory("""
+            "storyMessage":{"allowsReplies":false,"groupId":"abc123==","fileAttachment":{"id":"att9","contentType":"image/jpeg","size":42}}
+            """, includeStories: true)!;
+
+        Assert.Equal(new Attachment("att9", "image/jpeg", null, 42), media.Story!.File);
+        Assert.Equal(GroupId.FromInternalId("abc123=="), media.Group);
+        Assert.Null(MapStory(""" "storyMessage":{"allowsReplies":true} """, includeStories: true));
+    }
+
+    [Fact]
+    public void Maps_call_events_with_unsigned_ids()
+    {
+        // Call ids are unsigned 64-bit values (BigInteger in signal-cli); this one exceeds long.MaxValue.
+        var offer = MapOne(""" "callMessage":{"offerMessage":{"id":18446744073709551000,"type":"VIDEO_CALL","opaque":"AAAA"}} """)!;
+        var hangup = MapOne(""" "callMessage":{"hangupMessage":{"id":7,"type":"NORMAL","deviceId":1}} """)!;
+
+        Assert.Equal(new CallMessage(CallEventKind.Offer, 18446744073709551000) { IsVideo = true }, offer.Call);
+        Assert.Equal(new CallMessage(CallEventKind.Hangup, 7), hangup.Call);
+        Assert.Null(hangup.Call!.IsVideo);
+        Assert.Equal((Recipient)PhoneNumber.Parse("+15550001111"), offer.Conversation);
+    }
+
+    [Fact]
+    public void Drops_call_messages_with_only_ice_updates() =>
+        Assert.Null(MapOne(""" "callMessage":{"iceUpdateMessages":[{"id":7,"opaque":"AAAA"}]} """));
+
     [Fact]
     public void Ignores_malformed_stickers_but_keeps_the_message()
     {
