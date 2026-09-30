@@ -41,6 +41,7 @@ public interface ICommandArgumentBinder
 /// <item>Flag parameters bind from <c>--name</c> options; boolean flags are switches.</item>
 /// <item>Positional parameters bind in order; missing optional ones get their default.</item>
 /// <item>A <c>[Remainder]</c> parameter takes the rest of the text verbatim.</item>
+/// <item>A positional argument that is an <c>@mention</c> binds as the mentioned user's phone number (or UUID).</item>
 /// <item>Extra positional arguments and unknown flags are errors.</item>
 /// </list>
 /// Commands without declared parameters (e.g. <see cref="ICommand"/> classes) always bind successfully.
@@ -112,7 +113,27 @@ internal sealed class CommandArgumentBinder(IArgumentConverterProvider converter
                 continue;
             }
 
-            var input = parameter.IsRemainder ? Remainder(context, split, position) : split.Positional[position].Value;
+            var token = split.Positional[position];
+            string input;
+            if (parameter.IsRemainder)
+            {
+                input = Remainder(context, split, position);
+            }
+            else if (token is { IsQuoted: false, Value: [MentionPlaceholder] })
+            {
+                // Never pass an unresolved placeholder on: it would parse as a (bogus) username.
+                if (ResolveMention(context, token) is not { } author)
+                {
+                    return new ArgumentBindingError($"Could not resolve the @mention for <{parameter.Name}>.");
+                }
+
+                input = author;
+            }
+            else
+            {
+                input = token.Value;
+            }
+
             position = parameter.IsRemainder ? split.Positional.Count : position + 1;
 
             if ((error = Convert(parameter, input, context, out values[i])) is not null)
@@ -151,6 +172,41 @@ internal sealed class CommandArgumentBinder(IArgumentConverterProvider converter
             : string.Join(' ', split.Positional.Skip(position).Select(t => t.Value));
     }
 
+    /// <summary>
+    /// Signal replaces each mention in the text with this placeholder and lists the mentioned user in
+    /// <c>DataMessage.Mentions</c>.
+    /// </summary>
+    private const char MentionPlaceholder = '\uFFFC';
+
+    /// <summary>
+    /// Resolves a token that is a mention placeholder to the mentioned user's phone number (or UUID if the number is
+    /// hidden), so <c>Recipient</c>, <c>PhoneNumber</c> and <c>AccountId</c> parameters accept <c>@mentions</c>.
+    /// </summary>
+    /// <remarks>
+    /// The parser trims the text, so token offsets can't be mapped to mention offsets directly. Instead the n-th
+    /// placeholder in the text is matched with the n-th mention by position.
+    /// </remarks>
+    /// <returns>The author, or <see langword="null"/> if the mention can't be resolved.</returns>
+    private static string? ResolveMention(CommandContext context, CommandToken token)
+    {
+        if (context.Envelope.Data is not { Text: { } text } data)
+        {
+            return null;
+        }
+
+        var mentions = data.Mentions
+            .Where(m => m.Start >= 0 && m.Start < text.Length && text[m.Start] == MentionPlaceholder)
+            .OrderBy(m => m.Start)
+            .ToList();
+
+        // The raw arguments are the (trimmed) end of the text, so placeholders before them are counted separately.
+        var raw = context.Parsed.RawArguments;
+        var index = Count(text) - Count(raw) + Count(raw.AsSpan(0, token.Start));
+        return index < mentions.Count ? mentions[index].Author : null;
+
+        static int Count(ReadOnlySpan<char> span) => span.Count(MentionPlaceholder);
+    }
+
     /// <summary>Converts one value; returns a user-facing error or <see langword="null"/> on success.</summary>
     private string? Convert(CommandParameter parameter, string input, CommandContext context, out object? value)
     {
@@ -160,8 +216,10 @@ internal sealed class CommandArgumentBinder(IArgumentConverterProvider converter
                 $"No argument converter registered for {parameter.ParameterType} (parameter '{parameter.Name}' of command '{context.Command.Name}').");
         }
 
+        // An unresolved placeholder is invisible in a reply, so name it instead.
+        var shown = input == MentionPlaceholder.ToString() ? "@mention" : input;
         return converter.TryConvert(input, context, out value)
             ? null
-            : $"'{input}' is not a valid {converter.DisplayName} for <{parameter.Name}>.";
+            : $"'{shown}' is not a valid {converter.DisplayName} for <{parameter.Name}>.";
     }
 }

@@ -8,6 +8,8 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Mention-aware binding (roadmap 0.4.7):** a positional command argument that is an `@mention` binds as the mentioned user's phone number (or UUID if hidden), so `/kick @Bob` works with `Recipient`, `PhoneNumber` and `AccountId` parameters. A placeholder without a matching mention fails with `Could not resolve the @mention for <name>.` Before, it would have been accepted as a username.
+- **Received text styles (roadmap 0.4.8):** `DataMessage.TextStyles` lists the sender's formatting as `StyledRange(TextStyle, Start, Length)`.
 - **Sync messages (roadmap 0.4.1):** `EnvelopeContent` has a new case, `SentTranscript`, for messages the account sent from its other devices, raising the new `MessageSent` event. `IncomingEnvelope.Conversation` is the transcript's destination. Transcripts never run commands. They are delivered only with `AccessControl:IgnoreOwnMessages = false`, so the default behavior is unchanged.
 - **Edits, remote deletes and received stickers (roadmap 0.4.2, 0.4.3, 0.4.4):**
   - `EnvelopeContent` has a new case, `EditMessage` (edited message's timestamp plus the new version), raising the new `MessageEdited` event. Edits never run commands.

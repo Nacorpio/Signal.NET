@@ -112,12 +112,18 @@ Binding rules:
 - **Positional parameters** bind in declaration order.
 - **Optional parameters:** a parameter is optional if it has a default value, is nullable (`int?`, `string?`), or is a switch.
 - **Remainder:** a `[Remainder]` parameter gets the rest of the text verbatim, keeping multiple spaces. If flags follow it, the remaining token values are joined with single spaces instead.
+- **@mentions:** Signal replaces a mention in the text with a placeholder character (U+FFFC) and lists the user in
+  `DataMessage.Mentions`. A positional argument that is a mention binds as the mentioned user's phone number, or
+  their UUID if the number is hidden. So `/kick @Bob` works with a `Recipient`, `PhoneNumber` or `AccountId`
+  parameter. A `PhoneNumber` parameter rejects users with hidden numbers; use `Recipient` to accept both.
+  Mentions in `[Remainder]` text and in `--option` values are left as the placeholder.
 - **Errors** are user-facing, and the result handler adds the usage line:
   - `Missing argument <b>.`
   - `'x' is not a valid whole number for <b>.`
   - `Too many arguments ('3' was not expected).`
   - `Option --times requires a value.`
   - `Unknown option --loud.`
+  - `Could not resolve the @mention for <user>.` (a placeholder without a matching mention)
 - **Missing converter:** a parameter type without any converter is a programming error. It throws `InvalidOperationException`, which surfaces as a faulted command.
 
 ### Preconditions (`Preconditions/Preconditions.cs`)

@@ -99,8 +99,23 @@ internal static class EnvelopeMapper
                 ? sticker
                 : null,
             RemoteDelete = dto.RemoteDelete is { Timestamp: > 0 } d ? new RemoteDelete(d.Timestamp) : null,
+            TextStyles = [.. (dto.TextStyles ?? [])
+                .Where(t => t is { Start: >= 0, Length: > 0 })
+                .Select(t => ToTextStyle(t.Style) is { } style ? new StyledRange(style, t.Start, t.Length) : null)
+                .OfType<StyledRange>()],
         };
     }
+
+    /// <summary>Maps signal-cli's style names; <c>NONE</c> and unknown styles are skipped.</summary>
+    private static TextStyle? ToTextStyle(string? style) => style?.ToUpperInvariant() switch
+    {
+        "BOLD" => TextStyle.Bold,
+        "ITALIC" => TextStyle.Italic,
+        "SPOILER" => TextStyle.Spoiler,
+        "STRIKETHROUGH" => TextStyle.Strikethrough,
+        "MONOSPACE" => TextStyle.Monospace,
+        _ => null,
+    };
 
     /// <summary>
     /// Maps a message sent from another device. An edit takes precedence over the unwrapped data fields. The
