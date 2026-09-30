@@ -137,6 +137,11 @@ Binding rules:
 
 - **Positional parameters** bind in declaration order.
 - **Optional parameters:** a parameter is optional if it has a default value, is nullable (`int?`, `string?`), or is a switch.
+- **Collections:** a `params T[]`, `T[]`, `List<T>` or `IEnumerable<T>`/`IReadOnlyList<T>`/`IReadOnlyCollection<T>`/
+  `IList<T>`/`ICollection<T>` parameter takes **all remaining positional arguments**, each converted to `T` (so
+  `@mentions` resolve per element). Like `[Remainder]` it must be the last positional parameter, and it can't be a
+  `[Flag]`. `params` may be empty. Other collections are required unless they have a default or are nullable.
+  Usage shows `<people...>` or `[numbers...]`.
 - **Remainder:** a `[Remainder]` parameter gets the rest of the text verbatim, keeping multiple spaces. If flags follow it, the remaining token values are joined with single spaces instead.
 - **@mentions:** Signal replaces a mention in the text with a placeholder character (U+FFFC) and lists the user in
   `DataMessage.Mentions`. A positional argument that is a mention binds as the mentioned user's phone number, or
@@ -170,7 +175,7 @@ binding, so users without permission never see usage details.
 
 | Type | Purpose |
 |---|---|
-| `CommandParameter` | A bindable parameter: name, type, optional/default, remainder, flag name, summary. `ToString()` produces its usage fragment. |
+| `CommandParameter` | A bindable parameter: name, type, optional/default, remainder, flag name, summary, and `ElementType`/`IsCollection` for collections. `ToString()` produces its usage fragment. |
 | `CommandDescriptor` | Everything about one command. `FormatUsage(prefix)` generates `/add <a> <b>` when no custom `Usage` is set. `Group` (`CommandGroupInfo`) and `FullName` describe grouped commands. |
 | `CommandCatalog` | The registration-time list of command types, modules and descriptors. The builder fills it. |
 | `ICommandRegistry` / `CommandRegistry` | Built **lazily on first use**, so every registration is complete. Rejects duplicate names or aliases with a clear error. Honours `CaseSensitive` and skips `HelpModule` when `EnableHelp` is false. Grouped commands are keyed as `group command`; `GetGroup(name)` lists a group. |

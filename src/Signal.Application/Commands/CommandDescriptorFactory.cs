@@ -157,23 +157,57 @@ internal static class CommandDescriptorFactory
                 throw new InvalidOperationException($"[Remainder] parameter '{info.Name}' of {method.DeclaringType}.{method.Name} must be a string.");
             }
 
+            var elementType = CollectionElementType(type);
+            var isParams = info.GetCustomAttribute<ParamArrayAttribute>() is not null;
+            if (elementType is not null && flag is not null)
+            {
+                throw new InvalidOperationException(
+                    $"Collection parameter '{info.Name}' of {method.DeclaringType}.{method.Name} can't be a [Flag]; collections take the remaining positional arguments.");
+            }
+
             parameters.Add(new CommandParameter(
                 info.Name ?? $"arg{i}",
                 type,
-                IsOptional: info.HasDefaultValue || isNullable || isSwitch,
-                DefaultValue: DefaultValue(info, isSwitch),
+                IsOptional: info.HasDefaultValue || isNullable || isSwitch || isParams,
+                DefaultValue: isParams && !info.HasDefaultValue ? Array.CreateInstance(elementType!, 0) : DefaultValue(info, isSwitch),
                 isRemainder,
                 flag is null ? null : flag.Name ?? info.Name,
-                info.GetCustomAttribute<SummaryAttribute>()?.Text));
+                info.GetCustomAttribute<SummaryAttribute>()?.Text)
+            {
+                ElementType = elementType,
+            });
         }
 
         var positional = parameters.Where(p => !p.IsFlag).ToList();
-        if (positional.SkipLast(1).Any(p => p.IsRemainder))
+        if (positional.SkipLast(1).Any(p => p.IsRemainder || p.IsCollection))
         {
-            throw new InvalidOperationException($"[Remainder] must be the last positional parameter of {method.DeclaringType}.{method.Name}.");
+            throw new InvalidOperationException(
+                $"[Remainder] and collection parameters must be the last positional parameter of {method.DeclaringType}.{method.Name}.");
         }
 
         return (parameters, slots);
+    }
+
+    /// <summary>Supported collection shapes, all filled from an array (or a <see cref="List{T}"/>).</summary>
+    private static readonly Type[] CollectionInterfaces =
+        [typeof(IEnumerable<>), typeof(IReadOnlyList<>), typeof(IReadOnlyCollection<>), typeof(IList<>), typeof(ICollection<>)];
+
+    /// <summary>
+    /// The element type of <c>T[]</c>, <see cref="List{T}"/> and the collection interfaces an array implements;
+    /// <see langword="null"/> for everything else (including <see cref="string"/>, which is not treated as a collection).
+    /// </summary>
+    private static Type? CollectionElementType(Type type)
+    {
+        type = Nullable.GetUnderlyingType(type) ?? type;
+        if (type.IsArray)
+        {
+            return type.GetArrayRank() == 1 ? type.GetElementType() : null;
+        }
+
+        return type.IsGenericType
+            && (type.GetGenericTypeDefinition() == typeof(List<>) || CollectionInterfaces.Contains(type.GetGenericTypeDefinition()))
+            ? type.GenericTypeArguments[0]
+            : null;
     }
 
     /// <summary>The value for an omitted argument; never <see langword="null"/> for non-nullable value types.</summary>
