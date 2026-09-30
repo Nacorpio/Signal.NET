@@ -41,6 +41,7 @@ public interface ICommandArgumentBinder
 /// <item>Flag parameters bind from <c>--name</c> options; boolean flags are switches.</item>
 /// <item>Positional parameters bind in order; missing optional ones get their default.</item>
 /// <item>A <c>[Remainder]</c> parameter takes the rest of the text verbatim.</item>
+/// <item>A collection parameter (<c>params T[]</c>, <c>List&lt;T&gt;</c>, …) takes all remaining positional arguments.</item>
 /// <item>A positional argument that is an <c>@mention</c> binds as the mentioned user's phone number (or UUID).</item>
 /// <item>Extra positional arguments and unknown flags are errors.</item>
 /// </list>
@@ -94,7 +95,7 @@ internal sealed class CommandArgumentBinder(IArgumentConverterProvider converter
                     continue;
                 }
 
-                if ((error = Convert(parameter, raw, context, out values[i])) is not null)
+                if ((error = Convert(parameter, parameter.ParameterType, raw, context, out values[i])) is not null)
                 {
                     return new ArgumentBindingError(error);
                 }
@@ -113,30 +114,39 @@ internal sealed class CommandArgumentBinder(IArgumentConverterProvider converter
                 continue;
             }
 
-            var token = split.Positional[position];
-            string input;
+            if (parameter.IsCollection)
+            {
+                // Takes every remaining positional argument, each converted to the element type.
+                var elementType = parameter.ElementType!;
+                var items = Array.CreateInstance(elementType, split.Positional.Count - position);
+                for (var item = 0; position < split.Positional.Count; item++, position++)
+                {
+                    if ((error = TokenInput(context, split.Positional[position], parameter, out var itemInput)) is not null
+                        || (error = Convert(parameter, elementType, itemInput!, context, out var element)) is not null)
+                    {
+                        return new ArgumentBindingError(error);
+                    }
+
+                    items.SetValue(element, item);
+                }
+
+                values[i] = IsList(parameter.ParameterType) ? Activator.CreateInstance(parameter.ParameterType, items) : items;
+                continue;
+            }
+
+            string? input;
             if (parameter.IsRemainder)
             {
                 input = Remainder(context, split, position);
             }
-            else if (token is { IsQuoted: false, Value: [MentionPlaceholder] })
+            else if ((error = TokenInput(context, split.Positional[position], parameter, out input)) is not null)
             {
-                // Never pass an unresolved placeholder on: it would parse as a (bogus) username.
-                if (ResolveMention(context, token) is not { } author)
-                {
-                    return new ArgumentBindingError($"Could not resolve the @mention for <{parameter.Name}>.");
-                }
-
-                input = author;
-            }
-            else
-            {
-                input = token.Value;
+                return new ArgumentBindingError(error);
             }
 
             position = parameter.IsRemainder ? split.Positional.Count : position + 1;
 
-            if ((error = Convert(parameter, input, context, out values[i])) is not null)
+            if ((error = Convert(parameter, parameter.ParameterType, input!, context, out values[i])) is not null)
             {
                 return new ArgumentBindingError(error);
             }
@@ -207,13 +217,34 @@ internal sealed class CommandArgumentBinder(IArgumentConverterProvider converter
         static int Count(ReadOnlySpan<char> span) => span.Count(MentionPlaceholder);
     }
 
-    /// <summary>Converts one value; returns a user-facing error or <see langword="null"/> on success.</summary>
-    private string? Convert(CommandParameter parameter, string input, CommandContext context, out object? value)
+    /// <summary>
+    /// The text to convert for one positional token: the token itself, or the mentioned user for an <c>@mention</c>.
+    /// Returns a user-facing error for a mention that can't be resolved; an unresolved placeholder is never passed on,
+    /// because it would parse as a (bogus) one-character username.
+    /// </summary>
+    private static string? TokenInput(CommandContext context, CommandToken token, CommandParameter parameter, out string? input)
     {
-        if (!converters.TryGetConverter(parameter.ParameterType, out var converter))
+        if (token is not { IsQuoted: false, Value: [MentionPlaceholder] })
+        {
+            input = token.Value;
+            return null;
+        }
+
+        input = ResolveMention(context, token);
+        return input is null ? $"Could not resolve the @mention for <{parameter.Name}>." : null;
+    }
+
+    /// <summary>Whether a collection parameter needs a <see cref="List{T}"/> rather than an array.</summary>
+    private static bool IsList(Type type) =>
+        (Nullable.GetUnderlyingType(type) ?? type) is { IsGenericType: true } generic && generic.GetGenericTypeDefinition() == typeof(List<>);
+
+    /// <summary>Converts one value to <paramref name="type"/>; returns a user-facing error or <see langword="null"/> on success.</summary>
+    private string? Convert(CommandParameter parameter, Type type, string input, CommandContext context, out object? value)
+    {
+        if (!converters.TryGetConverter(type, out var converter))
         {
             throw new InvalidOperationException(
-                $"No argument converter registered for {parameter.ParameterType} (parameter '{parameter.Name}' of command '{context.Command.Name}').");
+                $"No argument converter registered for {type} (parameter '{parameter.Name}' of command '{context.Command.FullName}').");
         }
 
         // An unresolved placeholder is invisible in a reply, so name it instead.

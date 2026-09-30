@@ -21,17 +21,29 @@ public sealed record CommandParameter(
     string? FlagName,
     string? Summary)
 {
+    /// <summary>
+    /// For collection parameters (<c>params T[]</c>, <c>T[]</c>, <c>List&lt;T&gt;</c>, <c>IReadOnlyList&lt;T&gt;</c>, …): the
+    /// element type each remaining argument is converted to. <see langword="null"/> for single-value parameters.
+    /// </summary>
+    public Type? ElementType { get; init; }
+
+    /// <summary>Whether the parameter collects all remaining positional arguments (see <see cref="ElementType"/>).</summary>
+    public bool IsCollection => ElementType is not null;
+
     /// <summary>Whether the parameter is bound from a named option.</summary>
     public bool IsFlag => FlagName is not null;
 
     /// <summary>A boolean flag that does not take a value (<c>--verbose</c>).</summary>
     public bool IsSwitch => IsFlag && (ParameterType == typeof(bool) || ParameterType == typeof(bool?));
 
-    /// <summary>Formats the parameter for usage lines: <c>&lt;a&gt;</c>, <c>[a]</c>, <c>&lt;text...&gt;</c>, <c>[--flag &lt;v&gt;]</c>, <c>[--switch]</c>.</summary>
+    /// <summary>
+    /// Formats the parameter for usage lines: <c>&lt;a&gt;</c>, <c>[a]</c>, <c>&lt;text...&gt;</c>, <c>[numbers...]</c>,
+    /// <c>[--flag &lt;v&gt;]</c>, <c>[--switch]</c>.
+    /// </summary>
     /// <returns>The usage fragment.</returns>
     public override string ToString() => IsSwitch ? $"[--{FlagName}]"
         : IsFlag ? (IsOptional ? $"[--{FlagName} <{Name}>]" : $"--{FlagName} <{Name}>")
-        : IsRemainder ? (IsOptional ? $"[{Name}...]" : $"<{Name}...>")
+        : IsRemainder || IsCollection ? (IsOptional ? $"[{Name}...]" : $"<{Name}...>")
         : IsOptional ? $"[{Name}]" : $"<{Name}>";
 }
 

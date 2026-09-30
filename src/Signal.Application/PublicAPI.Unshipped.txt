@@ -23,6 +23,9 @@ Signal.Application.Commands.CommandGroupInfo.Description.init -> void
 Signal.Application.Commands.CommandGroupInfo.Equals(Signal.Application.Commands.CommandGroupInfo? other) -> bool
 Signal.Application.Commands.CommandGroupInfo.Name.get -> string!
 Signal.Application.Commands.CommandGroupInfo.Name.init -> void
+Signal.Application.Commands.CommandParameter.ElementType.get -> System.Type?
+Signal.Application.Commands.CommandParameter.ElementType.init -> void
+Signal.Application.Commands.CommandParameter.IsCollection.get -> bool
 Signal.Application.Commands.ICommandRegistry.GetGroup(string! groupNameOrAlias) -> System.Collections.Generic.IReadOnlyList<Signal.Application.Commands.CommandDescriptor!>!
 Signal.Application.Configuration.CommandOptions.SuggestSimilarCommands.get -> bool
 Signal.Application.Configuration.CommandOptions.SuggestSimilarCommands.set -> void
