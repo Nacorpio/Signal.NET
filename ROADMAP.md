@@ -10,7 +10,7 @@ The layer column shows where the work mainly lands (**D**omain, **A**pplication,
 
 ---
 
-## Where the project stands today (0.4.0-preview.1)
+## Where the project stands today (0.5.0-preview.1)
 
 | Area | State |
 |---|---|
@@ -19,7 +19,7 @@ The layer column shows where the work mainly lands (**D**omain, **A**pplication,
 | Commands | Modules, class and lambda commands; typed binding, flags, remainder; five preconditions and cooldowns; generated help |
 | Processing | Middleware pipeline, domain events, conversation-partitioned concurrency |
 | Language | .NET 11 **RC1** SDK; C# 15 unions (`Recipient`, `EnvelopeContent`, `CommandResult`, `ArgumentBindingResult`), C# 14 extension members |
-| Quality | 211 tests, XML docs and public API tracking enforced by the build, CI with coverage on Linux and Windows |
+| Quality | 321 tests, XML docs and public API tracking enforced by the build, CI with coverage on Linux and Windows |
 | Delivery | Tag-driven releases with NuGet Trusted Publishing (approval-gated `nuget` environment), a [docs site](https://nacorpio.github.io/Signal.NET/), a `dotnet new signalbot` template. Published on nuget.org as [`Nacorpio.Signal.*`](https://www.nuget.org/packages/Nacorpio.Signal.Hosting) since [v0.2.0-preview.2](https://github.com/Nacorpio/Signal.NET/releases/tag/v0.2.0-preview.2). |
 
 These known limitations shape the plan below:
@@ -101,7 +101,7 @@ it are exhaustive, the compiler points at every place that needs updating.*
 
 ## Milestone 0.5: Command system 2.0
 
-**Status:** all items are merged into `main` and not yet released (see the [changelog](CHANGELOG.md)).
+**Status:** complete, released in [v0.5.0-preview.1](https://github.com/Nacorpio/Signal.NET/releases/tag/v0.5.0-preview.1).
 
 *Goal: make complex bots pleasant to write.*
 
@@ -130,7 +130,7 @@ it are exhaustive, the compiler points at every place that needs updating.*
 | 0.6.3 | **Persistent state ports** | A | M | `ICooldownTracker` / `ISenderRateLimiter` backed by `IDistributedCache` (Redis). Fixes limitation 4. |
 | 0.6.4 | **Outbox for sends** | A/I | L | Optional durable queue with retries, so sends survive restarts and API outages without the risk of duplicates |
 | 0.6.5 | **Dynamic accounts** | H | M | Add and remove accounts at runtime (`IAccountManager`) instead of only through `Signal:Accounts` |
-| 0.6.6 | **Horizontal scale-out** | H | L | Leader election or account leasing, so only one instance receives per account while all can send |
+| 0.6.6 | **Horizontal scale-out** | H | L | Leader election or account leasing, so only one instance receives per account while all can send. Must also cover the 0.5 in-memory parts: scheduled messages (would be sent by every instance), pending prompts (the answer may reach another instance), the background queue and conversation settings. Write the ownership design first. |
 | 0.6.7 | **Graceful drain on shutdown** | H | S | Configurable drain timeout that finishes in-flight commands instead of cancelling them |
 | 0.6.8 | **Dead-letter handling** | A | S | `IFailedEnvelopeSink` for envelopes whose processing threw, for later inspection |
 | 0.6.9 | **API authentication support** | I | S | Bearer or basic auth headers and mTLS options, for containers behind an authenticating reverse proxy |
