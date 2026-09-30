@@ -55,6 +55,20 @@ public class EditDeleteStickerEventTests
     }
 
     [Fact]
+    public void Stories_and_calls_raise_their_events()
+    {
+        var group = GroupId.FromInternalId("abc");
+        var story = Envelope(new StoryMessage(true, group) { Text = "hi" });
+        var call = Envelope(new CallMessage(CallEventKind.Offer, 1) { IsVideo = false });
+
+        Assert.IsType<StoryReceived>(story.ToDomainEvent());
+        Assert.Equal(group, story.Group);
+        Assert.IsType<CallReceived>(call.ToDomainEvent());
+        Assert.Null(call.Group);
+        Assert.Equal(Alice.ToRecipient(), call.Conversation);
+    }
+
+    [Fact]
     public void A_sticker_alone_counts_as_content()
     {
         var data = new DataMessage(20, null) { Sticker = new Sticker("abc", 1) };

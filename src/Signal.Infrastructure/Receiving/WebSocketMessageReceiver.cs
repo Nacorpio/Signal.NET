@@ -129,7 +129,7 @@ internal sealed partial class WebSocketMessageReceiver(
         try
         {
             return JsonSerializer.Deserialize(json, SignalEnvelopeJsonContext.Default.ReceivedMessageDto) is { } dto
-                ? EnvelopeMapper.Map(dto, account)
+                ? EnvelopeMapper.Map(dto, account, includeStories: !options.CurrentValue.Receive.IgnoreStories)
                 : null;
         }
         catch (JsonException ex)

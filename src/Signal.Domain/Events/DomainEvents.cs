@@ -44,6 +44,19 @@ public sealed record MessageEdited(IncomingEnvelope Envelope, EditMessage Edit) 
 /// <param name="Transcript">The sent message and its destination.</param>
 public sealed record MessageSent(IncomingEnvelope Envelope, SentTranscript Transcript) : DomainEvent(Envelope);
 
+/// <summary>The sender posted a story. Requires <c>Receive:IgnoreStories = false</c>.</summary>
+/// <param name="Envelope">The envelope that produced the event.</param>
+/// <param name="Story">The story.</param>
+public sealed record StoryReceived(IncomingEnvelope Envelope, StoryMessage Story) : DomainEvent(Envelope);
+
+/// <summary>
+/// The sender called, answered, was busy or hung up. Signal.NET can't take calls; use this to react, e.g. with a
+/// "sorry, I'm a bot" reply to <see cref="CallEventKind.Offer"/>.
+/// </summary>
+/// <param name="Envelope">The envelope that produced the event.</param>
+/// <param name="Call">The call event.</param>
+public sealed record CallReceived(IncomingEnvelope Envelope, CallMessage Call) : DomainEvent(Envelope);
+
 /// <summary>The sender deleted one of their earlier messages for everyone.</summary>
 /// <param name="Envelope">The envelope that produced the event.</param>
 /// <param name="Delete">The deletion, naming the deleted message's timestamp.</param>

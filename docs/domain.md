@@ -7,9 +7,9 @@ speaks this language. The project has no dependencies, performs no I/O, and neve
 |---|---|
 | `/` | `ExecutionMode`, `ExecutionModeExtensions` |
 | `ValueObjects/` | `PhoneNumber`, `AccountId`, `Username`, `GroupId`, `Recipient` (union) |
-| `Messaging/` | `IncomingEnvelope`, `EnvelopeContent` (union), `DataMessage`, `EditMessage`, `RemoteDelete`, `SentTranscript`, `ReceiptMessage`, `TypingMessage`, `Sender`, `OutgoingMessage`, `OutgoingMessageBuilder`, `Attachment`, `Mention`, `Quote`, `Reaction`, `TextMode`, `ReceiptType`, `TypingAction` |
+| `Messaging/` | `IncomingEnvelope`, `EnvelopeContent` (union), `DataMessage`, `EditMessage`, `RemoteDelete`, `SentTranscript`, `StoryMessage`, `CallMessage`, `CallEventKind`, `ReceiptMessage`, `TypingMessage`, `Sender`, `OutgoingMessage`, `OutgoingMessageBuilder`, `Attachment`, `Mention`, `Quote`, `Reaction`, `TextMode`, `ReceiptType`, `TypingAction` |
 | `Entities/` | `Entity<TId>`, `Group`, `Contact`, `Identity` |
-| `Events/` | `IDomainEvent`, `DomainEvent`, `MessageReceived`, `MessageEdited`, `MessageDeleted`, `MessageSent`, `ReactionReceived`, `ReceiptReceived`, `TypingIndicatorChanged`, `GroupUpdated` |
+| `Events/` | `IDomainEvent`, `DomainEvent`, `MessageReceived`, `MessageEdited`, `MessageDeleted`, `MessageSent`, `StoryReceived`, `CallReceived`, `ReactionReceived`, `ReceiptReceived`, `TypingIndicatorChanged`, `GroupUpdated` |
 | `Exceptions/` | `SignalDomainException`, `InvalidPhoneNumberException`, `InvalidRecipientException` |
 
 ---
@@ -138,9 +138,9 @@ it with an `ArgumentException`.
 | `Account` | The receiving account |
 | `Source` | The `Sender` |
 | `Timestamp` / `ReceivedAt` | Server timestamp (ms) / as a `DateTimeOffset` |
-| `Content` | The `EnvelopeContent` union: **exactly one** of `DataMessage`, `EditMessage`, `SentTranscript`, `ReceiptMessage`, `TypingMessage` |
-| `Data` / `Edit` / `Transcript` / `Receipt` / `Typing` | Convenience accessors. Each returns the content if it has that type, otherwise `null`. |
-| `Group`, `IsGroup` | Group context, from the data message, the edited or sent message, or the typing message |
+| `Content` | The `EnvelopeContent` union: **exactly one** of `DataMessage`, `EditMessage`, `SentTranscript`, `StoryMessage`, `CallMessage`, `ReceiptMessage`, `TypingMessage` |
+| `Data` / `Edit` / `Transcript` / `Story` / `Call` / `Receipt` / `Typing` | Convenience accessors. Each returns the content if it has that type, otherwise `null`. |
+| `Group`, `IsGroup` | Group context, from the data message, the edited or sent message, a group story, or the typing message |
 | `Conversation` | **Where replies go:** the group recipient for group messages, otherwise the sender (by phone number, or by `AccountId` if the number is hidden). For a `SentTranscript` it is the transcript's destination, because the sender is the account itself. |
 | `ToDomainEvent()` | Converts the envelope into its domain event (see below) |
 
@@ -155,19 +155,21 @@ it with an `ArgumentException`.
 | `DataMessage` without content | none (`null`) |
 | `EditMessage` | `MessageEdited` |
 | `SentTranscript` | `MessageSent` |
+| `StoryMessage` | `StoryReceived` |
+| `CallMessage` | `CallReceived` |
 | `ReceiptMessage` | `ReceiptReceived` |
 | `TypingMessage` | `TypingIndicatorChanged` |
 
 ### `EnvelopeContent` (union)
 
 ```csharp
-public union EnvelopeContent(DataMessage, EditMessage, SentTranscript, ReceiptMessage, TypingMessage);
+public union EnvelopeContent(DataMessage, EditMessage, SentTranscript, StoryMessage, CallMessage, ReceiptMessage, TypingMessage);
 ```
 
 **Purpose:** a Signal envelope carries exactly one kind of content. Modelling that as a union makes it
 impossible to build an envelope with no content or with two kinds at once. Adding a new content kind
-produces a compiler warning at every `switch` that doesn't handle it yet. `EditMessage` and `SentTranscript` were added this
-way in 0.4, so exhaustive switches written against 0.3 now warn until they handle them.
+produces a compiler warning at every `switch` that doesn't handle it yet. `EditMessage`, `SentTranscript`, `StoryMessage` and
+`CallMessage` were added this way in 0.4, so exhaustive switches written against 0.3 now warn until they handle them.
 
 ### `DataMessage`
 
@@ -199,6 +201,21 @@ transcript of an edit, `EditTargetTimestamp` names the edited message.
 - **They're filtered by default.** Their sender is the account itself, so `AccessControl:IgnoreOwnMessages`
   (default `true`) drops them. Set it to `false` to receive `MessageSent`. If you use `AllowedSenders`, include
   the account's own number too.
+
+### `StoryMessage`
+
+**Purpose:** a story posted by the sender, to their contacts or (with `Group` set) to a group. A media story has
+`File` (an `Attachment`), a text story has `Text`; colors and gradients aren't modelled. `AllowsReplies` says
+whether it accepts replies. Stories are **opt-in**: set `Receive:IgnoreStories = false`. The option is enforced
+in every execution mode (the WebSocket modes can't ask the API to skip them, so the mapper drops them).
+Stories never run commands.
+
+### `CallMessage`
+
+**Purpose:** a voice or video call event: `Kind` (`Offer`, `Answer`, `Busy`, `Hangup`) and `CallId`, which links
+the events of one call. For offers, `IsVideo` says whether it's a video call. Signal.NET can't take calls; use
+`CallReceived` to react, for example by replying to an `Offer` that the bot can't take calls. Low-level ICE
+updates are not modelled.
 
 ### `ReceiptMessage`, `TypingMessage`
 
@@ -307,6 +324,8 @@ receives messages. Events are raised by `IncomingEnvelope.ToDomainEvent()` and d
 | `MessageReceived` | `Message` (`DataMessage`) | Logging, auto-replies, moderation, non-command bots |
 | `MessageEdited` | `Edit` (`EditMessage`) | Keeping stored copies or moderation up to date |
 | `MessageDeleted` | `Delete` (`RemoteDelete`) | Removing stored copies (e.g. logs, archives) |
+| `StoryReceived` | `Story` (`StoryMessage`) | Story archives, reactions to stories. Requires `IgnoreStories = false`. |
+| `CallReceived` | `Call` (`CallMessage`) | "Sorry, I'm a bot" replies to call offers |
 | `MessageSent` | `Transcript` (`SentTranscript`) | "Note to self" bots, multi-device awareness. Requires `IgnoreOwnMessages = false`. |
 | `ReactionReceived` | `Reaction` | Polls, acknowledgements |
 | `ReceiptReceived` | `Receipt` | Delivery tracking |

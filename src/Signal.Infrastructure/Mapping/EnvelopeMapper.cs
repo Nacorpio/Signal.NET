@@ -14,11 +14,12 @@ internal static class EnvelopeMapper
     /// <summary>Maps one received item.</summary>
     /// <param name="dto">The deserialized item.</param>
     /// <param name="fallbackAccount">Used when the item does not state its account.</param>
+    /// <param name="includeStories">Whether story messages are mapped (<c>Receive:IgnoreStories = false</c>).</param>
     /// <returns>
     /// The envelope, or <see langword="null"/> when it has no identifiable sender or no supported content
-    /// (e.g. sync, call or story messages).
+    /// (e.g. read or blocked-list sync messages, ICE updates, or stories when <paramref name="includeStories"/> is off).
     /// </returns>
-    public static IncomingEnvelope? Map(ReceivedMessageDto dto, PhoneNumber fallbackAccount)
+    public static IncomingEnvelope? Map(ReceivedMessageDto dto, PhoneNumber fallbackAccount, bool includeStories = false)
     {
         if (dto.Envelope is not { } envelope)
         {
@@ -39,8 +40,7 @@ internal static class EnvelopeMapper
             return null;
         }
 
-        // signal-cli sets exactly one content property. Sync, call and story messages are not modelled;
-        // envelopes without supported content are dropped.
+        // signal-cli sets exactly one content property; envelopes without supported content are dropped.
         EnvelopeContent content;
         if (Map(envelope.DataMessage) is { } data)
         {
@@ -53,6 +53,20 @@ internal static class EnvelopeMapper
         else if (Map(envelope.SyncMessage?.SentMessage) is { } transcript)
         {
             content = transcript;
+        }
+        else if (envelope.StoryMessage is { } storyDto)
+        {
+            // In WebSocket modes the API can't be asked to skip stories, so the option is also enforced here.
+            if (!includeStories || Map(storyDto) is not { } story)
+            {
+                return null;
+            }
+
+            content = story;
+        }
+        else if (Map(envelope.CallMessage) is { } call)
+        {
+            content = call;
         }
         else if (Map(envelope.ReceiptMessage) is { } receipt)
         {
@@ -152,6 +166,29 @@ internal static class EnvelopeMapper
             ? new SentTranscript(target, message) { EditTargetTimestamp = editTarget }
             : null;
     }
+
+    /// <summary>Maps a story; stories with neither a file nor text are dropped.</summary>
+    private static StoryMessage? Map(StoryMessageDto dto)
+    {
+        var file = dto.FileAttachment is { Id: { } id } f ? new Attachment(id, f.ContentType, f.Filename, f.Size) : null;
+        var text = dto.TextAttachment?.Text;
+        return file is null && string.IsNullOrEmpty(text)
+            ? null
+            : new StoryMessage(dto.AllowsReplies, ToGroupId(dto.GroupId)) { File = file, Text = text };
+    }
+
+    /// <summary>Maps a call event; envelopes with only ICE updates (or nothing) are dropped.</summary>
+    private static CallMessage? Map(CallMessageDto? dto) => dto switch
+    {
+        { OfferMessage: { } offer } => new CallMessage(CallEventKind.Offer, offer.Id)
+        {
+            IsVideo = string.Equals(offer.Type, "VIDEO_CALL", StringComparison.OrdinalIgnoreCase),
+        },
+        { AnswerMessage: { } answer } => new CallMessage(CallEventKind.Answer, answer.Id),
+        { BusyMessage: { } busy } => new CallMessage(CallEventKind.Busy, busy.Id),
+        { HangupMessage: { } hangup } => new CallMessage(CallEventKind.Hangup, hangup.Id),
+        _ => null,
+    };
 
     /// <summary>Maps a receipt; viewed takes precedence over read over delivery.</summary>
     private static ReceiptMessage? Map(ReceiptMessageDto? dto) => dto is null

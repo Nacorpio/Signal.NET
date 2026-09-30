@@ -186,7 +186,7 @@ public class CommandTests
     }
 
     [Fact]
-    public async Task Edits_deletes_stickers_and_transcripts_never_run_commands()
+    public async Task Only_regular_messages_run_commands()
     {
         // Own messages must be let through, or access control would drop the transcript before the command gate.
         await using var harness = Harness(o => o.AccessControl.IgnoreOwnMessages = false);
@@ -205,10 +205,17 @@ public class CommandTests
         var transcript = await harness.ReceiveAsync(new IncomingEnvelope(account, new Sender(account, null, "Me"), 5,
             new SentTranscript(account, new DataMessage(5, "/add 1 2"))));
 
+        var story = await harness.ReceiveAsync(new IncomingEnvelope(account, alice, 6,
+            new StoryMessage(true, null) { Text = "/add 1 2" }));
+        var call = await harness.ReceiveAsync(new IncomingEnvelope(account, alice, 7,
+            new CallMessage(CallEventKind.Offer, 1)));
+
         Assert.False(edit.IsHandled);
         Assert.False(delete.IsHandled);
         Assert.False(sticker.IsHandled);
         Assert.False(transcript.IsHandled);
+        Assert.False(story.IsHandled);
+        Assert.False(call.IsHandled);
         Assert.Empty(harness.Signal.Sent);
     }
 

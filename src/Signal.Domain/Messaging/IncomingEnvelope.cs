@@ -77,6 +77,47 @@ public sealed record SentTranscript(Recipient Conversation, DataMessage Message)
     public long? EditTargetTimestamp { get; init; }
 }
 
+/// <summary>A story posted by the sender, either to their contacts or to a group.</summary>
+/// <remarks>Only received when <c>Receive:IgnoreStories</c> is <see langword="false"/>. Stories never run commands.</remarks>
+/// <param name="AllowsReplies">Whether the story accepts replies.</param>
+/// <param name="Group">The group the story was posted to, or <see langword="null"/> for a story to the sender's contacts.</param>
+public sealed record StoryMessage(bool AllowsReplies, GroupId? Group)
+{
+    /// <summary>The image or video of a media story; <see langword="null"/> for a text story.</summary>
+    public Attachment? File { get; init; }
+
+    /// <summary>The text of a text story; <see langword="null"/> for a media story.</summary>
+    public string? Text { get; init; }
+}
+
+/// <summary>What happened in a call signalling message.</summary>
+public enum CallEventKind
+{
+    /// <summary>The sender is calling (a call offer).</summary>
+    Offer,
+
+    /// <summary>The sender answered a call.</summary>
+    Answer,
+
+    /// <summary>The sender is busy in another call.</summary>
+    Busy,
+
+    /// <summary>The sender hung up.</summary>
+    Hangup,
+}
+
+/// <summary>
+/// A voice or video call event. Signal.NET can't take calls, so this is for reacting to them, e.g. replying
+/// "I'm a bot and can't take calls".
+/// </summary>
+/// <param name="Kind">What happened.</param>
+/// <param name="CallId">Identifies the call across its offer, answer and hangup.</param>
+public sealed record CallMessage(CallEventKind Kind, ulong CallId)
+{
+    /// <summary>For offers: whether it is a video call; otherwise <see langword="null"/>.</summary>
+    public bool? IsVideo { get; init; }
+}
+
 /// <summary>A delivery, read or viewed receipt for previously sent messages.</summary>
 /// <param name="Type">The kind of receipt.</param>
 /// <param name="When">When the receipt was issued (Unix milliseconds).</param>
@@ -91,8 +132,8 @@ public sealed record TypingMessage(TypingAction Action, long Timestamp, GroupId?
 
 /// <summary>
 /// What an envelope carries: exactly one of a <see cref="DataMessage"/>, an <see cref="EditMessage"/>, a
-/// <see cref="SentTranscript"/>, a <see cref="ReceiptMessage"/> or a <see cref="TypingMessage"/>. Signal envelopes
-/// never combine them, and the union makes that impossible to violate.
+/// <see cref="SentTranscript"/>, a <see cref="StoryMessage"/>, a <see cref="CallMessage"/>, a <see cref="ReceiptMessage"/>
+/// or a <see cref="TypingMessage"/>. Signal envelopes never combine them, and the union makes that impossible to violate.
 /// </summary>
 /// <remarks>
 /// Switch over the content to handle every kind; the compiler warns when a case is missing (for example when a
@@ -103,12 +144,14 @@ public sealed record TypingMessage(TypingAction Action, long Timestamp, GroupId?
 ///     DataMessage data =&gt; data.Text,
 ///     EditMessage edit =&gt; $"edited: {edit.Message.Text}",
 ///     SentTranscript sent =&gt; $"sent from another device: {sent.Message.Text}",
+///     StoryMessage story =&gt; $"story: {story.Text}",
+///     CallMessage call =&gt; $"call {call.Kind}",
 ///     ReceiptMessage receipt =&gt; $"{receipt.Type} receipt",
 ///     TypingMessage typing =&gt; $"typing {typing.Action}",
 /// };
 /// </code>
 /// </remarks>
-public union EnvelopeContent(DataMessage, EditMessage, SentTranscript, ReceiptMessage, TypingMessage);
+public union EnvelopeContent(DataMessage, EditMessage, SentTranscript, StoryMessage, CallMessage, ReceiptMessage, TypingMessage);
 
 /// <summary>
 /// Aggregate root for everything received from Signal. Knows which conversation it belongs to
@@ -129,6 +172,12 @@ public sealed record IncomingEnvelope(PhoneNumber Account, Sender Source, long T
     /// <summary>The content if it is a transcript of a message sent from another device; otherwise <see langword="null"/>.</summary>
     public SentTranscript? Transcript => Content.Value as SentTranscript;
 
+    /// <summary>The content if it is a story; otherwise <see langword="null"/>.</summary>
+    public StoryMessage? Story => Content.Value as StoryMessage;
+
+    /// <summary>The content if it is a call event; otherwise <see langword="null"/>.</summary>
+    public CallMessage? Call => Content.Value as CallMessage;
+
     /// <summary>The content if it is a receipt; otherwise <see langword="null"/>.</summary>
     public ReceiptMessage? Receipt => Content.Value as ReceiptMessage;
 
@@ -136,15 +185,17 @@ public sealed record IncomingEnvelope(PhoneNumber Account, Sender Source, long T
     public TypingMessage? Typing => Content.Value as TypingMessage;
 
     /// <summary>
-    /// The group context of a data message, edit, transcript or typing indicator; <see langword="null"/> for direct
-    /// conversations and receipts.
+    /// The group context of a data message, edit, transcript, group story or typing indicator; <see langword="null"/>
+    /// for direct conversations, calls and receipts.
     /// </summary>
     public GroupId? Group => Content switch
     {
         DataMessage data => data.Group,
         EditMessage edit => edit.Message.Group,
         SentTranscript sent => sent.Message.Group,
+        StoryMessage story => story.Group,
         TypingMessage typing => typing.Group,
+        CallMessage => null,
         ReceiptMessage => null,
         null => null,
     };
@@ -169,6 +220,7 @@ public sealed record IncomingEnvelope(PhoneNumber Account, Sender Source, long T
     /// <item>for data messages, in this order of precedence: <see cref="MessageDeleted"/>, <see cref="ReactionReceived"/>,
     /// <see cref="GroupUpdated"/>, <see cref="MessageReceived"/>;</item>
     /// <item><see cref="MessageEdited"/> for edits and <see cref="MessageSent"/> for transcripts;</item>
+    /// <item><see cref="StoryReceived"/> for stories and <see cref="CallReceived"/> for call events;</item>
     /// <item><see cref="ReceiptReceived"/> for receipts and <see cref="TypingIndicatorChanged"/> for typing indicators.</item>
     /// </list>
     /// </summary>
@@ -182,6 +234,8 @@ public sealed record IncomingEnvelope(PhoneNumber Account, Sender Source, long T
         DataMessage => null,
         EditMessage edit => new MessageEdited(this, edit),
         SentTranscript sent => new MessageSent(this, sent),
+        StoryMessage story => new StoryReceived(this, story),
+        CallMessage call => new CallReceived(this, call),
         ReceiptMessage receipt => new ReceiptReceived(this, receipt),
         TypingMessage typing => new TypingIndicatorChanged(this, typing),
         null => null,

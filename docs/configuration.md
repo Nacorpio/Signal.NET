@@ -51,7 +51,7 @@ Durations use the `TimeSpan` format `hh:mm:ss`. Enum values are case-insensitive
 | `TimeoutSeconds` | 1 | ≥ 0. Server-side long-poll duration. |
 | `MaxMessages` | null | > 0 when set |
 | `IgnoreAttachments` | false | Don't store attachments in the container |
-| `IgnoreStories` | true | Skip stories |
+| `IgnoreStories` | true | Skip stories. Set it to `false` to receive `StoryReceived` events. Applies in every mode: the polling modes pass it to the API, and the mapper also drops stories when it's `true`. |
 | `SendReadReceipts` | false | The container sends read receipts automatically |
 | `MaxErrorBackoff` | 30 s | Cap of the retry delay after failed polls |
 
