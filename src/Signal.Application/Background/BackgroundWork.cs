@@ -22,7 +22,8 @@ namespace Signal.Application.Background;
 /// <param name="account">The account the work was queued for.</param>
 /// <param name="conversation">Where replies go: the conversation the work was queued from.</param>
 /// <param name="cancellationToken">Cancelled when the host shuts down.</param>
-public sealed class BackgroundWork(IServiceProvider services, PhoneNumber account, Recipient conversation, CancellationToken cancellationToken)
+/// <param name="sender">Who triggered the work, if it was queued from a message; prompts wait for this sender.</param>
+public sealed partial class BackgroundWork(IServiceProvider services, PhoneNumber account, Recipient conversation, CancellationToken cancellationToken, Sender? sender = null)
 {
     /// <summary>The work item's own scoped service provider.</summary>
     public IServiceProvider Services { get; } = services;
@@ -35,6 +36,9 @@ public sealed class BackgroundWork(IServiceProvider services, PhoneNumber accoun
 
     /// <summary>Cancelled when the host shuts down.</summary>
     public CancellationToken CancellationToken { get; } = cancellationToken;
+
+    /// <summary>Who triggered the work, if it was queued from a message.</summary>
+    public Sender? Sender { get; } = sender;
 
     /// <summary>Sends a text into <see cref="Conversation"/>.</summary>
     /// <param name="text">The text.</param>
@@ -52,7 +56,11 @@ public sealed class BackgroundWork(IServiceProvider services, PhoneNumber accoun
 /// <param name="Account">The account replies are sent from.</param>
 /// <param name="Conversation">Where replies go.</param>
 /// <param name="Work">The work to run.</param>
-public sealed record BackgroundWorkItem(PhoneNumber Account, Recipient Conversation, Func<BackgroundWork, Task> Work);
+public sealed record BackgroundWorkItem(PhoneNumber Account, Recipient Conversation, Func<BackgroundWork, Task> Work)
+{
+    /// <summary>Who triggered the work, if it was queued from a message; required for prompts.</summary>
+    public Sender? Sender { get; init; }
+}
 
 /// <summary>
 /// Runs work outside the conversation partition that received a message, so a slow command does not hold up the
@@ -92,7 +100,7 @@ public static class BackgroundWorkExtensions
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(work);
         return context.Services.GetRequiredService<IBackgroundWorkQueue>()
-            .QueueAsync(new BackgroundWorkItem(context.Account, context.Conversation, work), context.CancellationToken);
+            .QueueAsync(new BackgroundWorkItem(context.Account, context.Conversation, work) { Sender = context.Sender }, context.CancellationToken);
     }
 }
 
@@ -156,7 +164,7 @@ internal sealed partial class BackgroundWorkProcessor(
                 try
                 {
                     await using var scope = scopes.CreateAsyncScope();
-                    await item.Work(new BackgroundWork(scope.ServiceProvider, item.Account, item.Conversation, stoppingToken));
+                    await item.Work(new BackgroundWork(scope.ServiceProvider, item.Account, item.Conversation, stoppingToken, item.Sender));
                 }
                 catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
                 {

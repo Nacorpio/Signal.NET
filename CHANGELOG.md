@@ -8,6 +8,9 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Prompts (roadmap 0.5.2):** `BackgroundWork.PromptAsync(question)` and `PromptAsync<T>` (any `IParsable<T>`, re-asking on invalid input) wait for the triggering sender's next message in the conversation, and return a `PromptResult<T>` (`Answered`, `TimedOut`, `Invalid`).
+  - The host routes answers through the new `IPromptRegistry` before partitioning. Commands are never consumed as answers.
+  - New option `Signal:Background:PromptTimeout` (2 minutes). `BackgroundWork.Sender` and `BackgroundWorkItem.Sender` identify who may answer.
 - **Background work (roadmap 0.5.3):** `CommandModule.RunInBackgroundAsync(work => …)` (or `MessageContext.QueueBackgroundWorkAsync`, or `IBackgroundWorkQueue`) runs slow work outside the conversation partition, so later messages aren't held up.
   - Each item runs in its own DI scope and can reply to the original conversation with `work.ReplyAsync`.
   - The queue is bounded and in memory, configured by `Signal:Background:MaxConcurrency` (4) and `Capacity` (100). `AddSignal` hosts the processor (`IBackgroundWorkProcessor`).

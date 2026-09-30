@@ -15,7 +15,7 @@ It has no knowledge of HTTP, JSON or WebSockets.
 |---|---|
 | `Abstractions/` | Ports (`IMessageSender`, `IMessageReceiver`, …), `ISignalClient`, `SignalApiException`, `SendResult`, `SignalApiInfo`, `ProfileUpdate` |
 | `Configuration/` | `SignalOptions` and its sub-options, `SignalOptionsValidator` |
-| `Background/` | `IBackgroundWorkQueue`, `BackgroundWorkItem`, `BackgroundWork` (the work's scope, conversation and `ReplyAsync`), `IBackgroundWorkProcessor`, `QueueBackgroundWorkAsync` |
+| `Background/` | `IBackgroundWorkQueue`, `BackgroundWorkItem`, `BackgroundWork` (the work's scope, conversation, sender, `ReplyAsync` and `PromptAsync`), `IBackgroundWorkProcessor`, `QueueBackgroundWorkAsync`, `IPromptRegistry`, `PromptResult<T>`, `PromptStatus` |
 | `Pipeline/` | `MessageContext`, `IMessageMiddleware`, `MessageDelegate`, `IMessagePipeline`, `MiddlewareRegistry`, built-in middleware, `ISenderRateLimiter` |
 | `Events/` | `IEventHandler<TEvent>`, `IDomainEventDispatcher` |
 | `Commands/` | See [Command system](commands.md) |

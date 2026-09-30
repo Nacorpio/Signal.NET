@@ -106,7 +106,7 @@ it are exhaustive, the compiler points at every place that needs updating.*
 | # | Feature | Layer | Size | Notes |
 |---|---|---|---|---|
 | 0.5.1 | **Command groups and subcommands** | A | M | ✅ `[CommandGroup("group", Aliases, Description)]` on a module or command class; module preconditions shared; subcommand hints; group help; cooldowns keyed by full name |
-| 0.5.2 | **Conversations and prompts** | A | L | `await Context.PromptAsync<int>("How many?", timeout)` waits for the sender's next message in the conversation. Needs a pending-reply registry checked by the pipeline before command parsing. |
+| 0.5.2 | **Conversations and prompts** | A/H | L | ✅ `await work.PromptAsync<int>("How many?")` inside `RunInBackgroundAsync`. Answers are routed by `IPromptRegistry` in the receive loop **before** partitioning; checking in the pipeline would deadlock, because the answer would queue behind the waiting work. Prompts live in background work so a wait never holds a partition. |
 | 0.5.3 | **Background work from commands** | A/H | M | ✅ `RunInBackgroundAsync` / `IBackgroundWorkQueue`: bounded in-memory queue, `Background:MaxConcurrency` workers, own DI scope per item, replies to the original conversation. Fixes limitation 1. |
 | 0.5.4 | **Scheduled messages** | A/H | M | `IMessageScheduler` (in-memory plus a persistence port) for reminders and digests |
 | 0.5.5 | **Localisation** | A | M | Resource-based texts for framework replies (unknown command, binding errors, help), with culture per conversation |

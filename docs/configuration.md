@@ -29,7 +29,7 @@ Durations use the `TimeSpan` format `hh:mm:ss`. Enum values are case-insensitive
                    "QuoteReplies": false, "EnableHelp": true, "HelpPageSize": 20, "Admins": [ "+4915112345678" ] },
     "AccessControl": { "AllowedSenders": [], "BlockedSenders": [], "IgnoreOwnMessages": true },
     "RateLimit": { "PermitsPerWindow": 0, "Window": "00:01:00" },
-    "Background": { "MaxConcurrency": 4, "Capacity": 100 }
+    "Background": { "MaxConcurrency": 4, "Capacity": 100, "PromptTimeout": "00:02:00" }
   }
 }
 ```
@@ -111,6 +111,7 @@ Work queued with `RunInBackgroundAsync` / `IBackgroundWorkQueue`.
 |---|---|---|
 | `MaxConcurrency` | 4 | Work items running at the same time; at least 1 |
 | `Capacity` | 100 | Items that may wait; queuing waits while the queue is full. At least 1. |
+| `PromptTimeout` | 2 min | Default wait of `BackgroundWork.PromptAsync`; must be positive |
 
 Items still queued at shutdown are dropped (logged as a warning), so don't use the queue for work that must survive restarts.
 

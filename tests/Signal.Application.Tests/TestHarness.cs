@@ -74,9 +74,13 @@ internal sealed class FakeSignal : IMessageSender, IReactionService, IGroupServi
 
     public string? LastReply => Sent.LastOrDefault()?.Text;
 
+    /// <summary>Runs inside SendAsync, e.g. to simulate an instant answer.</summary>
+    public Action<OutgoingMessage>? OnSend { get; set; }
+
     public Task<SendResult> SendAsync(PhoneNumber account, OutgoingMessage message, CancellationToken cancellationToken = default)
     {
         Sent.Enqueue(message);
+        OnSend?.Invoke(message);
         return Task.FromResult(new SendResult(Sent.Count));
     }
 

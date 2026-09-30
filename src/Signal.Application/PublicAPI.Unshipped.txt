@@ -2,16 +2,22 @@
 override Signal.Application.Background.BackgroundWorkItem.Equals(object? obj) -> bool
 override Signal.Application.Background.BackgroundWorkItem.GetHashCode() -> int
 override Signal.Application.Background.BackgroundWorkItem.ToString() -> string!
+override Signal.Application.Background.PromptResult<T>.Equals(object? obj) -> bool
+override Signal.Application.Background.PromptResult<T>.GetHashCode() -> int
+override Signal.Application.Background.PromptResult<T>.ToString() -> string!
 override Signal.Application.Commands.CommandGroupInfo.Equals(object? obj) -> bool
 override Signal.Application.Commands.CommandGroupInfo.GetHashCode() -> int
 override Signal.Application.Commands.CommandGroupInfo.ToString() -> string!
 Signal.Application.Background.BackgroundWork
 Signal.Application.Background.BackgroundWork.Account.get -> Signal.Domain.ValueObjects.PhoneNumber
-Signal.Application.Background.BackgroundWork.BackgroundWork(System.IServiceProvider! services, Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient conversation, System.Threading.CancellationToken cancellationToken) -> void
+Signal.Application.Background.BackgroundWork.BackgroundWork(System.IServiceProvider! services, Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient conversation, System.Threading.CancellationToken cancellationToken, Signal.Domain.Messaging.Sender? sender = null) -> void
 Signal.Application.Background.BackgroundWork.CancellationToken.get -> System.Threading.CancellationToken
 Signal.Application.Background.BackgroundWork.Conversation.get -> Signal.Domain.ValueObjects.Recipient
+Signal.Application.Background.BackgroundWork.PromptAsync(string! question, System.TimeSpan? timeout = null) -> System.Threading.Tasks.Task<Signal.Application.Background.PromptResult<string!>!>!
+Signal.Application.Background.BackgroundWork.PromptAsync<T>(string! question, System.TimeSpan? timeout = null, int attempts = 3) -> System.Threading.Tasks.Task<Signal.Application.Background.PromptResult<T>!>!
 Signal.Application.Background.BackgroundWork.ReplyAsync(Signal.Domain.Messaging.OutgoingMessage! message) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
 Signal.Application.Background.BackgroundWork.ReplyAsync(string! text) -> System.Threading.Tasks.Task<Signal.Application.Abstractions.SendResult>!
+Signal.Application.Background.BackgroundWork.Sender.get -> Signal.Domain.Messaging.Sender?
 Signal.Application.Background.BackgroundWork.Services.get -> System.IServiceProvider!
 Signal.Application.Background.BackgroundWorkExtensions
 Signal.Application.Background.BackgroundWorkItem
@@ -23,12 +29,33 @@ Signal.Application.Background.BackgroundWorkItem.Conversation.get -> Signal.Doma
 Signal.Application.Background.BackgroundWorkItem.Conversation.init -> void
 Signal.Application.Background.BackgroundWorkItem.Deconstruct(out Signal.Domain.ValueObjects.PhoneNumber Account, out Signal.Domain.ValueObjects.Recipient Conversation, out System.Func<Signal.Application.Background.BackgroundWork!, System.Threading.Tasks.Task!>! Work) -> void
 Signal.Application.Background.BackgroundWorkItem.Equals(Signal.Application.Background.BackgroundWorkItem? other) -> bool
+Signal.Application.Background.BackgroundWorkItem.Sender.get -> Signal.Domain.Messaging.Sender?
+Signal.Application.Background.BackgroundWorkItem.Sender.init -> void
 Signal.Application.Background.BackgroundWorkItem.Work.get -> System.Func<Signal.Application.Background.BackgroundWork!, System.Threading.Tasks.Task!>!
 Signal.Application.Background.BackgroundWorkItem.Work.init -> void
 Signal.Application.Background.IBackgroundWorkProcessor
 Signal.Application.Background.IBackgroundWorkProcessor.RunAsync(System.Threading.CancellationToken stoppingToken) -> System.Threading.Tasks.Task!
 Signal.Application.Background.IBackgroundWorkQueue
 Signal.Application.Background.IBackgroundWorkQueue.QueueAsync(Signal.Application.Background.BackgroundWorkItem! item, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+Signal.Application.Background.IPromptRegistry
+Signal.Application.Background.IPromptRegistry.TryDeliver(Signal.Domain.Messaging.IncomingEnvelope! envelope) -> bool
+Signal.Application.Background.IPromptRegistry.WaitAsync(Signal.Domain.ValueObjects.PhoneNumber account, Signal.Domain.ValueObjects.Recipient conversation, Signal.Domain.Messaging.Sender! sender, System.TimeSpan timeout, System.Threading.CancellationToken cancellationToken) -> System.Threading.Tasks.Task<Signal.Domain.Messaging.IncomingEnvelope?>!
+Signal.Application.Background.PromptResult<T>
+Signal.Application.Background.PromptResult<T>.<Clone>$() -> Signal.Application.Background.PromptResult<T>!
+Signal.Application.Background.PromptResult<T>.Deconstruct(out Signal.Application.Background.PromptStatus Status, out T? Value, out string? Text) -> void
+Signal.Application.Background.PromptResult<T>.Equals(Signal.Application.Background.PromptResult<T>? other) -> bool
+Signal.Application.Background.PromptResult<T>.IsAnswered.get -> bool
+Signal.Application.Background.PromptResult<T>.PromptResult(Signal.Application.Background.PromptStatus Status, T? Value, string? Text) -> void
+Signal.Application.Background.PromptResult<T>.Status.get -> Signal.Application.Background.PromptStatus
+Signal.Application.Background.PromptResult<T>.Status.init -> void
+Signal.Application.Background.PromptResult<T>.Text.get -> string?
+Signal.Application.Background.PromptResult<T>.Text.init -> void
+Signal.Application.Background.PromptResult<T>.Value.get -> T?
+Signal.Application.Background.PromptResult<T>.Value.init -> void
+Signal.Application.Background.PromptStatus
+Signal.Application.Background.PromptStatus.Answered = 0 -> Signal.Application.Background.PromptStatus
+Signal.Application.Background.PromptStatus.Invalid = 2 -> Signal.Application.Background.PromptStatus
+Signal.Application.Background.PromptStatus.TimedOut = 1 -> Signal.Application.Background.PromptStatus
 Signal.Application.Commands.CategoryAttribute
 Signal.Application.Commands.CategoryAttribute.CategoryAttribute(string! name) -> void
 Signal.Application.Commands.CategoryAttribute.Name.get -> string!
@@ -71,6 +98,8 @@ Signal.Application.Configuration.BackgroundOptions.Capacity.get -> int
 Signal.Application.Configuration.BackgroundOptions.Capacity.set -> void
 Signal.Application.Configuration.BackgroundOptions.MaxConcurrency.get -> int
 Signal.Application.Configuration.BackgroundOptions.MaxConcurrency.set -> void
+Signal.Application.Configuration.BackgroundOptions.PromptTimeout.get -> System.TimeSpan
+Signal.Application.Configuration.BackgroundOptions.PromptTimeout.set -> void
 Signal.Application.Configuration.CommandOptions.HelpPageSize.get -> int
 Signal.Application.Configuration.CommandOptions.HelpPageSize.set -> void
 Signal.Application.Configuration.CommandOptions.SuggestSimilarCommands.get -> bool
@@ -80,6 +109,8 @@ Signal.Application.Configuration.SignalOptions.Background.set -> void
 static Signal.Application.Background.BackgroundWorkExtensions.QueueBackgroundWorkAsync(this Signal.Application.Pipeline.MessageContext! context, System.Func<Signal.Application.Background.BackgroundWork!, System.Threading.Tasks.Task!>! work) -> System.Threading.Tasks.ValueTask
 static Signal.Application.Background.BackgroundWorkItem.operator !=(Signal.Application.Background.BackgroundWorkItem? left, Signal.Application.Background.BackgroundWorkItem? right) -> bool
 static Signal.Application.Background.BackgroundWorkItem.operator ==(Signal.Application.Background.BackgroundWorkItem? left, Signal.Application.Background.BackgroundWorkItem? right) -> bool
+static Signal.Application.Background.PromptResult<T>.operator !=(Signal.Application.Background.PromptResult<T>? left, Signal.Application.Background.PromptResult<T>? right) -> bool
+static Signal.Application.Background.PromptResult<T>.operator ==(Signal.Application.Background.PromptResult<T>? left, Signal.Application.Background.PromptResult<T>? right) -> bool
 static Signal.Application.Commands.CommandGroupInfo.From(Signal.Application.Commands.CommandGroupAttribute! attribute) -> Signal.Application.Commands.CommandGroupInfo!
 static Signal.Application.Commands.CommandGroupInfo.operator !=(Signal.Application.Commands.CommandGroupInfo? left, Signal.Application.Commands.CommandGroupInfo? right) -> bool
 static Signal.Application.Commands.CommandGroupInfo.operator ==(Signal.Application.Commands.CommandGroupInfo? left, Signal.Application.Commands.CommandGroupInfo? right) -> bool

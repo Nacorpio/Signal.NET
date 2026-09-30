@@ -192,7 +192,7 @@ await signal.Groups.CreateAsync(account, "Team", ["+4915112345678"]);
 | `Commands:*` | prefix `/` | `Prefixes`, `CaseSensitive`, `RespondToUnknown`, `UnknownCommandMessage`, `SuggestSimilarCommands`, `ErrorMessage`, `QuoteReplies`, `EnableHelp`, `HelpPageSize`, `Admins`. |
 | `AccessControl:*` | | `AllowedSenders`, `BlockedSenders`, `IgnoreOwnMessages`. |
 | `RateLimit:*` | disabled | `PermitsPerWindow` per sender per `Window`. |
-| `Background:*` | 4 workers, 100 queued | `MaxConcurrency`, `Capacity` for work queued with `RunInBackgroundAsync`. |
+| `Background:*` | 4 workers, 100 queued, 2 min prompts | `MaxConcurrency`, `Capacity` for work queued with `RunInBackgroundAsync`; `PromptTimeout` for `PromptAsync`. |
 
 The options are validated on startup (`SignalOptionsValidator`). An invalid configuration stops the host with a list of all problems.
 
