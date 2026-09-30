@@ -24,6 +24,7 @@ Durations use the `TimeSpan` format `hh:mm:ss`. Enum values are case-insensitive
     "Http":      { "Timeout": "00:00:30", "RetryCount": 3 },
     "Commands":  { "Prefixes": [ "/", "!" ], "CaseSensitive": false, "RespondToUnknown": true,
                    "UnknownCommandMessage": "Unknown command '{0}'. Send {1}help for a list of commands.",
+                   "SuggestSimilarCommands": true,
                    "ErrorMessage": "Sorry, something went wrong while executing this command.",
                    "QuoteReplies": false, "EnableHelp": true, "Admins": [ "+4915112345678" ] },
     "AccessControl": { "AllowedSenders": [], "BlockedSenders": [], "IgnoreOwnMessages": true },
@@ -79,6 +80,7 @@ Durations use the `TimeSpan` format `hh:mm:ss`. Enum values are case-insensitive
 | `CaseSensitive` | false | Applies to command names and aliases |
 | `RespondToUnknown` | true | Reply to prefixed messages that don't match a command |
 | `UnknownCommandMessage` | see above | `{0}` = the typed name, `{1}` = the prefix |
+| `SuggestSimilarCommands` | true | Append "Did you mean /help?" when a visible command, alias or group name (or, for `/group typo`, a subcommand) is one typo away, or two for names of 6+ characters. Swapped letters count as one typo. |
 | `ErrorMessage` | see above | Sent when a command throws |
 | `QuoteReplies` | false | Replies quote the triggering message |
 | `EnableHelp` | true | Enables the built-in `help` command |

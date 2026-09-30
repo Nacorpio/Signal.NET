@@ -132,6 +132,12 @@ public sealed class CommandOptions
     /// <summary>Reply for unknown commands. Format placeholders: <c>{0}</c> = command name, <c>{1}</c> = used prefix.</summary>
     public string UnknownCommandMessage { get; set; } = "Unknown command '{0}'. Send {1}help for a list of commands.";
 
+    /// <summary>
+    /// Append "Did you mean /help?" to unknown-command replies when a visible command name is one or two typos away.
+    /// Default <see langword="true"/>.
+    /// </summary>
+    public bool SuggestSimilarCommands { get; set; } = true;
+
     /// <summary>Reply when a command throws an exception (details are only logged).</summary>
     public string ErrorMessage { get; set; } = "Sorry, something went wrong while executing this command.";
 

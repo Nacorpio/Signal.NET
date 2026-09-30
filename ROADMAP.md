@@ -113,7 +113,7 @@ it are exhaustive, the compiler points at every place that needs updating.*
 | 0.5.6 | **Role-based permissions** | A | M | `[RequireRole("moderator")]` backed by an `IRoleProvider` (config, database or group admins) |
 | 0.5.7 | **Per-conversation settings** | A | M | Prefix, language and enabled commands per group, via an `IConversationSettingsStore` port |
 | 0.5.8 | **Better help** | A | S | Grouped by module, paging for large bots, examples via `[Example("…")]` |
-| 0.5.9 | **"Did you mean …?"** | A | S | Suggest the closest command name on `CommandNotFound`, using edit distance |
+| 0.5.9 | **"Did you mean …?"** | A | S | ✅ Closest visible command, alias, group or subcommand by optimal-string-alignment distance (≤1, or ≤2 for 6+ characters); `Commands:SuggestSimilarCommands` |
 | 0.5.10 | **Variadic and collection parameters** | A | S | `params int[] numbers` and `List<PhoneNumber>` binding |
 | 0.5.11 | **Reaction commands** | A | S | Trigger handlers by reacting with an emoji (`[OnReaction("👍")]`), e.g. for polls and approvals |
 
