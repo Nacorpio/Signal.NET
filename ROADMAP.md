@@ -28,7 +28,7 @@ These known limitations shape the plan below:
 2. **Reflection and `Expression.Compile`** in `CommandDescriptorFactory`, `ArgumentConverters` and `DomainEventDispatcher` rule out trimming and Native AOT.
 3. **Unmodelled envelope content.** Sync messages other than sent transcripts (read, blocked, contacts), call ICE updates, payments and polls are dropped by `EnvelopeMapper`. Edits, remote deletes, stickers, sent transcripts, stories and calls are handled since 0.4.
 4. **State is in memory only.** Cooldowns and rate limits don't survive restarts and aren't shared between instances.
-5. **Partial API coverage.** Registration, devices, stickers, username, account settings, remote delete and search are missing.
+5. **API coverage gaps.** Milestone 0.3 covered registration, devices, stickers, usernames, account settings, remote delete and search. Remaining gaps (checked against the Swagger spec): polls (`/v1/polls`), contact and group avatars, single-contact lookup, deleting a device's local data, and the container configuration endpoints (`/v1/configuration`).
 6. **Pre-release SDK dependency.** The project builds with the .NET 11 RC1 SDK and `LangVersion=preview`. It cannot declare a stable 1.0 before .NET 11 and C# 15 are generally available.
 
 ---
