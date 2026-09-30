@@ -104,6 +104,15 @@ public sealed class SignalOptionsValidator : IValidateOptions<SignalOptions>
             errors.Add("Signal:Background:PromptTimeout must be positive.");
         }
 
+        try
+        {
+            _ = System.Globalization.CultureInfo.GetCultureInfo(options.Localization.DefaultCulture);
+        }
+        catch (Exception ex) when (ex is System.Globalization.CultureNotFoundException or ArgumentNullException)
+        {
+            errors.Add($"Signal:Localization:DefaultCulture '{options.Localization.DefaultCulture}' is not a known culture.");
+        }
+
         if (options.Commands.HelpPageSize < 0)
         {
             errors.Add("Signal:Commands:HelpPageSize must not be negative (0 disables paging).");

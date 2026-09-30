@@ -192,6 +192,7 @@ await signal.Groups.CreateAsync(account, "Team", ["+4915112345678"]);
 | `Commands:*` | prefix `/` | `Prefixes`, `CaseSensitive`, `RespondToUnknown`, `UnknownCommandMessage`, `DisabledCommandMessage`, `SuggestSimilarCommands`, `ErrorMessage`, `QuoteReplies`, `EnableHelp`, `HelpPageSize`, `Admins`, `Roles`. |
 | `AccessControl:*` | | `AllowedSenders`, `BlockedSenders`, `IgnoreOwnMessages`. |
 | `RateLimit:*` | disabled | `PermitsPerWindow` per sender per `Window`. |
+| `Localization:*` | English | `DefaultCulture`, `Texts` (culture → `TextKey` → text) for the framework's replies. |
 | `Scheduler:*` | 1 s checks, 1 min retry | `PollInterval`, `RetryDelay` for scheduled messages. |
 | `Background:*` | 4 workers, 100 queued, 2 min prompts | `MaxConcurrency`, `Capacity` for work queued with `RunInBackgroundAsync`; `PromptTimeout` for `PromptAsync`. |
 

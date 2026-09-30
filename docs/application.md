@@ -19,6 +19,7 @@ It has no knowledge of HTTP, JSON or WebSockets.
 | `Conversations/` | `ConversationSettings` (prefixes, culture, disabled commands), `IConversationSettingsStore` (in memory by default), `GetConversationSettingsAsync` |
 | `Roles/` | `IRoleProvider`, `IRoleService`, `RequireRoleAttribute`, `Role` (built-in role names `admin`, `group-admin`) |
 | `Scheduling/` | `IMessageScheduler`, `ScheduledMessage`, `IScheduledMessageStore` (persistence port; in-memory by default), `IScheduledMessageDispatcher`, `ScheduleReplyAsync` |
+| `Localization/` | `ISignalTexts`, `TextKey` (all text keys with their arguments), `GetCultureAsync` |
 | `Pipeline/` | `MessageContext`, `IMessageMiddleware`, `MessageDelegate`, `IMessagePipeline`, `MiddlewareRegistry`, built-in middleware, `ISenderRateLimiter` |
 | `Events/` | `IEventHandler<TEvent>`, `IDomainEventDispatcher` |
 | `Commands/` | See [Command system](commands.md) |
