@@ -189,7 +189,7 @@ await signal.Groups.CreateAsync(account, "Team", ["+4915112345678"]);
 | `Receive:*` | 1 s interval, 1 s timeout | `IgnoreStories` (all modes). Polling modes only: `PollingInterval`, `TimeoutSeconds`, `MaxMessages`, `IgnoreAttachments`, `SendReadReceipts`, `MaxErrorBackoff`. |
 | `WebSocket:*` | 1 s–30 s backoff, 20 s keep-alive | WebSocket modes only. |
 | `Http:Timeout` / `Http:RetryCount` | 30 s / 3 | Only GET/PUT/DELETE requests are retried. Sends are never retried, so a message is not duplicated. |
-| `Commands:*` | prefix `/` | `Prefixes`, `CaseSensitive`, `RespondToUnknown`, `UnknownCommandMessage`, `SuggestSimilarCommands`, `ErrorMessage`, `QuoteReplies`, `EnableHelp`, `Admins`. |
+| `Commands:*` | prefix `/` | `Prefixes`, `CaseSensitive`, `RespondToUnknown`, `UnknownCommandMessage`, `SuggestSimilarCommands`, `ErrorMessage`, `QuoteReplies`, `EnableHelp`, `HelpPageSize`, `Admins`. |
 | `AccessControl:*` | | `AllowedSenders`, `BlockedSenders`, `IgnoreOwnMessages`. |
 | `RateLimit:*` | disabled | `PermitsPerWindow` per sender per `Window`. |
 

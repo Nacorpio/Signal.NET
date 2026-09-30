@@ -39,6 +39,8 @@ internal static class CommandDescriptorFactory
         hidden: instance.Hidden)
     {
         Group = GroupOf(commandType),
+        Category = commandType.GetCustomAttribute<CategoryAttribute>()?.Name,
+        Examples = [.. commandType.GetCustomAttributes<ExampleAttribute>().Select(e => e.Text)],
     };
 
     /// <summary>Describes every public <c>[Command]</c> method of a module.</summary>
@@ -56,6 +58,7 @@ internal static class CommandDescriptorFactory
         var factory = ActivatorUtilities.CreateFactory(moduleType, Type.EmptyTypes);
         var modulePreconditions = moduleType.GetCustomAttributes<PreconditionAttribute>(inherit: true).ToArray();
         var group = GroupOf(moduleType);
+        var moduleCategory = moduleType.GetCustomAttribute<CategoryAttribute>()?.Name;
         var nullability = new NullabilityInfoContext();
 
         foreach (var method in moduleType.GetMethods(BindingFlags.Public | BindingFlags.Instance))
@@ -114,6 +117,8 @@ internal static class CommandDescriptorFactory
                 method)
             {
                 Group = group,
+                Category = method.GetCustomAttribute<CategoryAttribute>()?.Name ?? moduleCategory,
+                Examples = [.. method.GetCustomAttributes<ExampleAttribute>().Select(e => e.Text)],
             };
         }
     }

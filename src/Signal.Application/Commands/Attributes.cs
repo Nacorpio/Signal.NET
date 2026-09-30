@@ -38,6 +38,30 @@ public sealed class CommandAttribute(string name) : Attribute
 public sealed class RemainderAttribute : Attribute;
 
 /// <summary>
+/// An example invocation shown by <c>/help &lt;command&gt;</c>, written without prefix (e.g. <c>add 2 3</c>).
+/// Repeat the attribute for several examples.
+/// </summary>
+/// <param name="text">The example, without prefix.</param>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
+public sealed class ExampleAttribute(string text) : Attribute
+{
+    /// <summary>The example, without prefix.</summary>
+    public string Text { get; } = text;
+}
+
+/// <summary>
+/// Lists commands under a heading in <c>/help</c>. On a module it applies to all of its commands; on a method it
+/// overrides the module's category. Command groups get their own heading and ignore categories.
+/// </summary>
+/// <param name="name">The heading, e.g. <c>Moderation</c>.</param>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
+public sealed class CategoryAttribute(string name) : Attribute
+{
+    /// <summary>The heading.</summary>
+    public string Name { get; } = name;
+}
+
+/// <summary>
 /// Puts every command of a <see cref="CommandModule"/> (or an <see cref="ICommand"/> class) under a group, so it is
 /// invoked as <c>/group command</c>. Preconditions on the module apply to all of its commands.
 /// </summary>

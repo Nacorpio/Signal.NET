@@ -118,6 +118,12 @@ public sealed class CommandDescriptor
     /// <summary>The name as typed after the prefix: <c>group name</c> for grouped commands, otherwise <see cref="Name"/>.</summary>
     public string FullName => Group is null ? Name : $"{Group.Name} {Name}";
 
+    /// <summary>The help heading from <see cref="CategoryAttribute"/>, if any.</summary>
+    public string? Category { get; init; }
+
+    /// <summary>Example invocations without prefix, from <see cref="ExampleAttribute"/>.</summary>
+    public IReadOnlyList<string> Examples { get; init; } = [];
+
     /// <summary>Alternative names.</summary>
     public IReadOnlyList<string> Aliases { get; }
 

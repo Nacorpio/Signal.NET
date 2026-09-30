@@ -93,6 +93,8 @@ public sealed class PlaylistModule : CommandModule
 | `[Remainder]` | `string` parameter | Takes the rest of the text verbatim. Must be the last positional parameter. |
 | `[Flag(name?)]` | parameter | Binds from `--name value` or `--name=value`. A `bool` flag is a switch (`--name`). |
 | `[Summary(text)]` | parameter | Parameter description shown by `/help <command>` |
+| `[Example(text)]` | method / command class | An example without prefix (`add 2 3`) shown by `/help <command>`. Repeatable. |
+| `[Category(name)]` | module / method / command class | Heading for the command in `/help`. On a method it overrides the module's category. |
 | `[CommandGroup(name)]` | module / command class | Puts the commands under `/name`. Properties: `Aliases`, `Description`. See [Command groups](#command-groups). |
 
 ### Parsing (`Parsing/CommandParser.cs`)
@@ -190,7 +192,7 @@ binding, so users without permission never see usage details.
 | `CommandResult` (union) | Exactly one outcome case (see below). Also exposes `Parsed` and `IsSuccess`. It is stored in `MessageContext.Items[typeof(CommandResult)]`. |
 | `ICommandResultHandler` | Informs the user. The default handler replies with the unknown-command message (if enabled), the binding error plus usage, the precondition reason, or the generic `ErrorMessage`. Exception details are never sent to users. Replace it to localise messages or log elsewhere. |
 | `CommandMiddleware` | The pipeline step tying everything together. Reactions are never treated as commands. Messages already marked `IsHandled` are skipped. |
-| `HelpModule` | Built-in `help` / `?` / `commands`. It lists visible commands, or describes one with usage, aliases and parameter summaries. |
+| `HelpModule` | Built-in `help` / `?` / `commands`. `/help` lists visible commands under headings ("General", each command group, each `[Category]`) when there's more than one section, and a flat list otherwise. It pages by `HelpPageSize` (`/help 2`). `/help <command>` shows usage, aliases, parameter summaries and examples; `/help <group>` lists a group. |
 
 `CommandContext` exposes:
 
