@@ -95,6 +95,8 @@ internal static class EnvelopeMapper
         return new DataMessage(dto.Timestamp, dto.Message)
         {
             Group = ToGroupId(dto.GroupInfo?.GroupId),
+            GroupName = string.IsNullOrWhiteSpace(dto.GroupInfo?.GroupName) ? null : dto.GroupInfo.GroupName,
+            GroupRevision = dto.GroupInfo?.Revision,
             IsGroupUpdate = string.Equals(dto.GroupInfo?.Type, "UPDATE", StringComparison.OrdinalIgnoreCase),
             ViewOnce = dto.ViewOnce,
             Attachments = [.. (dto.Attachments ?? []).Where(a => a.Id is not null).Select(a => new Attachment(a.Id!, a.ContentType, a.Filename, a.Size))],

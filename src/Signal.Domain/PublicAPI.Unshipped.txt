@@ -48,6 +48,10 @@ Signal.Domain.Events.CallReceived.Call.init -> void
 Signal.Domain.Events.CallReceived.CallReceived(Signal.Domain.Messaging.IncomingEnvelope! Envelope, Signal.Domain.Messaging.CallMessage! Call) -> void
 Signal.Domain.Events.CallReceived.Deconstruct(out Signal.Domain.Messaging.IncomingEnvelope! Envelope, out Signal.Domain.Messaging.CallMessage! Call) -> void
 Signal.Domain.Events.CallReceived.Equals(Signal.Domain.Events.CallReceived? other) -> bool
+Signal.Domain.Events.GroupUpdated.Name.get -> string?
+Signal.Domain.Events.GroupUpdated.Name.init -> void
+Signal.Domain.Events.GroupUpdated.Revision.get -> int?
+Signal.Domain.Events.GroupUpdated.Revision.init -> void
 Signal.Domain.Events.MessageDeleted
 Signal.Domain.Events.MessageDeleted.Deconstruct(out Signal.Domain.Messaging.IncomingEnvelope! Envelope, out Signal.Domain.Messaging.RemoteDelete! Delete) -> void
 Signal.Domain.Events.MessageDeleted.Delete.get -> Signal.Domain.Messaging.RemoteDelete!
@@ -88,6 +92,10 @@ Signal.Domain.Messaging.CallMessage.IsVideo.get -> bool?
 Signal.Domain.Messaging.CallMessage.IsVideo.init -> void
 Signal.Domain.Messaging.CallMessage.Kind.get -> Signal.Domain.Messaging.CallEventKind
 Signal.Domain.Messaging.CallMessage.Kind.init -> void
+Signal.Domain.Messaging.DataMessage.GroupName.get -> string?
+Signal.Domain.Messaging.DataMessage.GroupName.init -> void
+Signal.Domain.Messaging.DataMessage.GroupRevision.get -> int?
+Signal.Domain.Messaging.DataMessage.GroupRevision.init -> void
 Signal.Domain.Messaging.DataMessage.RemoteDelete.get -> Signal.Domain.Messaging.RemoteDelete?
 Signal.Domain.Messaging.DataMessage.RemoteDelete.init -> void
 Signal.Domain.Messaging.DataMessage.Sticker.get -> Signal.Domain.Messaging.Sticker?

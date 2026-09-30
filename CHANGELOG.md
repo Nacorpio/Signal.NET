@@ -8,6 +8,7 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **Group update context (roadmap 0.4.9):** `GroupUpdated` has `Name` and `Revision`, and every group message exposes `DataMessage.GroupName` and `GroupRevision`. Signal doesn't report what changed; compare revisions or fetch the group to find out.
 - **Stories (roadmap 0.4.5):** `EnvelopeContent` has a new case, `StoryMessage` (file or text, optional group, `AllowsReplies`), raising the new `StoryReceived` event. Opt-in via `Receive:IgnoreStories = false`.
 - **Calls (roadmap 0.4.6):** `EnvelopeContent` has a new case, `CallMessage` (`CallEventKind` offer, answer, busy or hangup; `CallId`; `IsVideo` for offers), raising the new `CallReceived` event.
 - **Mention-aware binding (roadmap 0.4.7):** a positional command argument that is an `@mention` binds as the mentioned user's phone number (or UUID if hidden), so `/kick @Bob` works with `Recipient`, `PhoneNumber` and `AccountId` parameters. A placeholder without a matching mention fails with `Could not resolve the @mention for <name>.` Before, it would have been accepted as a username.

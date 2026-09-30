@@ -82,6 +82,8 @@ Item 0.2.8 exists so that can't happen again.
 
 ## Milestone 0.4: Richer incoming model
 
+**Status:** all items are merged into `main` and not yet released (see the [changelog](CHANGELOG.md)).
+
 *Goal: stop dropping envelope content. Each item extends the `EnvelopeContent` union. Because switches over
 it are exhaustive, the compiler points at every place that needs updating.*
 
@@ -95,7 +97,7 @@ it are exhaustive, the compiler points at every place that needs updating.*
 | 0.4.6 | **Call messages** | D/I | S | ✅ `CallMessage` union case (offer, answer, busy, hangup; unsigned 64-bit call id; video flag on offers) and `CallReceived` |
 | 0.4.7 | **Mention-aware binding** | A | S | ✅ Positional arguments that are `@mentions` bind as the mentioned user (phone number, else UUID), for `Recipient`, `PhoneNumber` and `AccountId`. Unresolvable placeholders are a binding error. |
 | 0.4.8 | **Text styles received** | D/I | S | ✅ `DataMessage.TextStyles` (`StyledRange`: bold, italic, spoiler, strikethrough, monospace) |
-| 0.4.9 | **Group change details** | D/I | M | `GroupUpdated` carries what changed (members added or removed, rename) |
+| 0.4.9 | **Group update context** | D/I | S | ✅ `GroupUpdated.Name` and `Revision` (and `DataMessage.GroupName`, `GroupRevision`). signal-cli reports only the group id, current name and revision for updates, not what changed, so a member/rename diff isn't possible without fetching and diffing group state. |
 
 ## Milestone 0.5: Command system 2.0
 

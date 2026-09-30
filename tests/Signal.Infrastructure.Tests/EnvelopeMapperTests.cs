@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Signal.Domain.Events;
 using Signal.Domain.Messaging;
 using Signal.Domain.ValueObjects;
 using Signal.Infrastructure.Http;
@@ -200,6 +201,28 @@ public class EnvelopeMapperTests
     [Fact]
     public void Drops_call_messages_with_only_ice_updates() =>
         Assert.Null(MapOne(""" "callMessage":{"iceUpdateMessages":[{"id":7,"opaque":"AAAA"}]} """));
+
+    [Fact]
+    public void Group_updates_carry_the_name_and_revision()
+    {
+        var envelope = MapOne("""
+            "dataMessage":{"timestamp":1,"message":null,"groupInfo":{"groupId":"abc123==","groupName":"Book club","revision":7,"type":"UPDATE"}}
+            """)!;
+
+        var updated = Assert.IsType<GroupUpdated>(envelope.ToDomainEvent());
+        Assert.Equal("Book club", updated.Name);
+        Assert.Equal(7, updated.Revision);
+        Assert.Equal("Book club", envelope.Data!.GroupName);
+    }
+
+    [Fact]
+    public void Missing_group_name_and_revision_stay_null()
+    {
+        var envelope = MapOne(""" "dataMessage":{"timestamp":1,"message":"hi","groupInfo":{"groupId":"abc123==","groupName":" ","type":"DELIVER"}} """)!;
+
+        Assert.Null(envelope.Data!.GroupName);
+        Assert.Null(envelope.Data.GroupRevision);
+    }
 
     [Fact]
     public void Ignores_malformed_stickers_but_keeps_the_message()

@@ -14,6 +14,12 @@ public sealed record DataMessage(long Timestamp, string? Text)
     /// <summary>The group the message was sent in, or <see langword="null"/> for direct messages.</summary>
     public GroupId? Group { get; init; }
 
+    /// <summary>The group's current name, if the message belongs to a group and the name is known.</summary>
+    public string? GroupName { get; init; }
+
+    /// <summary>The group's revision as of this message, if reported; it increases with every change to the group.</summary>
+    public int? GroupRevision { get; init; }
+
     /// <summary>Attachments of the message.</summary>
     public IReadOnlyList<Attachment> Attachments { get; init; } = [];
 
@@ -229,7 +235,7 @@ public sealed record IncomingEnvelope(PhoneNumber Account, Sender Source, long T
     {
         DataMessage { RemoteDelete: { } delete } => new MessageDeleted(this, delete),
         DataMessage { Reaction: { } reaction } => new ReactionReceived(this, reaction),
-        DataMessage { IsGroupUpdate: true, Group: { } group } => new GroupUpdated(this, group),
+        DataMessage { IsGroupUpdate: true, Group: { } group } data => new GroupUpdated(this, group) { Name = data.GroupName, Revision = data.GroupRevision },
         DataMessage { HasContent: true } data => new MessageReceived(this, data),
         DataMessage => null,
         EditMessage edit => new MessageEdited(this, edit),
