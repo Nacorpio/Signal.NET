@@ -83,6 +83,32 @@ public sealed class PlaylistModule : CommandModule
 - **Conflicts** are rejected at startup: a group can't have the same name or alias as a top-level command.
   Several modules may share a group name; their commands are merged.
 
+## Reaction commands
+
+`ReactionModule` methods with `[OnReaction(...)]` run when someone reacts with one of the emojis, which suits polls
+and approvals:
+
+```csharp
+public sealed class ApprovalModule(IApprovalStore approvals) : ReactionModule
+{
+    [OnReaction("👍")]
+    public async Task ApproveAsync(Reaction reaction)
+    {
+        await approvals.ApproveAsync(reaction.TargetTimestamp, Context.Sender.Identifier);
+        await ReplyAsync($"Approved by {Context.Sender}.");
+    }
+}
+```
+
+- **Which messages:** by default only reactions to **the bot's own messages** count; `AnyMessage = true` accepts
+  reactions to any message. Removals are ignored unless `IncludeRemovals = true` (`Reaction.IsRemove`).
+- **Emoji matching** ignores skin tones and variation selectors, so `👍` matches every skin tone and `❤` matches `❤️`.
+- **Signatures:** methods may take `ReactionContext`, `Reaction` and `CancellationToken`, and return `Task`,
+  `ValueTask` or `void`. A new module instance is created per reaction from the message's scope, so constructor
+  injection works. Invalid signatures fail **at registration**.
+- **Registration:** `AddCommands(assembly)` finds reaction modules too, or use `AddReactionModule<T>()`.
+- **Order:** handlers run after domain events and commands. A failing handler is logged and doesn't stop the others.
+
 ## Per-conversation settings
 
 A group (or direct chat) can have its own prefixes and disabled commands, stored in `IConversationSettingsStore`:

@@ -237,7 +237,7 @@ internal static class CommandDescriptorFactory
     /// Compiles <c>(object target, object?[] args) =&gt; (Task)((TModule)target).Method((T0)args[0], …)</c>,
     /// normalising <see langword="void"/> and <see cref="ValueTask"/> return types to <see cref="Task"/>.
     /// </summary>
-    private static Func<object, object?[], Task> CompileInvoker(MethodInfo method)
+    internal static Func<object, object?[], Task> CompileInvoker(MethodInfo method)
     {
         var target = Expression.Parameter(typeof(object), "target");
         var args = Expression.Parameter(typeof(object?[]), "args");

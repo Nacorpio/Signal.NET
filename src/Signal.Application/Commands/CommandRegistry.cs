@@ -15,6 +15,7 @@ public sealed class CommandCatalog
     private readonly List<Type> _commandTypes = [];
     private readonly List<Type> _moduleTypes = [];
     private readonly List<CommandDescriptor> _descriptors = [];
+    private readonly List<Type> _reactionModuleTypes = [];
 
     /// <summary>Registered <see cref="ICommand"/> implementations (must also be registered in DI).</summary>
     public IReadOnlyList<Type> CommandTypes => _commandTypes;
@@ -24,6 +25,9 @@ public sealed class CommandCatalog
 
     /// <summary>Directly registered descriptors (e.g. delegate commands).</summary>
     public IReadOnlyList<CommandDescriptor> Descriptors => _descriptors;
+
+    /// <summary>Registered <see cref="Reactions.ReactionModule"/> types.</summary>
+    public IReadOnlyList<Type> ReactionModuleTypes => _reactionModuleTypes;
 
     /// <summary>Adds a class-based command type. Duplicates are ignored.</summary>
     /// <param name="commandType">A non-abstract <see cref="ICommand"/> implementation.</param>
@@ -54,6 +58,25 @@ public sealed class CommandCatalog
         if (!_moduleTypes.Contains(moduleType))
         {
             _moduleTypes.Add(moduleType);
+        }
+    }
+
+    /// <summary>Adds a reaction module type (its <see cref="Reactions.OnReactionAttribute"/> methods). Duplicates are ignored.</summary>
+    /// <param name="moduleType">A non-abstract <see cref="Reactions.ReactionModule"/>.</param>
+    /// <exception cref="ArgumentException">The type is not a non-abstract <see cref="Reactions.ReactionModule"/>.</exception>
+    /// <exception cref="InvalidOperationException">A handler has an unsupported parameter or return type (checked now, not on the first reaction).</exception>
+    public void AddReactionModule(Type moduleType)
+    {
+        if (!typeof(Reactions.ReactionModule).IsAssignableFrom(moduleType) || moduleType.IsAbstract)
+        {
+            throw new ArgumentException($"{moduleType} must be a non-abstract {nameof(Reactions.ReactionModule)}.", nameof(moduleType));
+        }
+
+        Reactions.ReactionMiddleware.Validate(moduleType);
+
+        if (!_reactionModuleTypes.Contains(moduleType))
+        {
+            _reactionModuleTypes.Add(moduleType);
         }
     }
 

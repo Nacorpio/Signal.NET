@@ -12,6 +12,7 @@ using Signal.Application.Localization;
 using Signal.Application.Conversations;
 using Signal.Application.Events;
 using Signal.Application.Pipeline;
+using Signal.Application.Reactions;
 using Signal.Application.Roles;
 using Signal.Application.Scheduling;
 
@@ -36,7 +37,7 @@ public static class ApplicationServiceCollectionExtensions
         services.TryAddSingleton(TimeProvider.System);
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<SignalOptions>, SignalOptionsValidator>());
 
-        // Pipeline: guards → (user middleware) → events → commands.
+        // Pipeline: guards → (user middleware) → events → commands → reaction handlers.
         var middlewares = services.GetOrAddSingletonInstance<MiddlewareRegistry>();
         middlewares.AddLeading(typeof(ExceptionHandlingMiddleware));
         middlewares.AddLeading(typeof(LoggingMiddleware));
@@ -44,6 +45,7 @@ public static class ApplicationServiceCollectionExtensions
         middlewares.AddLeading(typeof(RateLimitingMiddleware));
         middlewares.AddTrailing(typeof(DomainEventMiddleware));
         middlewares.AddTrailing(typeof(CommandMiddleware));
+        middlewares.AddTrailing(typeof(ReactionMiddleware));
         foreach (var type in middlewares.Middlewares)
         {
             services.TryAddScoped(type);

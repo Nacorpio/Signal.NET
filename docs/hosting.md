@@ -33,6 +33,8 @@ Calling `AddSignal` more than once is safe, because the framework services use `
 |---|---|
 | `AddCommands(assembly)` | Registers every `ICommand` (as scoped) and `CommandModule` in the assembly |
 | `AddCommand<T>()` / `AddCommandModule<T>()` | Registers a single command or module |
+| `AddReactionModule<T>()` | Registers a reaction module (`[OnReaction]` handlers); `AddCommands(assembly)` also finds them |
+| `AddRoleProvider<T>()` | Adds an `IRoleProvider` next to the built-in ones |
 | `MapCommand(name, handler, description, aliases)` | Registers a lambda command |
 | `AddMiddleware<T>()` | Adds a pipeline step after the built-in guards |
 | `AddEventHandler<TEvent, THandler>()` / `AddEventHandlers(assembly)` | Registers event handlers (scoped). A class may handle several events. |
