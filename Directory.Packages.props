@@ -1,8 +1,8 @@
 <Project>
   <PropertyGroup>
-    <MicrosoftExtensionsVersion>10.0.12</MicrosoftExtensionsVersion>
+    <MicrosoftExtensionsVersion>10.0.14</MicrosoftExtensionsVersion>
     <!-- Released on its own (monthly minor) schedule, so it cannot share MicrosoftExtensionsVersion. -->
-    <MicrosoftExtensionsResilienceVersion>10.10.0</MicrosoftExtensionsResilienceVersion>
+    <MicrosoftExtensionsResilienceVersion>10.11.0</MicrosoftExtensionsResilienceVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="$(MicrosoftExtensionsVersion)" />
